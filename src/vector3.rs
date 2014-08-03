@@ -25,6 +25,10 @@ pub fn dot(a: Vector3, b: Vector3) -> f32 {
 }
 
 impl Vector3 {
+    pub fn new(x: f32, y: f32, z: f32) -> Vector3 {
+        Vector3 { x: x, y: y, z: z }
+    }
+
     pub fn magnitude_squared(self) -> f32 {
         dot(self, self)
     }
