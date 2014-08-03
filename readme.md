@@ -1,10 +1,11 @@
-Situs Luculentus
+Robigo Luculenta
 ================
 
 From the Latin ‘luculentus’, meaning ‘bright’, ‘shining’, ‘impressive’,
-‘gorgeous’ and ‘situs’, meaning ‘rust’ (the fungus). This is a port of the
-proof of concept spectral path tracer [Luculentus][luculentus], to the Rust
-programming language, released under the [GNU General Public License][gplv3].
+‘gorgeous’ and ‘robigo’, meaning ‘rust’ (on metals, as well as the fungus).
+This is a port of the proof of concept spectral path tracer
+[Luculentus][luculentus], to the Rust programming language, released under
+the [GNU General Public License][gplv3].
 
 Luculentus traces rays at different wavelengths, giving it the ability
 to simulate effects like dispersion and chromatic aberration. It was
