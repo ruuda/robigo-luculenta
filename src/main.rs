@@ -13,12 +13,12 @@ fn main() {
     let neg = -a;
     let mul_right = a * 2.0;
     let cross = cross(a, d);
-    println!("The vector has magnitude {}.", a.magnitude());
-    println!("The normalised y-component is {}.", b.y);
+    println!("The vector a has magnitude {}.", a.magnitude());
+    println!("The vector a normalised is {}.", b);
     println!("Their dot product is {}.", dot);
-    println!("The y-component of the sum is {}.", sum.y);
-    println!("The y-component of the difference is {}.", diff.y);
-    println!("The y-component of the negation is {}.", neg.y);
-    println!("The y-component of a * 2 is {}.", mul_right.y);
-    println!("The z-component of the cross product of a and d is {}.", cross.z);
+    println!("The sum a + c is {}.", sum);
+    println!("The difference a - c is {}.", diff);
+    println!("The negation of a is {}.", neg);
+    println!("The scalar product a * 2 is {}.", mul_right);
+    println!("The cross product of a and d is {}.", cross);
 }
