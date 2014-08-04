@@ -80,3 +80,13 @@ impl Neg<Vector3> for Vector3 {
         }
     }
 }
+
+impl Mul<f32, Vector3> for Vector3 {
+    fn mul(&self, f: &f32) -> Vector3 {
+        Vector3 {
+            x: self.x * *f,
+            y: self.y * *f,
+            z: self.z * *f
+        }
+    }
+}
