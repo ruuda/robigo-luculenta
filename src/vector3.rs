@@ -58,6 +58,22 @@ impl Vector3 {
             }
         }
     }
+
+    pub fn rotate_towards(self, normal: Vector3) -> Vector3 {
+        let dot = normal.z;
+
+        // No rotation necessary.
+        if dot > 0.9999 { return self; }
+
+        // Mirror along the z-axis.
+        if dot < -0.9999 { return Vector3::new(self.x, self.y, -self.z) }
+
+        let up = Vector3::new(0.0, 0.0, 1.0);
+        let a1 = cross(up, normal).normalised();
+        let a2 = cross(a1, normal).normalised();
+
+        a1 * self.x + a2 * self.y + normal * self.z
+    }
 }
 
 impl Add<Vector3, Vector3> for Vector3 {
