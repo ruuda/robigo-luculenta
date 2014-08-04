@@ -70,3 +70,13 @@ impl Sub<Vector3, Vector3> for Vector3 {
         }
     }
 }
+
+impl Neg<Vector3> for Vector3 {
+    fn neg(&self) -> Vector3 {
+        Vector3 {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z
+        }
+    }
+}

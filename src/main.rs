@@ -9,9 +9,11 @@ fn main() {
     let d = dot(a, b);
     let sum = a + c;
     let diff = a - c;
+    let neg = -a;
     println!("The vector has magnitude {}.", a.magnitude());
     println!("The normalised y-component is {}.", b.y);
     println!("Their dot product is {}.", d);
     println!("The y-component of the sum is {}.", sum.y);
     println!("The y-component of the difference is {}.", diff.y);
+    println!("The y-component of the negation is {}.", neg.y);
 }
