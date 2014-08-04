@@ -74,6 +74,10 @@ impl Vector3 {
 
         a1 * self.x + a2 * self.y + normal * self.z
     }
+
+    pub fn reflect(self, normal: Vector3) -> Vector3 {
+        self - normal * 2.0 * dot(normal, self)
+    }
 }
 
 impl Add<Vector3, Vector3> for Vector3 {

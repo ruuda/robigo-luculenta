@@ -14,6 +14,7 @@ fn main() {
     let mul_right = a * 2.0;
     let cross = cross(a, d);
     let rotated = a.rotate_towards(d);
+    let reflection = c.reflect(d);
     println!("The vector a has magnitude {}.", a.magnitude());
     println!("The vector a normalised is {}.", b);
     println!("Their dot product is {}.", dot);
@@ -23,4 +24,5 @@ fn main() {
     println!("The scalar product a * 2 is {}.", mul_right);
     println!("The cross product of a and d is {}.", cross);
     println!("The vector a rotated towards d is {}.", rotated);
+    println!("The vector c reflected in d is {}.", reflection);
 }
