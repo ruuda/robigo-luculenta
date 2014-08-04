@@ -50,3 +50,13 @@ impl Vector3 {
         }
     }
 }
+
+impl Add<Vector3, Vector3> for Vector3 {
+    fn add(&self, other: &Vector3) -> Vector3 {
+        Vector3 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z
+        }
+    }
+}
