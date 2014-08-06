@@ -86,3 +86,14 @@ impl Neg<Quaternion> for Quaternion {
         }
     }
 }
+
+impl Mul<f32, Quaternion> for Quaternion {
+    fn mul(&self, f: &f32) -> Quaternion {
+        Quaternion {
+            x: self.x * *f,
+            y: self.y * *f,
+            z: self.z * *f,
+            w: self.w * *f
+        }
+    }
+}

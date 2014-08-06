@@ -15,4 +15,5 @@ fn main() {
     println!("The sum a + c is {}.", sum);
     println!("The difference a - c is {}.", diff);
     println!("The negation of a is {}.", -a);
+    println!("The quaternion c * 2 is {}.", c * 2.0);
 }
