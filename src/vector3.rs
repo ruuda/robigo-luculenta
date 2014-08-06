@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use quaternion::Quaternion;
+
 #[deriving(Show)]
 pub struct Vector3 {
     pub x: f32,
@@ -73,6 +75,12 @@ impl Vector3 {
         let a2 = cross(a1, normal).normalise();
 
         a1 * self.x + a2 * self.y + normal * self.z
+    }
+
+    pub fn rotate(self, q: Quaternion) -> Vector3 {
+        let p = Quaternion::new(self.x, self.y, self.z, 0.0);
+        let r = q * p * q.conjugate();
+        Vector3::new(r.x, r.y, r.z)
     }
 
     pub fn reflect(self, normal: Vector3) -> Vector3 {
