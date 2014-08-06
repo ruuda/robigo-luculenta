@@ -64,3 +64,14 @@ impl Add<Quaternion, Quaternion> for Quaternion {
         }
     }
 }
+
+impl Sub<Quaternion, Quaternion> for Quaternion {
+    fn sub(&self, other: &Quaternion) -> Quaternion {
+        Quaternion {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+            w: self.w - other.w
+        }
+    }
+}
