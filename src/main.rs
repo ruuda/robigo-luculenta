@@ -12,6 +12,7 @@ fn main() {
     let diff = a - c;
     let d = Quaternion::new(0.0, 0.0, 0.0, 1.0);
     let v = Vector3::new(1.0, 0.0, 0.0);
+    let rotation = Quaternion::rotation(0.0, 0.0, 1.0, Float::frac_pi_2());
     println!("The quaternion a is {}.", a);
     println!("The quaternion a has magnitude {}.", a.magnitude());
     println!("The magnitude of b is {}.", b.magnitude());
@@ -22,5 +23,5 @@ fn main() {
     println!("The quaternion c * 2 is {}.", c * 2.0f32);
     println!("The product ac is {}.", a * c);
     println!("The product ad is {}.", a * d);
-    println!("The vector v rotated by d is {}.", v.rotate(d));
+    println!("The vector v rotated by 90° around the z-axis is {}.", v.rotate(rotation));
 }

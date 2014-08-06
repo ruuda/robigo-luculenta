@@ -27,6 +27,15 @@ impl Quaternion {
         Quaternion { x: x, y: y, z: z, w: w }
     }
 
+    pub fn rotation(x: f32, y: f32, z: f32, angle: f32) -> Quaternion {
+        Quaternion {
+            x: (angle * 0.5).sin() * x,
+            y: (angle * 0.5).sin() * y,
+            z: (angle * 0.5).sin() * z,
+            w: (angle * 0.5).cos()
+        }
+    }
+
     pub fn magnitude_squared(self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
     }
