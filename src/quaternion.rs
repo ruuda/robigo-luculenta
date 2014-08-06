@@ -21,3 +21,9 @@ pub struct Quaternion {
     pub z: f32,
     pub w: f32
 }
+
+impl Quaternion {
+    pub fn new(x: f32, y: f32, z: f32, w:f32) -> Quaternion {
+        Quaternion { x: x, y: y, z: z, w: w }
+    }
+}
