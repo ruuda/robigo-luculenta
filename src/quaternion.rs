@@ -26,4 +26,12 @@ impl Quaternion {
     pub fn new(x: f32, y: f32, z: f32, w:f32) -> Quaternion {
         Quaternion { x: x, y: y, z: z, w: w }
     }
+
+    pub fn magnitude_squared(self) -> f32 {
+        self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
+    }
+
+    pub fn magnitude(self) -> f32 {
+        self.magnitude_squared().sqrt()
+    }
 }
