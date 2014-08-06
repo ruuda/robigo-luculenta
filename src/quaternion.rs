@@ -34,4 +34,18 @@ impl Quaternion {
     pub fn magnitude(self) -> f32 {
         self.magnitude_squared().sqrt()
     }
+
+    pub fn normalise(self) -> Quaternion {
+        let magnitude = self.magnitude();
+        if magnitude == 0.0 {
+            self
+        } else {
+            Quaternion {
+                x: self.x / magnitude,
+                y: self.y / magnitude,
+                z: self.z / magnitude,
+                w: self.w / magnitude
+            }
+        }
+    }
 }
