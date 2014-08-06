@@ -48,4 +48,8 @@ impl Quaternion {
             }
         }
     }
+
+    pub fn conjugate(self) -> Quaternion {
+        Quaternion::new(-self.x, -self.y, -self.z, self.w)
+    }
 }
