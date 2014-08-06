@@ -53,3 +53,14 @@ impl Quaternion {
         Quaternion::new(-self.x, -self.y, -self.z, self.w)
     }
 }
+
+impl Add<Quaternion, Quaternion> for Quaternion {
+    fn add(&self, other: &Quaternion) -> Quaternion {
+        Quaternion {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+            w: self.w + other.w
+        }
+    }
+}
