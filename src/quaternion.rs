@@ -27,6 +27,8 @@ impl Quaternion {
         Quaternion { x: x, y: y, z: z, w: w }
     }
 
+    /// Returns a quaternion that represents a rotation of `angle` radians
+    /// around the axis specified by `x`, `y` and `z`.
     pub fn rotation(x: f32, y: f32, z: f32, angle: f32) -> Quaternion {
         Quaternion {
             x: (angle * 0.5).sin() * x,
