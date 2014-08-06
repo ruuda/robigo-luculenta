@@ -46,7 +46,7 @@ impl Vector3 {
         self.magnitude_squared().sqrt()
     }
 
-    pub fn normalised(self) -> Vector3 {
+    pub fn normalise(self) -> Vector3 {
         let magnitude = self.magnitude();
         if magnitude == 0.0 {
             self
@@ -69,8 +69,8 @@ impl Vector3 {
         if dot < -0.9999 { return Vector3::new(self.x, self.y, -self.z) }
 
         let up = Vector3::new(0.0, 0.0, 1.0);
-        let a1 = cross(up, normal).normalised();
-        let a2 = cross(a1, normal).normalised();
+        let a1 = cross(up, normal).normalise();
+        let a2 = cross(a1, normal).normalise();
 
         a1 * self.x + a2 * self.y + normal * self.z
     }
