@@ -14,4 +14,5 @@ fn main() {
     println!("The conjugate of c is {}.", c.conjugate());
     println!("The sum a + c is {}.", sum);
     println!("The difference a - c is {}.", diff);
+    println!("The negation of a is {}.", -a);
 }
