@@ -22,7 +22,6 @@ fn main() {
         wavelength: 550.0,
         probability: 1.0
     };
-    let bi_unit = monte_carlo::get_bi_unit();
     println!("The quaternion a is {}.", a);
     println!("The quaternion a has magnitude {}.", a.magnitude());
     println!("The magnitude of b is {}.", b.magnitude());
@@ -35,5 +34,8 @@ fn main() {
     println!("The product ad is {}.", a * d);
     println!("The vector v rotated by 90° around the z-axis is {}.", v.rotate(rotation));
     println!("The ray is {}.", ray);
-    println!("A random number in [-1, 1] is {}.", bi_unit);
+    println!("A random number in [-1, 1] is {}.", monte_carlo::get_bi_unit());
+    println!("A random number in [0, 1] is {}.", monte_carlo::get_unit());
+    println!("A random sphere coordinate is ({}, {}).", monte_carlo::get_longitude(), monte_carlo::get_latitude());
+    println!("A random visible wavelength is {}.", monte_carlo::get_wavelength());
 }

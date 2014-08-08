@@ -19,7 +19,28 @@ use std::rand::Closed01;
 
 // Note that it is safe to just use rand::random: it uses a task-local rng.
 
-pub fn get_bi_unit() -> f32 {
+/// Returns a random number in the range [0, 1].
+pub fn get_unit() -> f32 {
     let Closed01(x) = rand::random::<Closed01<f32>>();
-    x * 2.0 - 1.0
+    x
+}
+
+/// Returns a random number in the range [-1, 1].
+pub fn get_bi_unit() -> f32 {
+    get_unit() * 2.0 - 1.0
+}
+
+/// Returns a random number in the range [0, 2pi).
+pub fn  get_longitude() -> f32 {
+    rand::random::<f32>() * Float::two_pi()
+}
+
+/// Returns a random number in the range [-pi/2, pi/2].
+pub fn get_latitude() -> f32 {
+    get_bi_unit() * Float::frac_pi_2()
+}
+
+/// Returns a random number in the range [-380, 780].
+pub fn get_wavelength() -> f32 {
+    get_unit() * 400.0 + 380.0
 }
