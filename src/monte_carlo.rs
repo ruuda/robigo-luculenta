@@ -16,6 +16,7 @@
 
 use std::rand;
 use std::rand::Closed01;
+use vector3::Vector3;
 
 // Note that it is safe to just use rand::random: it uses a task-local rng.
 
@@ -43,4 +44,19 @@ pub fn get_latitude() -> f32 {
 /// Returns a random number in the range [-380, 780].
 pub fn get_wavelength() -> f32 {
     get_unit() * 400.0 + 380.0
+}
+
+/// Returns a random unit vector, pointing up along the z-axis, in the
+/// hemisphere bounded by the xy-plane, with a cosine-weighted probability.
+pub fn get_hemisphere_vector() -> Vector3 {
+    let phi = get_longitude();
+    let rq = get_unit();
+    let r = rq.sqrt();
+
+    // Calculate the direction based on polar coordinates.
+    Vector3 {
+        x: phi.cos() * r,
+        y: phi.sin() * r,
+        z: (1.0 - rq).sqrt()
+    }
 }

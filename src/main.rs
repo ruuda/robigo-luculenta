@@ -38,4 +38,5 @@ fn main() {
     println!("A random number in [0, 1] is {}.", monte_carlo::get_unit());
     println!("A random sphere coordinate is ({}, {}).", monte_carlo::get_longitude(), monte_carlo::get_latitude());
     println!("A random visible wavelength is {}.", monte_carlo::get_wavelength());
+    println!("A random hemisphere vector is {}.", monte_carlo::get_hemisphere_vector());
 }
