@@ -41,7 +41,7 @@ pub fn get_latitude() -> f32 {
     get_bi_unit() * Float::frac_pi_2()
 }
 
-/// Returns a random number in the range [-380, 780].
+/// Returns a random number in the range [380, 780].
 pub fn get_wavelength() -> f32 {
     get_unit() * 400.0 + 380.0
 }
