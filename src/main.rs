@@ -1,8 +1,9 @@
 use camera::Camera;
 use intersection::Intersection;
 use material::{Material, GlossyMirrorMaterial, DiffuseColouredMaterial, DiffuseGreyMaterial};
-use ray::Ray;
 use quaternion::Quaternion;
+use ray::Ray;
+use surface::{Surface, Plane};
 use vector3::Vector3;
 
 mod camera;
@@ -10,8 +11,9 @@ mod constants;
 mod intersection;
 mod material;
 mod monte_carlo;
-mod ray;
 mod quaternion;
+mod ray;
+mod surface;
 mod vector3;
 
 fn main() {
@@ -40,6 +42,7 @@ fn main() {
     let red = DiffuseColouredMaterial::new(0.9, 700.0, 60.0);
     let mirror = GlossyMirrorMaterial::new(0.1);
     let new_ray = diffuse_grey.get_new_ray(&ray, &intersection);
+    let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
     println!("The ray is {}.", ray);
     println!("A random number in [-1, 1] is {}.", monte_carlo::get_bi_unit());
     println!("A random number in [0, 1] is {}.", monte_carlo::get_unit());
@@ -51,4 +54,5 @@ fn main() {
     println!("The reflected ray is {}.", new_ray);
     println!("The ray reflected on red: {}.", red.get_new_ray(&ray, &intersection));
     println!("The mirrored ray is {}.", mirror.get_new_ray(&ray, &intersection));
+    println!("Intersecting ray with plane yields {}.", plane.intersect(&ray));
 }
