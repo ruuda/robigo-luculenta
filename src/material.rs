@@ -48,7 +48,6 @@ fn get_diffuse_ray(incoming_ray: &Ray, intersection: &Intersection) -> Ray {
     }
 }
 
-
 /// A perfectly diffuse material that reflects all wavelengths perfectly,
 /// but absorbes some energy.
 pub struct DiffuseGreyMaterial {
