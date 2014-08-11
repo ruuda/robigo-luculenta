@@ -18,6 +18,7 @@ use intersection::Intersection;
 use ray::Ray;
 use vector3::{Vector3, dot};
 
+/// Models the behaviour of a ray when it bounces off a surface.
 pub trait Material {
     /// Returns the ray that continues the light path, backwards from the
     /// camera to the light source.
