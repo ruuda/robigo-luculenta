@@ -1,6 +1,6 @@
 use camera::Camera;
 use intersection::Intersection;
-use material::{Material, DiffuseGreyMaterial};
+use material::{Material, DiffuseColouredMaterial, DiffuseGreyMaterial};
 use ray::Ray;
 use quaternion::Quaternion;
 use vector3::Vector3;
@@ -37,6 +37,7 @@ fn main() {
         distance: 1.0
     };
     let diffuse_grey = DiffuseGreyMaterial::new(0.8);
+    let red = DiffuseColouredMaterial::new(0.9, 700.0, 60.0);
     let new_ray = diffuse_grey.get_new_ray(&ray, &intersection);
     println!("The ray is {}.", ray);
     println!("A random number in [-1, 1] is {}.", monte_carlo::get_bi_unit());
@@ -46,5 +47,6 @@ fn main() {
     println!("A random hemisphere vector is {}.", monte_carlo::get_hemisphere_vector());
     println!("The speed of light is {} m/s.", constants::SPEED_OF_LIGHT);
     println!("A camera ray through (0,0) is {}.", camera.get_ray(0.0, 0.0, 550.0));
-    println!("The reflected ray is {}.", new_ray)
+    println!("The reflected ray is {}.", new_ray);
+    println!("The ray reflected on red: {}.", red.get_new_ray(&ray, &intersection));
 }
