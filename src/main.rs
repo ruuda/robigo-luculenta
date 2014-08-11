@@ -1,10 +1,14 @@
 use camera::Camera;
+use intersection::Intersection;
+use material::{Material, DiffuseGreyMaterial};
 use ray::Ray;
 use quaternion::Quaternion;
 use vector3::Vector3;
 
 mod camera;
 mod constants;
+mod intersection;
+mod material;
 mod monte_carlo;
 mod ray;
 mod quaternion;
@@ -33,6 +37,14 @@ fn main() {
         chromatic_abberation: 1.0,
         orientation: Quaternion::rotation(0.0, 0.0, 1.0, 0.0)
     };
+    let intersection = Intersection {
+        position: Vector3::new(0.0, 1.0, 2.0),
+        normal: Vector3::new(1.0, 0.0, 0.0),
+        tangent: Vector3::new(0.0, 1.0, 0.0),
+        distance: 1.0
+    };
+    let diffuse_grey = DiffuseGreyMaterial::new(0.8);
+    let new_ray = diffuse_grey.get_new_ray(&ray, &intersection);
     println!("The quaternion a is {}.", a);
     println!("The quaternion a has magnitude {}.", a.magnitude());
     println!("The magnitude of b is {}.", b.magnitude());
@@ -52,4 +64,5 @@ fn main() {
     println!("A random hemisphere vector is {}.", monte_carlo::get_hemisphere_vector());
     println!("The speed of light is {} m/s.", constants::SPEED_OF_LIGHT);
     println!("A camera ray through (0,0) is {}.", camera.get_ray(0.0, 0.0, 550.0));
+    println!("The reflected ray is {}.", new_ray)
 }
