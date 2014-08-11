@@ -2,6 +2,7 @@ use ray::Ray;
 use quaternion::Quaternion;
 use vector3::Vector3;
 
+mod constants;
 mod monte_carlo;
 mod ray;
 mod quaternion;
@@ -39,4 +40,5 @@ fn main() {
     println!("A random sphere coordinate is ({}, {}).", monte_carlo::get_longitude(), monte_carlo::get_latitude());
     println!("A random visible wavelength is {}.", monte_carlo::get_wavelength());
     println!("A random hemisphere vector is {}.", monte_carlo::get_hemisphere_vector());
+    println!("The speed of light is {} m/s.", constants::SPEED_OF_LIGHT);
 }
