@@ -110,3 +110,31 @@ impl Material for DiffuseColouredMaterial {
         ray
     }
 }
+
+/// Blends between perfect reflection and diffuse.
+pub struct GlossyMirrorMaterial {
+    /// The amount of 'gloss', where 1.0 equals diffuse,
+    /// and 0.0 is a perfect mirror.
+    glossiness: f32
+}
+
+impl GlossyMirrorMaterial {
+    pub fn new(gloss: f32) -> GlossyMirrorMaterial {
+        GlossyMirrorMaterial {
+            glossiness: gloss
+        }
+    }
+}
+
+impl Material for GlossyMirrorMaterial {
+    fn get_new_ray(&self, incoming_ray: &Ray, intersection: &Intersection) -> Ray {
+        // The diffuse component is as usual.
+        let mut ray = get_diffuse_ray(incoming_ray, intersection);
+
+        // Then blend between diffuse and reflection, and re-normalise.
+        let reflection = incoming_ray.direction.reflect(intersection.normal);
+        ray.direction = (ray.direction * self.glossiness
+                         + reflection * (1.0 - self.glossiness)).normalise();
+        ray
+    }
+}
