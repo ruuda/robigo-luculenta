@@ -1,7 +1,9 @@
+use camera::Camera;
 use ray::Ray;
 use quaternion::Quaternion;
 use vector3::Vector3;
 
+mod camera;
 mod constants;
 mod monte_carlo;
 mod ray;
@@ -22,6 +24,13 @@ fn main() {
         direction: Vector3::new(1.0, 2.0, 3.0).normalise(),
         wavelength: 550.0,
         probability: 1.0
+    };
+    let camera = Camera {
+        position: Vector3::new(0.0, 0.0, 0.0),
+        field_of_view: Float::frac_pi_2(),
+        focal_distance: 10.0,
+        chromatic_abberation: 1.0,
+        orientation: Quaternion::rotation(0.0, 0.0, 1.0, 0.0)
     };
     println!("The quaternion a is {}.", a);
     println!("The quaternion a has magnitude {}.", a.magnitude());
