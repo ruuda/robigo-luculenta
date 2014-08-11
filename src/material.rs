@@ -24,6 +24,30 @@ pub trait Material {
     fn get_new_ray(&self, incoming_ray: &Ray, intersection: &Intersection) -> Ray;
 }
 
+/// Returns a ray as if reflected by a perfectly diffuse white material.
+fn get_diffuse_ray(incoming_ray: &Ray, intersection: &Intersection) -> Ray {
+    // Generate a ray in a random direction,
+    // originating from the intersection.
+    let hemi_vec = ::monte_carlo::get_hemisphere_vector();
+
+    // However, the new ray is now facing in the wrong direction,
+    // it must be rotated towards the surface normal.
+    let normal = if dot(incoming_ray.direction, intersection.normal) < 0.0 {
+        intersection.normal
+    } else {
+        -intersection.normal
+    };
+    let direction = hemi_vec.rotate_towards(normal);
+
+    Ray {
+        origin: intersection.position,
+        direction: direction,
+        wavelength: incoming_ray.wavelength,
+        probability: 1.0
+    }
+}
+
+
 /// A perfectly diffuse material that reflects all wavelengths perfectly,
 /// but absorbes some energy.
 pub struct DiffuseGreyMaterial {
@@ -41,25 +65,11 @@ impl DiffuseGreyMaterial {
 
 impl Material for DiffuseGreyMaterial {
     fn get_new_ray(&self, incoming_ray: &Ray, intersection: &Intersection) -> Ray {
-        // Generate a ray in a random direction,
-        // originating from the intersection.
-        let hemi_vec = ::monte_carlo::get_hemisphere_vector();
+        let mut ray = get_diffuse_ray(incoming_ray, intersection);
 
-        // However, the new ray is now facing in the wrong direction,
-        // it must be rotated towards the surface normal.
-        let normal = if dot(incoming_ray.direction, intersection.normal) < 0.0 {
-            intersection.normal
-        } else {
-            -intersection.normal
-        };
-        let direction = hemi_vec.rotate_towards(normal);
+        // The probability that the ray was reflected is the reflectance.
+        ray.probability = self.reflectance;
 
-        // The probability of the new ray is determined by the reflectance.
-        Ray {
-            origin: intersection.position,
-            direction: direction,
-            wavelength: incoming_ray.wavelength,
-            probability: self.reflectance
-        }
+        ray
     }
 }
