@@ -29,6 +29,7 @@ fn main() {
         position: Vector3::new(0.0, 0.0, 0.0),
         field_of_view: Float::frac_pi_2(),
         focal_distance: 10.0,
+        depth_of_field: 10.0,
         chromatic_abberation: 1.0,
         orientation: Quaternion::rotation(0.0, 0.0, 1.0, 0.0)
     };
@@ -50,4 +51,5 @@ fn main() {
     println!("A random visible wavelength is {}.", monte_carlo::get_wavelength());
     println!("A random hemisphere vector is {}.", monte_carlo::get_hemisphere_vector());
     println!("The speed of light is {} m/s.", constants::SPEED_OF_LIGHT);
+    println!("A camera ray through (0,0) is {}.", camera.get_ray(0.0, 0.0, 550.0));
 }
