@@ -17,6 +17,7 @@
 use intersection::Intersection;
 use ray::Ray;
 use vector3::{Vector3, dot};
+use volume::Volume;
 
 /// Represents a surface that can be intersected with a ray.
 pub trait Surface {
@@ -66,5 +67,56 @@ impl Surface for Plane {
             };
             Some(intersection)
         }
+    }
+}
+
+/// An infinitely large one-sided plane that cuts space in half.
+pub struct SpacePartitioning {
+    /// A unit vector perpendicular to the plane.
+    normal: Vector3,
+
+    /// A point in the plane.
+    offset: Vector3
+}
+
+impl SpacePartitioning {
+    /// Creates a new space partitioning with the specified `normal` through
+    /// `offset`. The side that the normal points to is outside.
+    pub fn new(normal: Vector3, offset: Vector3) -> SpacePartitioning {
+        SpacePartitioning {
+            normal: normal,
+            offset: offset
+        }
+    }
+}
+
+impl Surface for SpacePartitioning {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        // Transform the ray into the space where the plane is a linear
+        // subspace (a plane through the origin).
+        let origin = ray.origin - self.offset;
+
+        let d = dot(self.normal, ray.direction);
+        let t = dot(self.normal, origin) / d;
+
+        // A ray has one direction, do not hit backwards.
+        if t <= 0.0 {
+            None
+        } else {
+            let intersection = Intersection {
+                position: ray.origin + ray.direction * t,
+                normal: self.normal,
+                // Tangent is not used here.
+                tangent: Vector3::new(0.0, 0.0, 0.0),
+                distance: t
+            };
+            Some(intersection)
+        }
+    }
+}
+
+impl Volume for SpacePartitioning {
+    fn lies_inside(&self, p: Vector3) -> bool {
+        dot(p - self.offset, self.normal) < 0.0
     }
 }

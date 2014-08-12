@@ -3,8 +3,9 @@ use intersection::Intersection;
 use material::{Material, GlossyMirrorMaterial, DiffuseColouredMaterial, DiffuseGreyMaterial};
 use quaternion::Quaternion;
 use ray::Ray;
-use surface::{Surface, Plane};
+use surface::{Surface, Plane, SpacePartitioning};
 use vector3::Vector3;
+use volume::Volume;
 
 mod camera;
 mod constants;
@@ -15,9 +16,9 @@ mod quaternion;
 mod ray;
 mod surface;
 mod vector3;
+mod volume;
 
 fn main() {
-    let rotation = Quaternion::rotation(0.0, 0.0, 1.0, Float::frac_pi_2());
     let ray = Ray {
         origin: Vector3::new(5.0, 7.0, 11.0),
         direction: Vector3::new(1.0, 2.0, 3.0).normalise(),
@@ -43,6 +44,7 @@ fn main() {
     let mirror = GlossyMirrorMaterial::new(0.1);
     let new_ray = diffuse_grey.get_new_ray(&ray, &intersection);
     let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
+    let sp = SpacePartitioning::new(Vector3::new(0.0, 0.0, 1.0), Vector3::new(0.0, 0.0, 1.0));
     println!("The ray is {}.", ray);
     println!("A random number in [-1, 1] is {}.", monte_carlo::get_bi_unit());
     println!("A random number in [0, 1] is {}.", monte_carlo::get_unit());
@@ -55,4 +57,6 @@ fn main() {
     println!("The ray reflected on red: {}.", red.get_new_ray(&ray, &intersection));
     println!("The mirrored ray is {}.", mirror.get_new_ray(&ray, &intersection));
     println!("Intersecting ray with plane yields {}.", plane.intersect(&ray));
+    println!("Is (0,0,0) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 0.0)));
+    println!("Is (0,0,2) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 2.0)));
 }
