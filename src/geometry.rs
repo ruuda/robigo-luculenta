@@ -202,3 +202,9 @@ impl Surface for Sphere {
         Some(intersection)
     }
 }
+
+impl Volume for Sphere {
+    fn lies_inside(&self, p: Vector3) -> bool {
+        (p - self.position).magnitude_squared() < self.radius_squared
+    }
+}

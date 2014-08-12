@@ -1,5 +1,5 @@
 use camera::Camera;
-use geometry::{Surface, Volume, Plane, SpacePartitioning};
+use geometry::{Surface, Volume, Plane, SpacePartitioning, Sphere};
 use intersection::Intersection;
 use material::{Material, GlossyMirrorMaterial, DiffuseColouredMaterial, DiffuseGreyMaterial};
 use quaternion::Quaternion;
@@ -43,6 +43,7 @@ fn main() {
     let new_ray = diffuse_grey.get_new_ray(&ray, &intersection);
     let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
     let sp = SpacePartitioning::new(Vector3::new(0.0, 0.0, 1.0), Vector3::new(0.0, 0.0, 1.0));
+    let sphere = Sphere::new(Vector3::new(0.0, 0.0, 0.0), 2.0);
     println!("The ray is {}.", ray);
     println!("A random number in [-1, 1] is {}.", monte_carlo::get_bi_unit());
     println!("A random number in [0, 1] is {}.", monte_carlo::get_unit());
@@ -57,4 +58,6 @@ fn main() {
     println!("Intersecting ray with plane yields {}.", plane.intersect(&ray));
     println!("Is (0,0,0) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 0.0)));
     println!("Is (0,0,2) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 2.0)));
+    println!("Is (1,0,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(1.0, 0.0, 0.0)));
+    println!("Is (2,1,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(2.0, 1.0, 0.0)));
 }
