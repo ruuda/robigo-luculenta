@@ -16,7 +16,7 @@
 
 use intersection::Intersection;
 use ray::Ray;
-use vector3::{Vector3, dot};
+use vector3::{Vector3, cross, dot};
 
 /// Represents a surface that can be intersected with a ray.
 pub trait Surface {
@@ -123,5 +123,82 @@ impl Surface for SpacePartitioning {
 impl Volume for SpacePartitioning {
     fn lies_inside(&self, p: Vector3) -> bool {
         dot(p - self.offset, self.normal) < 0.0
+    }
+}
+
+pub struct Sphere {
+    /// The position of the centre of the sphere.
+    position: Vector3,
+
+    /// The square of the radius of the spere.
+    radius_squared: f32
+}
+
+impl Sphere {
+    pub fn new(position: Vector3, radius: f32) -> Sphere {
+        Sphere {
+            position: position,
+            radius_squared: radius * radius
+        }
+    }
+
+    /// Returns whether a ray intersects the sphere, and if it does,
+    /// the distances along the ray.
+    fn get_intersections(&self, ray: &Ray) -> Option<(f32, f32)> {
+        // Compute the a, b, c factors of the quadratic equation.
+        let a = 1.0f32;
+        let centre_offset = self.position - ray.origin;
+        let b = 2.0 * dot(ray.direction, centre_offset);
+        let c = centre_offset.magnitude_squared() - self.radius_squared;
+
+        // The discriminant determines whether the equation has a solution.
+        let discriminant = b * b - 4.0 * a * c;
+
+        if discriminant < 0.0 {
+            // For a negative discriminant, there is no solution.
+            None
+        } else {
+            let d = discriminant.sqrt();
+            let t1 = -0.5 * (-b + d) / a;
+            let t2 = -0.5 * (-b - d) / a;
+            Some((t1, t2))
+        }
+    }
+}
+
+impl Surface for Sphere {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        // TODO: is there a macro for this, like try!?
+        // Maybe write it myself?
+        let (t1, t2) = match self.get_intersections(ray) {
+            None => return None,
+            Some(x) => x
+        };
+
+        // One of the ts must be positive at least, for an intersection.
+        let mut t = 0.0f32;
+        if t1 > 0.0 && t1 < t2 { t = t1; }
+        else if t2 > 0.0 && t2 < t1 { t = t2; }
+        // For negative t, the sphere lies behind the ray entirely.
+        else { return None; }
+
+        // The intersection point can be calculated from the distance.
+        let position = ray.origin + ray.direction * t;
+
+        // The normal points radially outward everywhere.
+        let normal = (position - self.position).normalise();
+
+        // The tangent vector is perpendicular to the surface normal
+        // and the up vector. The choice is quite arbitrary.
+        let up = Vector3::new(0.0, 1.0, 0.0);
+        let tangent = cross(up, normal).normalise();
+
+        let intersection = Intersection {
+            position: position,
+            normal: normal,
+            tangent: tangent,
+            distance: t
+        };
+        Some(intersection)
     }
 }
