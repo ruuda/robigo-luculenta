@@ -17,12 +17,17 @@
 use intersection::Intersection;
 use ray::Ray;
 use vector3::{Vector3, dot};
-use volume::Volume;
 
 /// Represents a surface that can be intersected with a ray.
 pub trait Surface {
     /// Returns whether the surface was intersected, and if so, where.
     fn intersect(&self, ray: &Ray) -> Option<Intersection>;
+}
+
+/// Represents a part of space.
+pub trait Volume {
+    /// Returns whether the specified point `p` lies inside the volume.
+    fn lies_inside(&self, p: Vector3) -> bool;
 }
 
 /// An infinitely large plane.

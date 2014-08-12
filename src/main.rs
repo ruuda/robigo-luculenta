@@ -1,22 +1,20 @@
 use camera::Camera;
+use geometry::{Surface, Volume, Plane, SpacePartitioning};
 use intersection::Intersection;
 use material::{Material, GlossyMirrorMaterial, DiffuseColouredMaterial, DiffuseGreyMaterial};
 use quaternion::Quaternion;
 use ray::Ray;
-use surface::{Surface, Plane, SpacePartitioning};
 use vector3::Vector3;
-use volume::Volume;
 
 mod camera;
 mod constants;
+mod geometry;
 mod intersection;
 mod material;
 mod monte_carlo;
 mod quaternion;
 mod ray;
-mod surface;
 mod vector3;
-mod volume;
 
 fn main() {
     let ray = Ray {
