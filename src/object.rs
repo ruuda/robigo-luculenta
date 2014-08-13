@@ -16,9 +16,37 @@
 
 use geometry::Surface;
 use material::{Material, EmissiveMaterial};
+use std::fmt::{Show, Formatter, FormatError};
+
+pub enum MaterialBox {
+    Reflective(Box<Material>),
+    Emissive(Box<EmissiveMaterial>)
+}
 
 /// Represents a surface with a material.
-pub enum Object {
-    Reflective(Box<Surface>, Box<Material>),
-    Emissive(Box<Surface>, Box<EmissiveMaterial>)
+pub struct Object {
+    /// The surface that defines the geometry of the object.
+    pub surface: Box<Surface>,
+    /// Either an emissive or a reflective material.
+    pub material: MaterialBox
+}
+
+impl Object {
+    /// Creates an object with the specified `surface` and `material`.
+    pub fn new(surface: Box<Surface>, material: MaterialBox) -> Object {
+        Object {
+            surface: surface,
+            material: material
+        }
+    }
+}
+
+// TODO: implement Show for debugging only, remove this.
+impl Show for Object {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
+        match self.material {
+            Reflective(_) => "ReflectiveObject".fmt(f),
+            Emissive(_) => "EmissiveObject".fmt(f)
+        }
+    }
 }
