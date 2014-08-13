@@ -56,6 +56,7 @@ impl Surface for Plane {
         let origin = ray.origin - self.offset;
 
         let d = dot(self.normal, ray.direction);
+        if d == 0.0 { return None; }
         let t = dot(self.normal, origin) / d;
 
         // A ray has one direction, do not hit backwards.
