@@ -5,8 +5,9 @@ use material::{EmissiveMaterial, BlackBodyMaterial, DiffuseColouredMaterial};
 use object::{Object, Emissive, Reflective};
 use quaternion::Quaternion;
 use ray::Ray;
-use vector3::Vector3;
 use scene::Scene;
+use trace_unit::TraceUnit;
+use vector3::Vector3;
 
 mod camera;
 mod constants;
@@ -18,6 +19,7 @@ mod object;
 mod quaternion;
 mod ray;
 mod scene;
+mod trace_unit;
 mod vector3;
 
 fn main() {
