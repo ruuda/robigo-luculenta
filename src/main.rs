@@ -1,7 +1,7 @@
 use camera::Camera;
 use geometry::{Surface, Volume, Plane, SpacePartitioning, Sphere};
 use intersection::Intersection;
-use material::{Material, GlossyMirrorMaterial, DiffuseColouredMaterial, DiffuseGreyMaterial};
+use material::{Material, EmissiveMaterial, BlackBodyMaterial, GlossyMirrorMaterial, DiffuseColouredMaterial, DiffuseGreyMaterial};
 use quaternion::Quaternion;
 use ray::Ray;
 use vector3::Vector3;
@@ -44,6 +44,7 @@ fn main() {
     let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
     let sp = SpacePartitioning::new(Vector3::new(0.0, 0.0, 1.0), Vector3::new(0.0, 0.0, 1.0));
     let sphere = Sphere::new(Vector3::new(0.0, 0.0, 0.0), 2.0);
+    let black_body = BlackBodyMaterial::new(6504.0, 1.0);
     println!("The ray is {}.", ray);
     println!("A random number in [-1, 1] is {}.", monte_carlo::get_bi_unit());
     println!("A random number in [0, 1] is {}.", monte_carlo::get_unit());
@@ -60,4 +61,5 @@ fn main() {
     println!("Is (0,0,2) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 2.0)));
     println!("Is (1,0,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(1.0, 0.0, 0.0)));
     println!("Is (2,1,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(2.0, 1.0, 0.0)));
+    println!("Black body intensity at 400 and 600 nm is {} and {}.", black_body.get_intensity(400.0), black_body.get_intensity(600.0));
 }

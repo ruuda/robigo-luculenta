@@ -17,12 +17,20 @@
 use intersection::Intersection;
 use ray::Ray;
 use vector3::{Vector3, dot};
+use constants::{BOLTZMANNS_CONSTANT, SPEED_OF_LIGHT, PLANCKS_CONSTANT, WIENS_CONSTANT};
 
 /// Models the behaviour of a ray when it bounces off a surface.
 pub trait Material {
     /// Returns the ray that continues the light path, backwards from the
     /// camera to the light source.
     fn get_new_ray(&self, incoming_ray: &Ray, intersection: &Intersection) -> Ray;
+}
+
+/// Models the behavior of a light-emitting surface. Light-emitting surfaces
+/// are handled independently of reflecting surfaces.
+pub trait EmissiveMaterial {
+    /// Returns the light intensity at the specified `wavelength`.
+    fn get_intensity(&self, wavelength: f32) -> f32;
 }
 
 /// Returns a ray as if reflected by a perfectly diffuse white material.
@@ -45,6 +53,53 @@ fn get_diffuse_ray(incoming_ray: &Ray, intersection: &Intersection) -> Ray {
         direction: direction,
         wavelength: incoming_ray.wavelength,
         probability: 1.0
+    }
+}
+
+/// The Boltzmann distribution.
+fn boltzmann(wavelength: f64, temperature: f64) -> f64 {
+    // Use double precision here, the numbers are quite large/small,
+    // which might cause precision loss.
+    let h = PLANCKS_CONSTANT;
+    let k = BOLTZMANNS_CONSTANT;
+    let c = SPEED_OF_LIGHT;
+
+    // Multiply by 1e-9 (nano), because the wavelength is specified in nm,
+    // while m is the standard unit.
+    let f = c / (wavelength * 1.0e-9);
+
+    // Then evaluate the Boltzmann distribution.
+    (2.0 * h * f * f * f) / (c * c * ((h * f / (k * temperature)).exp() - 1.0))
+}
+
+/// Has the spectrum of a black body.
+pub struct BlackBodyMaterial {
+    /// The temperature of the black body, in Kelvin. 6504 is a warm white,
+    /// higher values are blue-ish, lower are red-ish.
+    temperature: f32,
+
+    /// Bodies with lower temperature also have a lower intensity,
+    /// but for the purposes of a light source, only the distribution
+    /// is important, not the intensity, so the distribution must be
+    /// normalised.
+    normalisation_factor: f32
+}
+
+impl BlackBodyMaterial {
+    /// Constructs a black body material with the specified
+    /// temperature in Kelvin.
+    pub fn new(kelvins: f32, intensity: f32) -> BlackBodyMaterial {
+        BlackBodyMaterial {
+            temperature: kelvins,
+            normalisation_factor: intensity
+                / boltzmann((WIENS_CONSTANT / kelvins as f64) * 1.0e9, kelvins as f64) as f32
+        }
+    }
+}
+
+impl EmissiveMaterial for BlackBodyMaterial {
+    fn get_intensity(&self, wavelength: f32) -> f32 {
+        boltzmann(wavelength as f64, self.temperature as f64) as f32 * self.normalisation_factor
     }
 }
 
