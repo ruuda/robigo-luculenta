@@ -16,7 +16,7 @@
 
 use intersection::Intersection;
 use ray::Ray;
-use vector3::{Vector3, dot};
+use vector3::dot;
 use constants::{BOLTZMANNS_CONSTANT, SPEED_OF_LIGHT, PLANCKS_CONSTANT, WIENS_CONSTANT};
 
 /// Models the behaviour of a ray when it bounces off a surface.
