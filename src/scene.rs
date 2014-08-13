@@ -36,7 +36,7 @@ impl<'a> Scene<'a> {
     pub fn intersect(&self, ray: &Ray) -> Option<(Intersection, &Object)> {
         // Assume Nothing is found, and that Nothing is Very Far Away (tm).
         let mut result = None;
-        let mut distance = 1.012f32;
+        let mut distance = 1.0e12f32;
 
         // Then intersect all surfaces.
         for obj in self.objects.iter() {
