@@ -1,3 +1,5 @@
+#![feature(macro_rules)]
+
 use camera::Camera;
 use geometry::{Volume, Plane, Sphere};
 use material::{EmissiveMaterial, BlackBodyMaterial, DiffuseColouredMaterial};

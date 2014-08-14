@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::cmp::{min, max};
 use trace_unit::MappedPhoton;
 use vector3::Vector3;
 
@@ -47,7 +48,43 @@ impl PlotUnit {
     /// Plots a pixel, anti-aliased into the buffer
     /// (adding it to existing content).
     fn plot_pixel(&mut self, x: f32, y: f32, cie: Vector3) {
+        // Map the position to pixels.
+        let w = self.image_width;
+        let h = self.image_height;
+        let px = (x * 0.5 + 0.5) * (w as f32 - 1.0);
+        let py = (y * self.aspect_ratio * 0.5 + 0.5) * (h as f32 - 1.0);
 
+        // Then map them to discrete pixels.
+        let px1 = max(0i, min(w as int - 1, px.floor() as int)) as uint;
+        let px2 = max(0i, min(w as int - 1, px.ceil() as int)) as uint;
+        let py1 = max(0i, min(h as int - 1, py.floor() as int)) as uint;
+        let py2 = max(0i, min(h as int - 1, py.ceil() as int)) as uint;
+
+        // Compute pixel coefficients.
+        let cx = px - px1 as f32;
+        let cy = py - py1 as f32;
+        let c11 = (1.0 - cx) * (1.0 - cy);
+        let c12 = (1.0 - cx) * cy;
+        let c21 = cx * (1.0 - cy);
+        let c22 = cx * cy;
+
+        // Generate all indexing instead of hard-coding the indices.
+        macro_rules! add_to_buffer {
+            ($buffer:ident, $w: expr, $cie: ident, $x: expr, $y: expr, $c: expr) => (
+                (
+                    $buffer[$y * $w * 3 + $x * 3 + 0] += $cie.x * $c,
+                    $buffer[$y * $w * 3 + $x * 3 + 1] += $cie.y * $c,
+                    $buffer[$y * $w * 3 + $x * 3 + 2] += $cie.z * $c
+                )
+            );
+        }
+
+        // Then plot the four pixels.
+        let buffer = self.tristimulus_buffer.mut_slice_from(0);
+        add_to_buffer!(buffer, w, cie, px1, py1, c11);
+        add_to_buffer!(buffer, w, cie, px2, py1, c21);
+        add_to_buffer!(buffer, w, cie, px1, px2, c12);
+        add_to_buffer!(buffer, w, cie, px2, px2, c22);
     }
 
     /// Plots the result of the specified TraceUnit onto the canvas.
