@@ -74,7 +74,7 @@ impl<'a> TraceUnit<'a> {
 
     /// Return the contribution of a photon travelling backwards
     /// the specified ray.
-    fn render_ray(&self, initial_ray: Ray) -> f32 {
+    fn render_ray(scene: &'a Scene<'a>, initial_ray: Ray) -> f32 {
         // The path starts with the ray, and there is a chance it continues.
         let mut ray = initial_ray;
         let mut continue_chance = 1.0f32;
@@ -88,7 +88,7 @@ impl<'a> TraceUnit<'a> {
             let object: &Object;
 
             // Intersect the ray with the scene.
-            match self.scene.intersect(&ray) {
+            match scene.intersect(&ray) {
                 // If nothing was intersected, the path ends,
                 // and the only thing left is the utter darkness of The Void.
                 None => return 0.0,
@@ -133,23 +133,23 @@ impl<'a> TraceUnit<'a> {
 
     /// Returns the contribution of a ray
     /// through the specified creen coordinate.
-    fn render_camera_ray(&self, x: f32, y: f32, wavelength: f32) -> f32 {
+    fn render_camera_ray(scene: &'a Scene<'a>, x: f32, y: f32, wavelength: f32) -> f32 {
         // Get a random time to sample at.
         let t = ::monte_carlo::get_unit();
 
         // Get the camera at that time.
-        let camera = (self.scene.get_camera_at_time)(t);
+        let camera = (scene.get_camera_at_time)(t);
 
         // Create a camera ray for the specified pixel and wavelength.
         let ray = camera.get_ray(x, y, wavelength);
 
         // And render this camera ray.
-        self.render_ray(ray)
+        TraceUnit::render_ray(scene, ray)
     }
 
     /// Filss the buffer of mapped photons once.
     pub fn render(&mut self) {
-        for &mut mapped_photon in self.mapped_photons.iter() {
+        for mapped_photon in self.mapped_photons.mut_iter() {
             // Pick a wavelength for this photon.
             let wavelength = ::monte_carlo::get_wavelength();
 
@@ -163,7 +163,7 @@ impl<'a> TraceUnit<'a> {
             mapped_photon.y = y;
 
             // And then trace the scene at this wavelength.
-            mapped_photon.probability = self.render_camera_ray(x, y, wavelength);
+            mapped_photon.probability = TraceUnit::render_camera_ray(self.scene, x, y, wavelength);
         }
     }
 }

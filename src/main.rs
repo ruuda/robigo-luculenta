@@ -23,20 +23,20 @@ mod vector3;
 fn main() {
     fn make_camera(_: f32) -> Camera {
         Camera {
-            position: Vector3::new(0.0, 0.0, 0.0),
+            position: Vector3::new(0.0, 1.0, -10.0),
             field_of_view: Float::frac_pi_2(),
             focal_distance: 10.0,
             depth_of_field: 10.0,
             chromatic_abberation: 1.0,
-            orientation: Quaternion::rotation(0.0, 0.0, 1.0, 0.0)
+            orientation: Quaternion::rotation(1.0, 0.0, 0.0, 0.5)
         }
     }
     let red = DiffuseColouredMaterial::new(0.9, 700.0, 60.0);
     let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
     let sphere = Sphere::new(Vector3::new(0.0, 0.0, 0.0), 2.0);
     let black_body = BlackBodyMaterial::new(6504.0, 1.0);
-    let reflective = Object::new(box plane, Reflective(box red));
-    let emissive = Object::new(box sphere, Emissive(box black_body));
+    let reflective = Object::new(box plane, Emissive(box black_body));
+    let emissive = Object::new(box sphere, Reflective(box red));
     let scene = Scene {
         objects: vec!(reflective, emissive),
         get_camera_at_time: make_camera
