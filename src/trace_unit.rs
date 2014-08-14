@@ -18,7 +18,7 @@ use scene::Scene;
 
 /// The number of paths to trace in one batch.
 // TODO: Use 1024 * 64 for debug, 1024 * 512 in release.
-static number_of_paths: i32 = 1024 * 64;
+static number_of_photons: uint = 1024 * 64;
 
 /// Represents a photon that has been traced.
 pub struct MappedPhoton {
@@ -36,6 +36,17 @@ pub struct MappedPhoton {
     pub wavelength: f32
 }
 
+impl MappedPhoton {
+    fn new() -> MappedPhoton {
+        MappedPhoton {
+            x: 0.0,
+            y: 0.0,
+            probability: 0.0,
+            wavelength: 0.0
+        }
+    }
+}
+
 /// Handles ray tracing.
 pub struct TraceUnit<'a> {
     /// The scene that will be rendered.
@@ -44,6 +55,17 @@ pub struct TraceUnit<'a> {
     /// The aspect ratio of the image that will be rendered.
     aspect_ratio: f32,
 
-    /// THe photons that were rendered.
-    pub mapped_photons: [MappedPhoton, ..number_of_paths]
+    /// The photons that were rendered.
+    pub mapped_photons: [MappedPhoton, ..number_of_photons]
+}
+
+impl<'a> TraceUnit<'a> {
+    /// Creates a new trace unit that renders the given scene.
+    pub fn new<'b>(scene: &'b Scene<'b>, width: i32, height: i32) -> TraceUnit<'b> {
+        TraceUnit {
+            scene: scene,
+            aspect_ratio: width as f32 / height as f32,
+            mapped_photons: [MappedPhoton::new(), ..number_of_photons]
+        }
+    }
 }
