@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use trace_unit::MappedPhoton;
+use vector3::Vector3;
 
 /// Handles plotting the result of a `TraceUnit`.
 pub struct PlotUnit {
@@ -45,7 +46,7 @@ impl PlotUnit {
 
     /// Plots a pixel, anti-aliased into the buffer
     /// (adding it to existing content).
-    fn plot_pixel(&mut self, x: f32, y: f32, cie: (f32, f32, f32)) {
+    fn plot_pixel(&mut self, x: f32, y: f32, cie: Vector3) {
 
     }
 

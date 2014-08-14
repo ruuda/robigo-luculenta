@@ -14,30 +14,36 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use vector3::Vector3;
+
 /// Returns the CIE 1931 tristimulus values for the given wavelength.
-pub fn get_tristimulus(wavelength: f32) -> (f32, f32, f32) {
+pub fn get_tristimulus(wavelength: f32) -> Vector3 {
     let indexf = (wavelength - 380.0) / 5.0;
     let index = indexf.floor() as int;
     let remainder = indexf - index as f32;
 
     if (index < -1 || index > 80) {
         // Wavelength is not in the visible spectrum.
-        (0.0, 0.0, 0.0)
+        Vector3::new(0.0, 0.0, 0.0)
     } else if (index == -1) {
         // No interpolation possible.
-        (x[0] * remainder, y[0] * remainder, z[0] * remainder)
+        Vector3::new(x[0] * remainder, y[0] * remainder, z[0] * remainder)
     } else if (index == 80) {
         // No interpolation possible.
-        (x[80] * (1.0 - remainder), y[80] * (1.0 - remainder), z[80] * (1.0 - remainder))
+        Vector3 {
+            x: x[80] * (1.0 - remainder),
+            y: y[80] * (1.0 - remainder),
+            z: z[80] * (1.0 - remainder)
+        }
     } else {
         let i = index as uint;
 
         // Interpolate between two measurements.
-        (
-            x[i] * (1.0 - remainder) + x[i + 1] * remainder,
-            y[i] * (1.0 - remainder) + y[i + 1] * remainder,
-            z[i] * (1.0 - remainder) + z[i + 1] * remainder
-        )
+        Vector3 {
+            x: x[i] * (1.0 - remainder) + x[i + 1] * remainder,
+            y: y[i] * (1.0 - remainder) + y[i + 1] * remainder,
+            z: z[i] * (1.0 - remainder) + z[i + 1] * remainder
+        }
     }
 }
 
