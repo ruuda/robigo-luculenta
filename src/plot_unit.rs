@@ -52,7 +52,13 @@ impl PlotUnit {
 
     /// Plots the result of the specified TraceUnit onto the canvas.
     pub fn plot(&mut self, photons: &[MappedPhoton]) {
+        for ref photon in photons.iter() {
+            // Calculate the CIE tristimulus values, given the wavelength.
+            let cie = ::cie1931::get_tristimulus(photon.wavelength);
 
+            // Then plot the pixel into the buffer.
+            self.plot_pixel(photon.x, photon.y, cie * photon.probability);
+        }
     }
 
     /// Resets the tristimulus buffer to black.
