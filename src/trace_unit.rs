@@ -79,7 +79,17 @@ impl<'a> TraceUnit<'a> {
     /// Returns the contribution of a ray
     /// through the specified creen coordinate.
     fn render_camera_ray(&self, x: f32, y: f32, wavelength: f32) -> f32 {
-        0.0
+        // Get a random time to sample at.
+        let t = ::monte_carlo::get_unit();
+
+        // Get the camera at that time.
+        let camera = (self.scene.get_camera_at_time)(t);
+
+        // Create a camera ray for the specified pixel and wavelength.
+        let ray = camera.get_ray(x, y, wavelength);
+
+        // And render this camera ray.
+        self.render_ray(&ray)
     }
 
     /// Filss the buffer of mapped photons once.

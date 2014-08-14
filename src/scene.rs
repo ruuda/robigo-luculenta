@@ -28,7 +28,10 @@ pub struct Scene<'a> {
     /// will be seen. The function takes one parameter, the time (in
     /// the range 0.0 - 1.0), which will be sampled randomly to create
     /// effects like motion blur and zoom blur.
-    pub get_camera_at_time: |f32|: 'a -> Camera
+    // TODO: apparently there is no such thing as an immutable closure
+    // any more, but I'd prefer to be able to use a pure function here,
+    // which might be a closure.
+    pub get_camera_at_time: fn (f32) -> Camera
 }
 
 impl<'a> Scene<'a> {

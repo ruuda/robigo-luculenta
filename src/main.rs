@@ -29,14 +29,16 @@ fn main() {
         wavelength: 550.0,
         probability: 1.0
     };
-    let camera = Camera {
-        position: Vector3::new(0.0, 0.0, 0.0),
-        field_of_view: Float::frac_pi_2(),
-        focal_distance: 10.0,
-        depth_of_field: 10.0,
-        chromatic_abberation: 1.0,
-        orientation: Quaternion::rotation(0.0, 0.0, 1.0, 0.0)
-    };
+    fn make_camera(_: f32) -> Camera {
+        Camera {
+            position: Vector3::new(0.0, 0.0, 0.0),
+            field_of_view: Float::frac_pi_2(),
+            focal_distance: 10.0,
+            depth_of_field: 10.0,
+            chromatic_abberation: 1.0,
+            orientation: Quaternion::rotation(0.0, 0.0, 1.0, 0.0)
+        }
+    }
     let intersection = Intersection {
         position: Vector3::new(0.0, 1.0, 2.0),
         normal: Vector3::new(1.0, 0.0, 0.0),
@@ -52,7 +54,7 @@ fn main() {
     let emissive = Object::new(box sphere, Emissive(box black_body));
     let scene = Scene {
         objects: vec!(reflective, emissive),
-        get_camera_at_time: |_| { camera }
+        get_camera_at_time: make_camera
     };
     println!("Is (0,0,0) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 0.0)));
     println!("Is (0,0,2) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 2.0)));
