@@ -147,7 +147,7 @@ impl<'a> TraceUnit<'a> {
         TraceUnit::render_ray(scene, ray)
     }
 
-    /// Filss the buffer of mapped photons once.
+    /// Fills the buffer of mapped photons once.
     pub fn render(&mut self) {
         for mapped_photon in self.mapped_photons.mut_iter() {
             // Pick a wavelength for this photon.
