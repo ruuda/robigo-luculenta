@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use ray::Ray;
 use scene::Scene;
 
 /// The number of paths to trace in one batch.
@@ -66,6 +67,38 @@ impl<'a> TraceUnit<'a> {
             scene: scene,
             aspect_ratio: width as f32 / height as f32,
             mapped_photons: [MappedPhoton::new(), ..number_of_photons]
+        }
+    }
+
+    /// Return the contribution of a photon travelling backwards
+    /// the specified ray.
+    fn render_ray(&self, ray: &Ray) -> f32 {
+        0.0
+    }
+
+    /// Returns the contribution of a ray
+    /// through the specified creen coordinate.
+    fn render_camera_ray(&self, x: f32, y: f32, wavelength: f32) -> f32 {
+        0.0
+    }
+
+    /// Filss the buffer of mapped photons once.
+    pub fn render(&mut self) {
+        for &mut mapped_photon in self.mapped_photons.iter() {
+            // Pick a wavelength for this photon.
+            let wavelength = ::monte_carlo::get_wavelength();
+
+            // Pick a screen coordinate for the photon.
+            let x = ::monte_carlo::get_bi_unit();
+            let y = ::monte_carlo::get_bi_unit() / self.aspect_ratio;
+
+            // Store the coordinates already.
+            mapped_photon.wavelength = wavelength;
+            mapped_photon.x = x;
+            mapped_photon.y = y;
+
+            // And then trace the scene at this wavelength.
+            mapped_photon.probability = self.render_camera_ray(x, y, wavelength);
         }
     }
 }
