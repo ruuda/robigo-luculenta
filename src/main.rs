@@ -57,4 +57,6 @@ fn main() {
     for i in trace_unit.mapped_photons.slice(0, 3).iter().map(|mp| { mp.probability }) {
         println!("{}", i);
     }
+    let mut plot_unit = box PlotUnit::new(1280, 720);
+    plot_unit.plot(trace_unit.mapped_photons);
 }

@@ -83,8 +83,8 @@ impl PlotUnit {
         let buffer = self.tristimulus_buffer.mut_slice_from(0);
         add_to_buffer!(buffer, w, cie, px1, py1, c11);
         add_to_buffer!(buffer, w, cie, px2, py1, c21);
-        add_to_buffer!(buffer, w, cie, px1, px2, c12);
-        add_to_buffer!(buffer, w, cie, px2, px2, c22);
+        add_to_buffer!(buffer, w, cie, px1, py2, c12);
+        add_to_buffer!(buffer, w, cie, px2, py2, c22);
     }
 
     /// Plots the result of the specified TraceUnit onto the canvas.
