@@ -5,15 +5,18 @@ use object::{Object, Emissive, Reflective};
 use quaternion::Quaternion;
 use scene::Scene;
 use trace_unit::TraceUnit;
+use plot_unit::PlotUnit;
 use vector3::Vector3;
 
 mod camera;
+mod cie1931;
 mod constants;
 mod geometry;
 mod intersection;
 mod material;
 mod monte_carlo;
 mod object;
+mod plot_unit;
 mod quaternion;
 mod ray;
 mod scene;
