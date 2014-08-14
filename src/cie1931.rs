@@ -22,13 +22,13 @@ pub fn get_tristimulus(wavelength: f32) -> Vector3 {
     let index = indexf.floor() as int;
     let remainder = indexf - index as f32;
 
-    if (index < -1 || index > 80) {
+    if index < -1 || index > 80 {
         // Wavelength is not in the visible spectrum.
         Vector3::new(0.0, 0.0, 0.0)
-    } else if (index == -1) {
+    } else if index == -1 {
         // No interpolation possible.
         Vector3::new(x[0] * remainder, y[0] * remainder, z[0] * remainder)
-    } else if (index == 80) {
+    } else if index == 80 {
         // No interpolation possible.
         Vector3 {
             x: x[80] * (1.0 - remainder),
