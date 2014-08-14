@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use intersection::Intersection;
+use object::{Object, Reflective, Emissive};
 use ray::Ray;
 use scene::Scene;
 
@@ -72,7 +74,60 @@ impl<'a> TraceUnit<'a> {
 
     /// Return the contribution of a photon travelling backwards
     /// the specified ray.
-    fn render_ray(&self, ray: &Ray) -> f32 {
+    fn render_ray(&self, initial_ray: Ray) -> f32 {
+        // The path starts with the ray, and there is a chance it continues.
+        let mut ray = initial_ray;
+        let mut continue_chance = 1.0f32;
+
+        // Apart from the chance, which might decrease even for specular
+        // bounces, light intensity is affected by interaction probabilities.
+        let mut intensity = 1.0f32;
+
+        loop {
+            let intersection: Intersection;
+            let object: &Object;
+
+            // Intersect the ray with the scene.
+            match self.scene.intersect(&ray) {
+                // If nothing was intersected, the path ends,
+                // and the only thing left is the utter darkness of The Void.
+                None => return 0.0,
+                Some((isect, obj)) => { intersection = isect; object = obj; }
+            }
+
+            match object.material {
+                // If a light was hit, the path ends, and the intensity
+                // of the light determines the intensity of the path.
+                Emissive(ref mat) => {
+                    return intensity * mat.get_intensity(ray.wavelength);
+                },
+                // Otherwise, the ray must have hit a non-emissive surface,
+                // and so the journey continues ...
+                Reflective(ref mat) => {
+                    ray = mat.get_new_ray(&ray, &intersection);
+                    intensity = intensity * ray.probability;
+                }
+            }
+
+            // Displace the origin slightly, so the new ray won't intersect
+            // the same point.
+            ray.origin = ray.origin + ray.direction * 0.00001;
+
+            // And the chance of a new bounce decreases slightly.
+            continue_chance = continue_chance * 0.96;
+
+            // Use a sharp falloff based on intensity, so an intensity of
+            // 0.1 still has 86% chance of continuing, but an intensity of
+            // 0.01 has only 18% chance of continuing.
+            if ::monte_carlo::get_unit() * 0.85 > continue_chance
+                * (1.0 - (intensity * -20.0).exp()) {
+                break;
+            }
+        }
+
+        // If Russian roulette terminated the path, there is always
+        // an option of trying direct illumination, which could be
+        // implemented here, but is not.
         0.0
     }
 
@@ -89,7 +144,7 @@ impl<'a> TraceUnit<'a> {
         let ray = camera.get_ray(x, y, wavelength);
 
         // And render this camera ray.
-        self.render_ray(&ray)
+        self.render_ray(ray)
     }
 
     /// Filss the buffer of mapped photons once.
