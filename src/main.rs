@@ -1,10 +1,8 @@
 use camera::Camera;
-use geometry::{Surface, Volume, Plane, SpacePartitioning, Sphere};
-use intersection::Intersection;
+use geometry::{Volume, Plane, Sphere};
 use material::{EmissiveMaterial, BlackBodyMaterial, DiffuseColouredMaterial};
 use object::{Object, Emissive, Reflective};
 use quaternion::Quaternion;
-use ray::Ray;
 use scene::Scene;
 use trace_unit::TraceUnit;
 use vector3::Vector3;
@@ -23,12 +21,6 @@ mod trace_unit;
 mod vector3;
 
 fn main() {
-    let ray = Ray {
-        origin: Vector3::new(0.0, 0.0, -10.0),
-        direction: Vector3::new(0.0, 0.0, 1.0),
-        wavelength: 550.0,
-        probability: 1.0
-    };
     fn make_camera(_: f32) -> Camera {
         Camera {
             position: Vector3::new(0.0, 0.0, 0.0),
@@ -39,15 +31,8 @@ fn main() {
             orientation: Quaternion::rotation(0.0, 0.0, 1.0, 0.0)
         }
     }
-    let intersection = Intersection {
-        position: Vector3::new(0.0, 1.0, 2.0),
-        normal: Vector3::new(1.0, 0.0, 0.0),
-        tangent: Vector3::new(0.0, 1.0, 0.0),
-        distance: 1.0
-    };
     let red = DiffuseColouredMaterial::new(0.9, 700.0, 60.0);
     let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
-    let sp = SpacePartitioning::new(Vector3::new(0.0, 0.0, 1.0), Vector3::new(0.0, 0.0, 1.0));
     let sphere = Sphere::new(Vector3::new(0.0, 0.0, 0.0), 2.0);
     let black_body = BlackBodyMaterial::new(6504.0, 1.0);
     let reflective = Object::new(box plane, Reflective(box red));
@@ -56,10 +41,14 @@ fn main() {
         objects: vec!(reflective, emissive),
         get_camera_at_time: make_camera
     };
-    println!("Is (0,0,0) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 0.0)));
-    println!("Is (0,0,2) inside sp? {}.", sp.lies_inside(Vector3::new(0.0, 0.0, 2.0)));
     println!("Is (1,0,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(1.0, 0.0, 0.0)));
     println!("Is (2,1,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(2.0, 1.0, 0.0)));
     println!("Black body intensity at 400 and 600 nm is {} and {}.", black_body.get_intensity(400.0), black_body.get_intensity(600.0));
-    println!("Intersecting ray with the scene yields {}.", scene.intersect(&ray));
+
+    let mut trace_unit = box TraceUnit::new(&scene, 1280, 720);
+    trace_unit.render();
+    println!("First three intensities are:.");
+    for i in trace_unit.mapped_photons.slice(0, 3).iter().map(|mp| { mp.probability }) {
+        println!("{}", i);
+    }
 }
