@@ -64,7 +64,7 @@ pub struct TraceUnit<'a> {
 
 impl<'a> TraceUnit<'a> {
     /// Creates a new trace unit that renders the given scene.
-    pub fn new<'b>(scene: &'b Scene<'b>, width: i32, height: i32) -> TraceUnit<'b> {
+    pub fn new<'b>(scene: &'b Scene<'b>, width: uint, height: uint) -> TraceUnit<'b> {
         TraceUnit {
             scene: scene,
             aspect_ratio: width as f32 / height as f32,
