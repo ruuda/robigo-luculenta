@@ -1,4 +1,5 @@
 #![feature(macro_rules)]
+#![allow(dead_code)]
 
 use camera::Camera;
 use geometry::{Volume, Plane, Sphere};
