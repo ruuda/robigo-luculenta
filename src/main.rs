@@ -14,6 +14,7 @@ use vector3::Vector3;
 mod camera;
 mod cie1931;
 mod constants;
+mod gather_unit;
 mod geometry;
 mod intersection;
 mod material;
