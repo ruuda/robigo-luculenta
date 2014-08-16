@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::iter::AdditiveIterator;
+
 /// Converts the result of a `GatherUnit` into an sRGB image.
 pub struct TonemapUnit {
     /// The width of the canvas (in pixels).
@@ -41,7 +43,32 @@ impl TonemapUnit {
     /// The returned value is the maximum acceptable intensity, the
     /// intensity that should become (nearly) white.
     fn find_exposure(&self, tristimuli: &[f32]) -> f32 {
-        1.0
+        let mut intensities = tristimuli
+        // Iterate over triplets of CIE XYZ values.
+        .chunks(3)
+        // Calculations are based on the CIE Y value (which corresponds
+        // to lightness), but X and Z are also taken into account slightly
+        // to avoid weird situations.
+        .map(|cie| { cie[0] + cie[1] * 5.0 + cie[2] });
+
+        // Compute the average intensity. Divide by 7 to compensate
+        // for the coefficients above.
+        let average = intensities.sum() /
+        (self.image_width as f32 * self.image_height as f32 * 7.0);
+
+        // TODO: I have not found a good way to re-use an iterator.
+        intensities = tristimuli.chunks(3)
+        .map(|cie| { cie[0] + cie[1] * 5.0 + cie[2] });
+
+        // Then compute the standard deviation. Divide by 49 = 7 * 7
+        // to compensate for the coefficients above.
+        let variance = intensities.by_ref().map(|i| { i * i }).sum() /
+        (self.image_width as f32 * self.image_height as f32 * 49.0) -
+        (average * average);
+        let standard_deviation = variance.sqrt();
+
+        // The desired 'white' is one standard deviation above average.
+        average + standard_deviation
     }
 
     /// Converts the unweighted CIE XYZ values in the buffer
