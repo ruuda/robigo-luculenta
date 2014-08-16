@@ -27,4 +27,15 @@ impl GatherUnit {
             tristimulus_buffer: Vec::from_elem(width * height * 3, 0.0)
         }
     }
+
+    /// Add the results of the PlotUnit to the canvas.
+    pub fn accumulate(&mut self, tristimuli: &[f32]) {
+        let accs = self.tristimulus_buffer.mut_iter();
+        let pixels = tristimuli.iter();
+
+        // Loop through all the pixels, and add the values.
+        for (acc, px) in accs.zip(pixels) {
+            *acc += *px;
+        }
+    }
 }

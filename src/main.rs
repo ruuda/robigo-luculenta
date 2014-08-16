@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 
 use camera::Camera;
+use gather_unit::GatherUnit;
 use geometry::{Volume, Plane, Sphere};
 use material::{EmissiveMaterial, BlackBodyMaterial, DiffuseColouredMaterial};
 use object::{Object, Emissive, Reflective};
@@ -60,4 +61,14 @@ fn main() {
     }
     let mut plot_unit = box PlotUnit::new(1280, 720);
     plot_unit.plot(trace_unit.mapped_photons);
+    plot_unit.tristimulus_buffer.mut_slice_from(0)[0] = 1.0;
+    let mut gather_unit = box GatherUnit::new(1280, 720);
+    gather_unit.accumulate(plot_unit.tristimulus_buffer.as_slice());
+    for i in gather_unit.tristimulus_buffer.slice(0, 3).iter() {
+        println!("Gathered once: {}", i);
+    }
+    gather_unit.accumulate(plot_unit.tristimulus_buffer.as_slice());
+    for i in gather_unit.tristimulus_buffer.slice(0, 3).iter() {
+        println!("Gathered twice: {}", i);
+    }
 }
