@@ -26,6 +26,7 @@ mod plot_unit;
 mod quaternion;
 mod ray;
 mod scene;
+mod srgb;
 mod tonemap_unit;
 mod trace_unit;
 mod vector3;
