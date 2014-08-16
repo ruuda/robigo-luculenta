@@ -8,6 +8,7 @@ use material::{EmissiveMaterial, BlackBodyMaterial, DiffuseColouredMaterial};
 use object::{Object, Emissive, Reflective};
 use quaternion::Quaternion;
 use scene::Scene;
+use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 use plot_unit::PlotUnit;
 use vector3::Vector3;
@@ -25,6 +26,7 @@ mod plot_unit;
 mod quaternion;
 mod ray;
 mod scene;
+mod tonemap_unit;
 mod trace_unit;
 mod vector3;
 
@@ -67,8 +69,6 @@ fn main() {
     for i in gather_unit.tristimulus_buffer.slice(0, 3).iter() {
         println!("Gathered once: {}", i);
     }
-    gather_unit.accumulate(plot_unit.tristimulus_buffer.as_slice());
-    for i in gather_unit.tristimulus_buffer.slice(0, 3).iter() {
-        println!("Gathered twice: {}", i);
-    }
+    let mut tonemap_unit = box TonemapUnit::new(1280, 720);
+    tonemap_unit.tonemap(gather_unit.tristimulus_buffer.as_slice());
 }
