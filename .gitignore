@@ -4,3 +4,6 @@
 
 # Rustdoc files
 /doc/
+
+# Program output
+/output.png

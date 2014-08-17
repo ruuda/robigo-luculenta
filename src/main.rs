@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+extern crate lodepng;
+
 use camera::Camera;
 use gather_unit::GatherUnit;
 use geometry::{Volume, Plane, Sphere};
@@ -71,4 +73,8 @@ fn main() {
     }
     let mut tonemap_unit = box TonemapUnit::new(1280, 720);
     tonemap_unit.tonemap(gather_unit.tristimulus_buffer.as_slice());
+    match lodepng::encode24_file(&Path::new("output.png"), tonemap_unit.rgb_buffer.as_slice(), 1280, 720) {
+        Ok(_) => { },
+        Err(reason) => println!("Failed to write output png: {}", reason)
+    }
 }
