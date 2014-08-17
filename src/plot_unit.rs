@@ -69,7 +69,7 @@ impl PlotUnit {
         let c22 = cx * cy;
 
         // Then plot the four pixels.
-        let buffer = self.tristimulus_buffer.mut_slice_from(0);
+        let buffer = self.tristimulus_buffer.as_mut_slice();
         buffer[py1 * w + px1] = buffer[py1 * w + px1] + cie * c11;
         buffer[py1 * w + px2] = buffer[py1 * w + px2] + cie * c21;
         buffer[py2 * w + px1] = buffer[py2 * w + px1] + cie * c12;

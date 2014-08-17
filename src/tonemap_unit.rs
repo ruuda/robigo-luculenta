@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::cmp::PartialOrd;
 use std::iter::AdditiveIterator;
 use vector3::Vector3;
 
@@ -27,6 +28,13 @@ pub struct TonemapUnit {
 
     /// The buffer of sRGB values.
     pub rgb_buffer: Vec<u8>
+}
+
+/// Clamps `x` to the interval [0, 1].
+fn clamp(x: f32) -> f32 {
+    if x.lt(&0.0) { 0.0 }
+    else if 1.0f32.lt(&x) { 1.0 }
+    else { x }
 }
 
 impl TonemapUnit {
@@ -74,6 +82,32 @@ impl TonemapUnit {
     /// Converts the unweighted CIE XYZ values in the buffer
     /// to tonemapped sRGB values.
     pub fn tonemap(&mut self, tristimuli: &[Vector3]) {
+        let max_intensity = self.find_exposure(tristimuli);
+        let buffer = self.rgb_buffer.as_mut_slice().mut_chunks(3);
+        let pixels = tristimuli.iter();
+        let ln_4 = 4.0f32.ln();
 
+        // Loop through all pixels.
+        for (buf, px) in buffer.zip(pixels) {
+            // Apply exposure correction.
+            let cie = Vector3 {
+                x: (px.x / max_intensity + 1.0).ln() / ln_4,
+                y: (px.y / max_intensity + 1.0).ln() / ln_4,
+                z: (px.z / max_intensity + 1.0).ln() / ln_4
+            };
+
+            // Then convert to sRGB.
+            let rgb = ::srgb::transform(cie);
+
+            // Clamp colours to saturate.
+            let r = clamp(rgb.x);
+            let g = clamp(rgb.y);
+            let b = clamp(rgb.z);
+
+            // Then convert to integers.
+            buf[0] = (r * 255.0) as u8;
+            buf[1] = (g * 255.0) as u8;
+            buf[2] = (b * 255.0) as u8;
+        }
     }
 }
