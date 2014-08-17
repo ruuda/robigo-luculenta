@@ -23,8 +23,25 @@ use scene::Scene;
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 
+pub enum Task<'t, 's> {
+    /// Do nothing, wait a while.
+    Sleep,
+
+    /// Trace a certain number of rays and store the mapped photons.
+    Trace(Box<TraceUnit<'s>>),
+
+    /// Plot all intermediate mapped photons to a canvas of CIE XYZ values.
+    Plot(Box<PlotUnit>, &'t [Box<TraceUnit<'s>>]),
+
+    /// Combine all CIE XYZ canvases and accumulate them into the final image.
+    Gather(Box<GatherUnit>, &'t [Box<PlotUnit>]),
+
+    /// Convert the CIE XYZ values to sRGB and display the image.
+    Tonemap(Box<TonemapUnit>)
+}
+
 /// Handles splitting the workload across threads.
-struct TaskScheduler<'s> {
+pub struct TaskScheduler<'s> {
     /// The number of trace units to use. Not all of them have to be
     /// active simultaneously.
     number_of_trace_units: uint,
