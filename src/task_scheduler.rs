@@ -23,7 +23,7 @@ use scene::Scene;
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 
-pub enum Task<'t, 's> {
+pub enum Task<'s> {
     /// Do nothing, wait a while.
     Sleep,
 
@@ -31,13 +31,13 @@ pub enum Task<'t, 's> {
     Trace(Box<TraceUnit<'s>>),
 
     /// Plot all intermediate mapped photons to a canvas of CIE XYZ values.
-    Plot(Box<PlotUnit>, &'t [Box<TraceUnit<'s>>]),
+    Plot(Box<PlotUnit>, Vec<Box<TraceUnit<'s>>>),
 
     /// Combine all CIE XYZ canvases and accumulate them into the final image.
-    Gather(Box<GatherUnit>, &'t [Box<PlotUnit>]),
+    Gather(Box<GatherUnit>, Vec<Box<PlotUnit>>),
 
     /// Convert the CIE XYZ values to sRGB and display the image.
-    Tonemap(Box<TonemapUnit>)
+    Tonemap(Box<TonemapUnit>, Box<GatherUnit>)
 }
 
 /// Handles splitting the workload across threads.
@@ -118,5 +118,82 @@ impl<'s> TaskScheduler<'s> {
             last_tonemap_time: get_time(),
             image_changed: false
         }
+    }
+
+    /// Makes resources used by the task available again.
+    fn complete_task(&mut self, task: Task<'s>) {
+        match task {
+            Sleep => { },
+            Trace(unit) => self.complete_trace_task(unit),
+            Plot(unit, units) => self.complete_plot_task(unit, units),
+            Gather(unit, units) => self.complete_gather_task(unit, units),
+            Tonemap(t_unt, g_unt) => self.complete_tonemap_task(t_unt, g_unt)
+        }
+    }
+
+    fn complete_trace_task(&mut self, trace_unit: Box<TraceUnit<'s>>) {
+        println!("done tracing with unit x."); // TODO: unit numbers.
+
+        // The trace unit used for the task, now needs plotting before
+        // it is available again.
+        self.done_trace_units.push(trace_unit);
+    }
+
+    fn complete_plot_task(&mut self,
+                          plot_unit: Box<PlotUnit>,
+                          trace_units: Vec<Box<TraceUnit<'s>>>) {
+        println!("done plotting with unit x."); // TODO: unit numbers.
+        print!("the following trace units are available again: ");
+
+        // All trace units that were plotted, can be used again now.
+        for trace_unit in trace_units.move_iter() {
+            self.available_trace_units.push(trace_unit);
+            print!(" x "); // TODO: unit numbers.
+        }
+
+        println!("");
+
+        // And the plot unit that was used, needs to be gathered before
+        // it can be used again.
+        self.done_plot_units.push(plot_unit);
+    }
+
+    fn complete_gather_task(&mut self,
+                            gather_unit: Box<GatherUnit>,
+                            plot_units: Vec<Box<PlotUnit>>) {
+        println!("done gathering");
+        print!("the following plot units are available again: ");
+
+        // All plot units that were gathered, can be used again now.
+        for plot_unit in plot_units.move_iter() {
+            self.available_plot_units.push(plot_unit);
+            print!(" x "); // TODO: unit numbers.
+        }
+
+        println!("");
+
+        // The gather unit can now be used again as well.
+        self.gather_unit = Some(gather_unit);
+
+        // The image must have changed because of gathering.
+        self.image_changed = true;
+    }
+
+    fn complete_tonemap_task(&mut self,
+                             tonemap_unit: Box<TonemapUnit>,
+                             gather_unit: Box<GatherUnit>) {
+        println!("done tonemapping");
+
+        // The tonemapper needed the gather unit,
+        // so the gather unit is free now.
+        self.gather_unit = Some(gather_unit);
+
+        // And of course the tonemap unit itself is available again.
+        self.tonemap_unit = Some(tonemap_unit);
+
+        // The image is tonemapped now, so until a new gathering happens,
+        // it will not change.
+        self.image_changed = false;
+        self.last_tonemap_time = get_time();
     }
 }
