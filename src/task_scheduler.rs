@@ -23,6 +23,33 @@ use scene::Scene;
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 
+struct PopItems<'a, T, C> {
+    container: &'a mut C
+}
+
+// Heper for moving out of a `RingBuf`
+trait PopIter<T> {
+    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, T, Self>;
+}
+
+impl<'a, T, C: PopIter<T> + Collection + MutableSeq<T>> Iterator<T> for PopItems<'a, T, C> {
+    fn next(&mut self) -> Option<T> {
+        self.container.pop()
+    }
+
+    fn size_hint(&self) -> (uint, Option<uint>) {
+        (self.container.len(), Some(self.container.len()))
+    }
+}
+
+impl<T, C: Collection + MutableSeq<T>> PopIter<T> for C {
+    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, T, C> {
+        PopItems {
+            container: self
+        }
+    }
+}
+
 pub enum Task<'s> {
     /// Do nothing, wait a while.
     Sleep,
@@ -118,6 +145,52 @@ impl<'s> TaskScheduler<'s> {
             last_tonemap_time: get_time(),
             image_changed: false
         }
+    }
+
+    fn create_trace_task(&mut self) -> Task {
+        // Pick the first available trace unit, and use it for the task.
+        // We know a unit is available, because this method would not
+        // have been called otherwise.
+        let trace_unit = self.available_trace_units.pop().unwrap();
+        Trace(trace_unit)
+    }
+
+    fn create_plot_task(&mut self) -> Task<'s> {
+        // Pick the first available plot unit, and use it for the task.
+        // We know a unit is available, because this method would not
+        // have been called otherwise.
+        let plot_unit = self.available_plot_units.pop().unwrap();
+
+        // Take around half of the trace units which are done for this task.
+        let done = self.done_trace_units.len();
+        let n = max(1, done / 2);
+
+        // Have it plot the trace units which are done.
+        let trace_units: Vec<Box<TraceUnit<'s>>> = self.done_trace_units
+        .pop_iter().take(n).collect();
+
+        Plot(plot_unit, trace_units)
+    }
+
+    fn create_gather_task(&mut self) -> Task {
+        // We know the gather unit is available, because this method would
+        // not have been called otherwise.
+        let gather_unit = self.gather_unit.take_unwrap();
+
+        // Have it gather all plot units which are done.
+        let plot_units: Vec<Box<PlotUnit>> = self.done_plot_units
+        .pop_iter().collect();
+
+        Gather(gather_unit, plot_units)
+    }
+
+    fn create_tonemap_task(&mut self) -> Task {
+        // We know the units are available, because this method would
+        // not have been called otherwise.
+        let gather_unit = self.gather_unit.take_unwrap();
+        let tonemap_unit = self.tonemap_unit.take_unwrap();
+
+        Tonemap(tonemap_unit, gather_unit)
     }
 
     /// Makes resources used by the task available again.
