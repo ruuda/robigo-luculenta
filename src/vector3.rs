@@ -40,6 +40,10 @@ impl Vector3 {
         Vector3 { x: x, y: y, z: z }
     }
 
+    pub fn zero() -> Vector3 {
+        Vector3::new(0.0, 0.0, 0.0)
+    }
+
     pub fn magnitude_squared(self) -> f32 {
         dot(self, self)
     }

@@ -43,8 +43,8 @@ fn main() {
         }
     }
     let red = DiffuseColouredMaterial::new(0.9, 700.0, 60.0);
-    let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
-    let sphere = Sphere::new(Vector3::new(0.0, 0.0, 0.0), 2.0);
+    let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::zero());
+    let sphere = Sphere::new(Vector3::zero(), 2.0);
     let black_body = BlackBodyMaterial::new(6504.0, 1.0);
     let reflective = Object::new(box plane, Emissive(box black_body));
     let emissive = Object::new(box sphere, Reflective(box red));

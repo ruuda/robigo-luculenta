@@ -24,7 +24,7 @@ pub fn get_tristimulus(wavelength: f32) -> Vector3 {
 
     if index < -1 || index > 80 {
         // Wavelength is not in the visible spectrum.
-        Vector3::new(0.0, 0.0, 0.0)
+        Vector3::zero()
     } else if index == -1 {
         // No interpolation possible.
         Vector3::new(x[0] * remainder, y[0] * remainder, z[0] * remainder)

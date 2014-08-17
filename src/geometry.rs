@@ -68,7 +68,7 @@ impl Surface for Plane {
                 // Planes are two-sided.
                 normal: if d < 0.0 { self.normal } else { -self.normal },
                 // Tangent is not used here.
-                tangent: Vector3::new(0.0, 0.0, 0.0),
+                tangent: Vector3::zero(),
                 distance: t
             };
             Some(intersection)
@@ -113,7 +113,7 @@ impl Surface for SpacePartitioning {
                 position: ray.origin + ray.direction * t,
                 normal: self.normal,
                 // Tangent is not used here.
-                tangent: Vector3::new(0.0, 0.0, 0.0),
+                tangent: Vector3::zero(),
                 distance: t
             };
             Some(intersection)
