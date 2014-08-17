@@ -30,7 +30,7 @@ pub struct PlotUnit {
     aspect_ratio: f32,
 
     /// The buffer of tristimulus values.
-    pub tristimulus_buffer: Vec<f32>
+    pub tristimulus_buffer: Vec<Vector3>
 }
 
 impl PlotUnit {
@@ -41,7 +41,7 @@ impl PlotUnit {
             image_width: width,
             image_height: height,
             aspect_ratio: width as f32 / height as f32,
-            tristimulus_buffer: Vec::from_elem(width * height * 3, 0.0)
+            tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero())
         }
     }
 
@@ -68,23 +68,12 @@ impl PlotUnit {
         let c21 = cx * (1.0 - cy);
         let c22 = cx * cy;
 
-        // Generate all indexing instead of hard-coding the indices.
-        macro_rules! add_to_buffer {
-            ($buffer:ident, $w: expr, $cie: ident, $x: expr, $y: expr, $c: expr) => (
-                (
-                    $buffer[$y * $w * 3 + $x * 3 + 0] += $cie.x * $c,
-                    $buffer[$y * $w * 3 + $x * 3 + 1] += $cie.y * $c,
-                    $buffer[$y * $w * 3 + $x * 3 + 2] += $cie.z * $c
-                )
-            );
-        }
-
         // Then plot the four pixels.
         let buffer = self.tristimulus_buffer.mut_slice_from(0);
-        add_to_buffer!(buffer, w, cie, px1, py1, c11);
-        add_to_buffer!(buffer, w, cie, px2, py1, c21);
-        add_to_buffer!(buffer, w, cie, px1, py2, c12);
-        add_to_buffer!(buffer, w, cie, px2, py2, c22);
+        buffer[py1 * w + px1] = buffer[py1 * w + px1] + cie * c11;
+        buffer[py1 * w + px2] = buffer[py1 * w + px2] + cie * c21;
+        buffer[py2 * w + px1] = buffer[py2 * w + px1] + cie * c12;
+        buffer[py2 * w + px2] = buffer[py2 * w + px2] + cie * c22;
     }
 
     /// Plots the result of the specified TraceUnit onto the canvas.
@@ -103,7 +92,7 @@ impl PlotUnit {
         // TODO: is there a way to optimise this to a memzero?
         // Will LLVM do it automatically?
         for x in self.tristimulus_buffer.mut_iter() {
-            *x = 0.0;
+            *x = Vector3::zero();
         }
     }
 }

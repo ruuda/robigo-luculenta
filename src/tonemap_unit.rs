@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::iter::AdditiveIterator;
+use vector3::Vector3;
 
 /// Converts the result of a `GatherUnit` into an sRGB image.
 pub struct TonemapUnit {
@@ -42,14 +43,13 @@ impl TonemapUnit {
     /// Returns an exposure estimate based on the average cieY value.
     /// The returned value is the maximum acceptable intensity, the
     /// intensity that should become (nearly) white.
-    fn find_exposure(&self, tristimuli: &[f32]) -> f32 {
-        let mut intensities = tristimuli
+    fn find_exposure(&self, tristimuli: &[Vector3]) -> f32 {
+        let mut intensities = tristimuli.iter()
         // Iterate over triplets of CIE XYZ values.
-        .chunks(3)
         // Calculations are based on the CIE Y value (which corresponds
         // to lightness), but X and Z are also taken into account slightly
         // to avoid weird situations.
-        .map(|cie| { cie[0] + cie[1] * 5.0 + cie[2] });
+        .map(|cie| { cie.x + cie.y * 5.0 + cie.z });
 
         // Compute the average intensity. Divide by 7 to compensate
         // for the coefficients above.
@@ -57,8 +57,8 @@ impl TonemapUnit {
         (self.image_width as f32 * self.image_height as f32 * 7.0);
 
         // TODO: I have not found a good way to re-use an iterator.
-        intensities = tristimuli.chunks(3)
-        .map(|cie| { cie[0] + cie[1] * 5.0 + cie[2] });
+        intensities = tristimuli.iter()
+        .map(|cie| { cie.x + cie.y * 5.0 + cie.z });
 
         // Then compute the standard deviation. Divide by 49 = 7 * 7
         // to compensate for the coefficients above.
@@ -73,7 +73,7 @@ impl TonemapUnit {
 
     /// Converts the unweighted CIE XYZ values in the buffer
     /// to tonemapped sRGB values.
-    pub fn tonemap(&mut self, tristimuli: &[f32]) {
+    pub fn tonemap(&mut self, tristimuli: &[Vector3]) {
 
     }
 }

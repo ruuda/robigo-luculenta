@@ -14,9 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use vector3::Vector3;
+
 pub struct GatherUnit {
     /// The buffer of tristimulus values.
-    pub tristimulus_buffer: Vec<f32>
+    pub tristimulus_buffer: Vec<Vector3>
 }
 
 impl GatherUnit {
@@ -24,18 +26,18 @@ impl GatherUnit {
     /// of the specified size.
     pub fn new(width: uint, height: uint) -> GatherUnit {
         GatherUnit {
-            tristimulus_buffer: Vec::from_elem(width * height * 3, 0.0)
+            tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero())
         }
     }
 
     /// Add the results of the PlotUnit to the canvas.
-    pub fn accumulate(&mut self, tristimuli: &[f32]) {
+    pub fn accumulate(&mut self, tristimuli: &[Vector3]) {
         let accs = self.tristimulus_buffer.mut_iter();
         let pixels = tristimuli.iter();
 
         // Loop through all the pixels, and add the values.
         for (acc, px) in accs.zip(pixels) {
-            *acc += *px;
+            *acc = *acc + *px;
         }
     }
 }
