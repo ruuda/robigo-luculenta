@@ -20,7 +20,7 @@ use object::Object;
 use ray::Ray;
 
 /// A collection of objects.
-pub struct Scene<'a> {
+pub struct Scene {
     /// All the renderable objects in the scene.
     pub objects: Vec<Object>,
 
@@ -34,7 +34,7 @@ pub struct Scene<'a> {
     pub get_camera_at_time: fn (f32) -> Camera
 }
 
-impl<'a> Scene<'a> {
+impl Scene {
     /// Intersects the specified ray with the scene.
     pub fn intersect(&self, ray: &Ray) -> Option<(Intersection, &Object)> {
         // Assume Nothing is found, and that Nothing is Very Far Away (tm).

@@ -53,7 +53,7 @@ impl MappedPhoton {
 /// Handles ray tracing.
 pub struct TraceUnit<'s> {
     /// The scene that will be rendered.
-    scene: &'s Scene<'s>,
+    scene: &'s Scene,
 
     /// The aspect ratio of the image that will be rendered.
     aspect_ratio: f32,
@@ -64,7 +64,7 @@ pub struct TraceUnit<'s> {
 
 impl<'s> TraceUnit<'s> {
     /// Creates a new trace unit that renders the given scene.
-    pub fn new<'sc>(scene: &'sc Scene<'sc>, width: uint, height: uint) -> TraceUnit<'sc> {
+    pub fn new<'sc>(scene: &'sc Scene, width: uint, height: uint) -> TraceUnit<'sc> {
         TraceUnit {
             scene: scene,
             aspect_ratio: width as f32 / height as f32,
@@ -74,7 +74,7 @@ impl<'s> TraceUnit<'s> {
 
     /// Return the contribution of a photon travelling backwards
     /// the specified ray.
-    fn render_ray(scene: &'s Scene<'s>, initial_ray: Ray) -> f32 {
+    fn render_ray(scene: &'s Scene, initial_ray: Ray) -> f32 {
         // The path starts with the ray, and there is a chance it continues.
         let mut ray = initial_ray;
         let mut continue_chance = 1.0f32;
@@ -133,7 +133,7 @@ impl<'s> TraceUnit<'s> {
 
     /// Returns the contribution of a ray
     /// through the specified creen coordinate.
-    fn render_camera_ray(scene: &'s Scene<'s>, x: f32, y: f32, wavelength: f32) -> f32 {
+    fn render_camera_ray(scene: &'s Scene, x: f32, y: f32, wavelength: f32) -> f32 {
         // Get a random time to sample at.
         let t = ::monte_carlo::get_unit();
 
