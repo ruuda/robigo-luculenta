@@ -25,6 +25,7 @@ mod material;
 mod monte_carlo;
 mod object;
 mod plot_unit;
+mod pop_iter;
 mod quaternion;
 mod ray;
 mod scene;

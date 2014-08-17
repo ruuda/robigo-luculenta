@@ -19,54 +19,10 @@ use std::collections::RingBuf;
 use time::{Timespec, get_time};
 use gather_unit::GatherUnit;
 use plot_unit::PlotUnit;
+use pop_iter::PopFrontIter;
 use scene::Scene;
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
-
-struct PopItems<'a, C> {
-    container: &'a mut C
-}
-
-// Heper for moving out of a `RingBuf`
-trait PopIter {
-    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, Self>;
-}
-
-impl<'a, T, C: PopIter + Collection + MutableSeq<T>> Iterator<T> for PopItems<'a, C> {
-    fn next(&mut self) -> Option<T> {
-        self.container.pop()
-    }
-
-    fn size_hint(&self) -> (uint, Option<uint>) {
-        (self.container.len(), Some(self.container.len()))
-    }
-}
-
-impl<T, C: Collection + MutableSeq<T>> PopIter for C {
-    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, C> {
-        PopItems {
-            container: self
-        }
-    }
-}
-
-#[test]
-fn pop_iter_vec() {
-    let mut xs = vec!(0u, 1, 2, 3, 4);
-    let ys: Vec<uint> = xs.pop_iter().take(3).collect();
-    assert_eq!(xs.as_slice(), &[0u, 1]);
-    assert_eq!(ys.as_slice(), &[4u, 3, 2]);
-}
-
-#[test]
-fn pop_iter_ring_buf() {
-    let mut xs = RingBuf::new();
-    xs.push(0u); xs.push(1); xs.push(2); xs.push(3); xs.push(4);
-    let ys: Vec<uint> = xs.pop_iter().take(3).collect();
-    assert_eq!(xs.get(0), &0u);
-    assert_eq!(xs.get(1), &1u);
-    assert_eq!(ys.as_slice(), &[4u, 3, 2]);
-}
 
 pub enum Task<'s> {
     /// Do nothing, wait a while.
@@ -185,7 +141,7 @@ impl<'s> TaskScheduler<'s> {
 
         // Have it plot the trace units which are done.
         let trace_units: Vec<Box<TraceUnit<'s>>> = self.done_trace_units
-        .pop_iter().take(n).collect();
+        .pop_front_iter().take(n).collect();
 
         Plot(plot_unit, trace_units)
     }
@@ -197,7 +153,7 @@ impl<'s> TaskScheduler<'s> {
 
         // Have it gather all plot units which are done.
         let plot_units: Vec<Box<PlotUnit>> = self.done_plot_units
-        .pop_iter().collect();
+        .pop_front_iter().collect();
 
         Gather(gather_unit, plot_units)
     }
