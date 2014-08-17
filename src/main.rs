@@ -40,7 +40,7 @@ fn main() {
             focal_distance: 10.0,
             depth_of_field: 10.0,
             chromatic_abberation: 1.0,
-            orientation: Quaternion::rotation(1.0, 0.0, 0.0, 0.5)
+            orientation: Quaternion::rotation(1.0, 0.0, 0.0, 1.531)
         }
     }
     let red = DiffuseColouredMaterial::new(0.9, 700.0, 60.0);
