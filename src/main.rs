@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+extern crate time;
 extern crate lodepng;
 
 use camera::Camera;
@@ -28,6 +29,7 @@ mod quaternion;
 mod ray;
 mod scene;
 mod srgb;
+mod task_scheduler;
 mod tonemap_unit;
 mod trace_unit;
 mod vector3;
