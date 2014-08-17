@@ -23,16 +23,16 @@ use scene::Scene;
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 
-struct PopItems<'a, T, C> {
+struct PopItems<'a, C> {
     container: &'a mut C
 }
 
 // Heper for moving out of a `RingBuf`
-trait PopIter<T> {
-    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, T, Self>;
+trait PopIter {
+    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, Self>;
 }
 
-impl<'a, T, C: PopIter<T> + Collection + MutableSeq<T>> Iterator<T> for PopItems<'a, T, C> {
+impl<'a, T, C: PopIter + Collection + MutableSeq<T>> Iterator<T> for PopItems<'a, C> {
     fn next(&mut self) -> Option<T> {
         self.container.pop()
     }
@@ -42,12 +42,30 @@ impl<'a, T, C: PopIter<T> + Collection + MutableSeq<T>> Iterator<T> for PopItems
     }
 }
 
-impl<T, C: Collection + MutableSeq<T>> PopIter<T> for C {
-    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, T, C> {
+impl<T, C: Collection + MutableSeq<T>> PopIter for C {
+    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, C> {
         PopItems {
             container: self
         }
     }
+}
+
+#[test]
+fn pop_iter_vec() {
+    let mut xs = vec!(0u, 1, 2, 3, 4);
+    let ys: Vec<uint> = xs.pop_iter().take(3).collect();
+    assert_eq!(xs.as_slice(), &[0u, 1]);
+    assert_eq!(ys.as_slice(), &[4u, 3, 2]);
+}
+
+#[test]
+fn pop_iter_ring_buf() {
+    let mut xs = RingBuf::new();
+    xs.push(0u); xs.push(1); xs.push(2); xs.push(3); xs.push(4);
+    let ys: Vec<uint> = xs.pop_iter().take(3).collect();
+    assert_eq!(xs.get(0), &0u);
+    assert_eq!(xs.get(1), &1u);
+    assert_eq!(ys.as_slice(), &[4u, 3, 2]);
 }
 
 pub enum Task<'s> {
