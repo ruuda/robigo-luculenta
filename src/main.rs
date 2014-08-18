@@ -60,10 +60,10 @@ fn main() {
     println!("Is (2,1,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(2.0, 1.0, 0.0)));
     println!("Black body intensity at 400 and 600 nm is {} and {}.", black_body.get_intensity(400.0), black_body.get_intensity(600.0));
 
-    let mut trace_unit = box TraceUnit::new(&scene, 1280, 720);
+    let mut trace_unit = box TraceUnit::new(1280, 720);
     let mut plot_unit = box PlotUnit::new(1280, 720);
     for _ in range(0u, 100) {
-        trace_unit.render();
+        trace_unit.render(&scene);
         plot_unit.plot(trace_unit.mapped_photons);
     }
     let mut gather_unit = box GatherUnit::new(1280, 720);

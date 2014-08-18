@@ -20,19 +20,18 @@ use time::{Timespec, get_time};
 use gather_unit::GatherUnit;
 use plot_unit::PlotUnit;
 use pop_iter::PopFrontIter;
-use scene::Scene;
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 
-pub enum Task<'s> {
+pub enum Task {
     /// Do nothing, wait a while.
     Sleep,
 
     /// Trace a certain number of rays and store the mapped photons.
-    Trace(Box<TraceUnit<'s>>),
+    Trace(Box<TraceUnit>),
 
     /// Plot all intermediate mapped photons to a canvas of CIE XYZ values.
-    Plot(Box<PlotUnit>, Vec<Box<TraceUnit<'s>>>),
+    Plot(Box<PlotUnit>, Vec<Box<TraceUnit>>),
 
     /// Combine all CIE XYZ canvases and accumulate them into the final image.
     Gather(Box<GatherUnit>, Vec<Box<PlotUnit>>),
@@ -56,17 +55,17 @@ fn sub_timespec(this: &Timespec, that: &Timespec) -> Timespec {
 }
 
 /// Handles splitting the workload across threads.
-pub struct TaskScheduler<'s> {
+pub struct TaskScheduler {
     /// The number of trace units to use. Not all of them have to be
     /// active simultaneously.
     number_of_trace_units: uint,
 
     /// The trace units which are available for tracing rays.
-    available_trace_units: RingBuf<Box<TraceUnit<'s>>>,
+    available_trace_units: RingBuf<Box<TraceUnit>>,
 
     /// The trace units which have mapped photons that must be plotted,
     /// before the trace unit can be used again.
-    done_trace_units: RingBuf<Box<TraceUnit<'s>>>,
+    done_trace_units: RingBuf<Box<TraceUnit>>,
 
     /// The number of plot units to use. Not all of them have to be
     /// active simultaneously.
@@ -93,14 +92,10 @@ pub struct TaskScheduler<'s> {
     image_changed: bool
 }
 
-impl<'s> TaskScheduler<'s> {
+impl TaskScheduler {
     /// Creates a new task scheduler, that will render `scene` to a
     /// canvas of the specified size, using `concurrency` threads.
-    pub fn new<'sc>(concurrency: uint,
-                    width: uint,
-                    height: uint,
-                    scene: &'sc Scene)
-                    -> TaskScheduler<'sc> {
+    pub fn new(concurrency: uint, width: uint, height: uint) -> TaskScheduler {
         // More trace units than threads seems sensible,
         // but less plot units is acceptable,
         // because one plot unit can handle multiple trace units.
@@ -109,7 +104,7 @@ impl<'s> TaskScheduler<'s> {
 
         // Build the trace units.
         let trace_units = range(0, n_trace_units)
-        .map(|_| { box TraceUnit::new(scene, width, height) })
+        .map(|_| { box TraceUnit::new(width, height) })
         .collect::<RingBuf<Box<TraceUnit>>>();
 
         // Then build the plot units.
@@ -135,7 +130,7 @@ impl<'s> TaskScheduler<'s> {
         }
     }
 
-    pub fn get_new_task(&mut self, completed_task: Task<'s>) -> Task<'s> {
+    pub fn get_new_task(&mut self, completed_task: Task) -> Task {
         // Make the units that were used by the completed task available again.
         self.complete_task(completed_task);
 
@@ -192,7 +187,7 @@ impl<'s> TaskScheduler<'s> {
         Sleep
     }
 
-    fn create_trace_task(&mut self) -> Task<'s> {
+    fn create_trace_task(&mut self) -> Task {
         // Pick the first available trace unit, and use it for the task.
         // We know a unit is available, because this method would not
         // have been called otherwise.
@@ -200,7 +195,7 @@ impl<'s> TaskScheduler<'s> {
         Trace(trace_unit)
     }
 
-    fn create_plot_task(&mut self) -> Task<'s> {
+    fn create_plot_task(&mut self) -> Task {
         // Pick the first available plot unit, and use it for the task.
         // We know a unit is available, because this method would not
         // have been called otherwise.
@@ -211,13 +206,13 @@ impl<'s> TaskScheduler<'s> {
         let n = max(1, done / 2);
 
         // Have it plot the trace units which are done.
-        let trace_units: Vec<Box<TraceUnit<'s>>> = self.done_trace_units
+        let trace_units: Vec<Box<TraceUnit>> = self.done_trace_units
         .pop_front_iter().take(n).collect();
 
         Plot(plot_unit, trace_units)
     }
 
-    fn create_gather_task(&mut self) -> Task<'s> {
+    fn create_gather_task(&mut self) -> Task {
         // We know the gather unit is available, because this method would
         // not have been called otherwise.
         let gather_unit = self.gather_unit.take_unwrap();
@@ -229,7 +224,7 @@ impl<'s> TaskScheduler<'s> {
         Gather(gather_unit, plot_units)
     }
 
-    fn create_tonemap_task(&mut self) -> Task<'s> {
+    fn create_tonemap_task(&mut self) -> Task {
         // We know the units are available, because this method would
         // not have been called otherwise.
         let gather_unit = self.gather_unit.take_unwrap();
@@ -239,7 +234,7 @@ impl<'s> TaskScheduler<'s> {
     }
 
     /// Makes resources used by the task available again.
-    fn complete_task(&mut self, task: Task<'s>) {
+    fn complete_task(&mut self, task: Task) {
         match task {
             Sleep => { },
             Trace(unit) => self.complete_trace_task(unit),
@@ -249,7 +244,7 @@ impl<'s> TaskScheduler<'s> {
         }
     }
 
-    fn complete_trace_task(&mut self, trace_unit: Box<TraceUnit<'s>>) {
+    fn complete_trace_task(&mut self, trace_unit: Box<TraceUnit>) {
         println!("done tracing with unit x."); // TODO: unit numbers.
 
         // The trace unit used for the task, now needs plotting before
@@ -259,7 +254,7 @@ impl<'s> TaskScheduler<'s> {
 
     fn complete_plot_task(&mut self,
                           plot_unit: Box<PlotUnit>,
-                          trace_units: Vec<Box<TraceUnit<'s>>>) {
+                          trace_units: Vec<Box<TraceUnit>>) {
         println!("done plotting with unit x."); // TODO: unit numbers.
         print!("the following trace units are available again: ");
 
