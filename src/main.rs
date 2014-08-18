@@ -15,6 +15,7 @@ use trace_unit::TraceUnit;
 use plot_unit::PlotUnit;
 use vector3::Vector3;
 
+mod app;
 mod camera;
 mod cie1931;
 mod constants;
