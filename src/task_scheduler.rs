@@ -41,6 +41,20 @@ pub enum Task<'s> {
     Tonemap(Box<TonemapUnit>, Box<GatherUnit>)
 }
 
+/// Tonemap every 10 seconds.
+static tonemap_interval: Timespec = Timespec { sec: 10, nsec: 0 };
+
+// Helper to be able to take time differences.
+fn sub_timespec(this: &Timespec, that: &Timespec) -> Timespec {
+    let mut sec = this.sec - that.sec;
+    let mut nsec = this.nsec - that.nsec;
+    if nsec < 0 {
+        nsec += 1_000_000_000;
+        sec -= 1;
+    }
+    Timespec::new(sec, nsec)
+}
+
 /// Handles splitting the workload across threads.
 pub struct TaskScheduler<'s> {
     /// The number of trace units to use. Not all of them have to be
@@ -121,7 +135,64 @@ impl<'s> TaskScheduler<'s> {
         }
     }
 
-    fn create_trace_task(&mut self) -> Task {
+    pub fn get_new_task(&mut self, completed_task: Task<'s>) -> Task<'s> {
+        // Make the units that were used by the completed task available again.
+        self.complete_task(completed_task);
+
+        // If the last tonemapping time was more than x seconds ago,
+        // an update should be done.
+        let now = get_time();
+        if sub_timespec(&now, &self.last_tonemap_time) > tonemap_interval {
+            // If the image has changed since it was last tonemapped,
+            // tonemap it now.
+            if self.image_changed {
+                // Tonemapping can only be done if no gathering
+                // and tonemapping are busy.
+                if self.gather_unit.is_some() && self.tonemap_unit.is_some() {
+                    return self.create_tonemap_task();
+                }
+            } else {
+                // Otherwise, the plots must first be gathered, tonemapping
+                // will happen once that is done.
+                if self.gather_unit.is_some() &&
+                   !self.done_plot_units.is_empty() {
+                    return self.create_gather_task();
+                }
+            }
+        }
+
+        // If a substantial number of trace units is done, plot them first
+        // so they can be recycled soon.
+        if self.done_trace_units.len() > self.number_of_trace_units / 2 &&
+            !self.available_plot_units.is_empty() {
+            return self.create_plot_task();
+        }
+
+        // Then, if there are enough trace units available, go trace some rays!
+        if !self.available_trace_units.is_empty() {
+            return self.create_trace_task();
+        }
+
+        // Otherwise, some trace units need to be plotted to make them
+        // available again.
+        if !self.available_plot_units.is_empty() &&
+           !self.done_trace_units.is_empty() {
+            return self.create_plot_task();
+        }
+
+        // If no plot units are available (or all trace units are busy,
+        // which should be impossible), gather some plots to make the plot
+        // units available again.
+        if self.gather_unit.is_some() && !self.done_plot_units.is_empty() {
+            return self.create_gather_task();
+        }
+
+        // If everything is locked in dependencies and everything is a big
+        // mess, simply wait a while for units to become available.
+        Sleep
+    }
+
+    fn create_trace_task(&mut self) -> Task<'s> {
         // Pick the first available trace unit, and use it for the task.
         // We know a unit is available, because this method would not
         // have been called otherwise.
@@ -146,7 +217,7 @@ impl<'s> TaskScheduler<'s> {
         Plot(plot_unit, trace_units)
     }
 
-    fn create_gather_task(&mut self) -> Task {
+    fn create_gather_task(&mut self) -> Task<'s> {
         // We know the gather unit is available, because this method would
         // not have been called otherwise.
         let gather_unit = self.gather_unit.take_unwrap();
@@ -158,7 +229,7 @@ impl<'s> TaskScheduler<'s> {
         Gather(gather_unit, plot_units)
     }
 
-    fn create_tonemap_task(&mut self) -> Task {
+    fn create_tonemap_task(&mut self) -> Task<'s> {
         // We know the units are available, because this method would
         // not have been called otherwise.
         let gather_unit = self.gather_unit.take_unwrap();
