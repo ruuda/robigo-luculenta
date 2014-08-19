@@ -15,13 +15,19 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::comm::{Handle, Select, Sender, Receiver, channel};
+use std::io::timer::sleep;
 use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 use std::vec::unzip;
 use camera::Camera;
-use scene::Scene;
+use gather_unit::GatherUnit;
+use plot_unit::PlotUnit;
 use quaternion::Quaternion;
-use task_scheduler::TaskScheduler;
+use scene::Scene;
+use task_scheduler::{Task, Sleep, Trace, Plot, Gather, Tonemap, TaskScheduler};
+use tonemap_unit::TonemapUnit;
+use trace_unit::TraceUnit;
 use vector3::Vector3;
 
 pub type Image = Vec<u8>;
@@ -116,6 +122,56 @@ impl App {
 
         // TODO: spawn proc.
         (stop_tx, img_rx)
+    }
+
+    fn execute_task(task: &mut Task, scene: &Scene, img_tx: &mut Sender<Image>) {
+        match *task {
+            Sleep =>
+                App::execute_sleep_task(),
+            Trace(ref mut trace_unit) =>
+                App::execute_trace_task(scene, &mut **trace_unit),
+            Plot(ref mut plot_unit, ref mut units) =>
+                App::execute_plot_task(&mut **plot_unit, units.as_mut_slice()),
+            Gather(ref mut gather_unit, ref mut units) =>
+                App::execute_gather_task(&mut **gather_unit, units.as_mut_slice()),
+            Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
+                App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit)
+        }
+    }
+
+    fn execute_sleep_task() {
+        sleep(Duration::milliseconds(100));
+    }
+
+    fn execute_trace_task(scene: &Scene, trace_unit: &mut TraceUnit) {
+        trace_unit.render(scene);
+    }
+
+    fn execute_plot_task(plot_unit: &mut PlotUnit,
+                         units: &mut[Box<TraceUnit>]) {
+        for unit in units.mut_iter() {
+            plot_unit.plot(unit.mapped_photons);
+        }
+    }
+
+    fn execute_gather_task(gather_unit: &mut GatherUnit,
+                           units: &mut[Box<PlotUnit>]) {
+        for unit in units.mut_iter() {
+            gather_unit.accumulate(unit.tristimulus_buffer.as_slice());
+            unit.clear();
+        }
+    }
+
+    fn execute_tonemap_task(img_tx: &mut Sender<Image>,
+                            tonemap_unit: &mut TonemapUnit,
+                            gather_unit: &mut GatherUnit) {
+        tonemap_unit.tonemap(gather_unit.tristimulus_buffer.as_slice());
+
+        // Copy the rendered image.
+        let img = tonemap_unit.rgb_buffer.clone();
+
+        // And send it to the UI / main task.
+        img_tx.send(img);
     }
 
     fn set_up_scene() -> Scene {
