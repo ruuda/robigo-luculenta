@@ -23,7 +23,7 @@ use std::vec::unzip;
 use camera::Camera;
 use gather_unit::GatherUnit;
 use geometry::{Plane, Sphere};
-use material::{BlackBodyMaterial, DiffuseColouredMaterial};
+use material::{BlackBodyMaterial, DiffuseGreyMaterial, DiffuseColouredMaterial};
 use object::{Emissive, Object, Reflective};
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
@@ -200,6 +200,33 @@ impl App {
     }
 
     fn set_up_scene() -> Scene {
+        let mut objects = Vec::new();
+
+        let grey = DiffuseGreyMaterial::new(0.8);
+        let red = DiffuseColouredMaterial::new(0.9, 660.0, 60.0);
+        let green = DiffuseColouredMaterial::new(0.9, 550.0, 40.0);
+        let blue = DiffuseColouredMaterial::new(0.5, 470.0, 25.0);
+
+        let sun_emissive = BlackBodyMaterial::new(6504.0, 1.0);
+        let sky1_emissive = BlackBodyMaterial::new(7600.0, 0.6);
+        let sky2_emissive = BlackBodyMaterial::new(5000.0, 0.6);
+
+        // Sphere in the centre.
+        let sun_radius: f32 = 5.0;
+        let sun_position = Vector3::zero();
+        let sun_sphere = Sphere::new(sun_position, sun_radius);
+        let sun = Object::new(box sun_sphere, Emissive(box sun_emissive));
+        objects.push(sun);
+
+        let floor_normal = Vector3::new(0.0, 0.0, -1.0);
+        let sky_height: f32 = 30.0;
+
+        // Ceiling plane (for more interesting light).
+        let ceiling_position = Vector3::new(0.0, 0.0, sky_height * 2.0);
+        let ceiling_plane = Plane::new(floor_normal, ceiling_position);
+        let ceiling = Object::new(box ceiling_plane, Reflective(box blue));
+        objects.push(ceiling);
+
         fn make_camera(t: f32) -> Camera {
             // Orbit around (0, 0, 0) based on the time.
             let pi: f32 = Float::pi();
@@ -240,7 +267,7 @@ impl App {
         let reflective = Object::new(box plane, Reflective(box red));
         let emissive = Object::new(box sphere, Emissive(box black_body));
         Scene {
-            objects: vec!(reflective, emissive),
+            objects: objects,
             get_camera_at_time: make_camera
         }
     }
