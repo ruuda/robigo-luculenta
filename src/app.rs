@@ -42,9 +42,6 @@ pub static image_height: uint = 720;
 static aspect_ratio: f32 = image_width as f32 / image_height as f32;
 
 pub struct App {
-    /// The scene that is rendered.
-    scene: Scene,
-
     /// Channel that can be used to signal the application to stop.
     pub stop: Sender<()>,
 
@@ -54,8 +51,6 @@ pub struct App {
 
 impl App {
     pub fn new() -> App {
-        // Build the scene that will be rendered.
-        let scene = App::set_up_scene();
         let concurrency = num_cpus();
         let ts = TaskScheduler::new(concurrency, image_width, image_height);
         let task_scheduler = Arc::new(Mutex::new(ts));
@@ -109,16 +104,44 @@ impl App {
         });
 
         App {
-            scene: scene,
             stop: stop_tx,
             images: img_rx
         }
     }
 
-    fn start_worker(scheduler: Arc<Mutex<TaskScheduler>>)
+    fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>)
                     -> (Sender<()>, Receiver<Image>) {
         let (stop_tx, stop_rx) = channel::<()>();
         let (img_tx, img_rx) = channel::<Image>();
+
+        spawn(proc() {
+            // TODO: there should be one scene for the entire program,
+            // not one per worker thread. However, I can't get sharing
+            // the scene working properly :(
+            let scene = App::set_up_scene();
+
+            // Move img_tx into the proc.
+            let mut owned_img_tx = img_tx;
+
+            // There is no task yet, but the task scheduler expects
+            // a completed task. Therefore, this worker is done sleeping.
+            let mut task = Sleep;
+
+            // Until something signals this worker to stop,
+            // continue executing tasks.
+            loop {
+                // Ask the task scheduler for a new task, complete the old one.
+                // Then execute it.
+                task = task_scheduler.lock().get_new_task(task);
+                App::execute_task(&mut task, &scene, &mut owned_img_tx);
+
+                // Stop only if a stop signal has been sent.
+                match stop_rx.try_recv() {
+                    Ok(()) => break,
+                    _ => { }
+                }
+            }
+        });
 
         // TODO: spawn proc.
         (stop_tx, img_rx)
