@@ -46,17 +46,17 @@ mod vector3;
 
 fn main() {
     // Start up the path tracer. It begins rendering immediately.
-    let mut app = App::new();
+    let app = App::new();
 
     // Spawn a new proc that will signal stop when enter is pressed.
     let (stop_tx, stop_rx) = channel();
     spawn(proc() {
         println!("press enter to stop rendering");
-        stdin().read_line();
+        stdin().read_line().unwrap();
         stop_tx.send(());
     });
 
-    let mut images = app.images;
+    let images = app.images;
 
     // Then wait for news from other tasks: when an image has been rendered,
     // write it out, and when stop is signalled, stop the app.

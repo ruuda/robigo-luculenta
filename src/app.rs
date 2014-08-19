@@ -72,10 +72,7 @@ impl App {
             // Combine values so we can recv one at a time.
             let select = Select::new();
             let mut worker_handles: Vec<Handle<Image>> = images
-            .iter().map(|worker_rx| {
-                let mut handle = select.handle(worker_rx);
-                handle
-            }).collect();
+            .iter().map(|worker_rx| { select.handle(worker_rx) }).collect();
             for handle in worker_handles.mut_iter() {
                 unsafe { handle.add(); }
             }
