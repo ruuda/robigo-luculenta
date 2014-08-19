@@ -7,3 +7,6 @@
 
 # Program output
 /output.png
+
+# Editor files
+*.swp
