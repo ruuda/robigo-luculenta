@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use intersection::Intersection;
-use object::{Object, Reflective, Emissive};
+use object::{Reflective, Emissive};
 use ray::Ray;
 use scene::Scene;
 
@@ -80,28 +79,24 @@ impl TraceUnit {
         let mut intensity = 1.0f32;
 
         loop {
-            let intersection: Intersection;
-            let object: &Object;
-
-            // Intersect the ray with the scene.
             match scene.intersect(&ray) {
                 // If nothing was intersected, the path ends,
                 // and the only thing left is the utter darkness of The Void.
                 None => return 0.0,
-                Some((isect, obj)) => { intersection = isect; object = obj; }
-            }
-
-            match object.material {
-                // If a light was hit, the path ends, and the intensity
-                // of the light determines the intensity of the path.
-                Emissive(ref mat) => {
-                    return intensity * mat.get_intensity(ray.wavelength);
-                },
-                // Otherwise, the ray must have hit a non-emissive surface,
-                // and so the journey continues ...
-                Reflective(ref mat) => {
-                    ray = mat.get_new_ray(&ray, &intersection);
-                    intensity = intensity * ray.probability;
+                Some((intersection, object)) => {
+                    match object.material {
+                        // If a light was hit, the path ends, and the intensity
+                        // of the light determines the intensity of the path.
+                        Emissive(ref mat) => {
+                            return intensity * mat.get_intensity(ray.wavelength);
+                        },
+                        // Otherwise, the ray must have hit a non-emissive surface,
+                        // and so the journey continues ...
+                        Reflective(ref mat) => {
+                            ray = mat.get_new_ray(&ray, &intersection);
+                            intensity = intensity * ray.probability;
+                        }
+                    }
                 }
             }
 
