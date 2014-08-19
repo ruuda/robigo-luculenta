@@ -104,7 +104,7 @@ impl TaskScheduler {
 
         // Build the trace units.
         let trace_units = range(0, n_trace_units)
-        .map(|_| { box TraceUnit::new(width, height) })
+        .map(|i| { box TraceUnit::new(i, width, height) })
         .collect::<RingBuf<Box<TraceUnit>>>();
 
         // Then build the plot units.
@@ -245,7 +245,7 @@ impl TaskScheduler {
     }
 
     fn complete_trace_task(&mut self, trace_unit: Box<TraceUnit>) {
-        println!("done tracing with unit x."); // TODO: unit numbers.
+        println!("done tracing with unit {}", trace_unit.id);
 
         // The trace unit used for the task, now needs plotting before
         // it is available again.
