@@ -203,14 +203,36 @@ impl App {
     }
 
     fn set_up_scene() -> Scene {
-        fn make_camera(_: f32) -> Camera {
+        fn make_camera(t: f32) -> Camera {
+            // Orbit around (0, 0, 0) based on the time.
+            let pi: f32 = Float::pi();
+            let phi = pi * (1.0 + 0.01 * t);
+            let alpha = pi * (0.3 - 0.01 * t);
+
+            // Also zoom in a bit. (Or actually, it is a dolly roll.)
+            let distance = 50.0 - 0.5 * t;
+
+            let position = Vector3 {
+                x: alpha.cos() * phi.sin() * distance,
+                y: alpha.cos() * phi.cos() * distance,
+                z: alpha.sin() * distance
+            };
+
+            // Compensate for the displacement of the camera by rotating
+            // such that (0, 0, 0) remains fixed. The camera is aimed
+            // downward with angle alpha.
+            let orientation = Quaternion::rotation(0.0, 0.0, -1.0, phi + Float::pi())
+                * Quaternion::rotation(1.0, 0.0, 0.0, -alpha);
+
             Camera {
-                position: Vector3::new(0.0, 1.0, -10.0),
-                field_of_view: Float::frac_pi_2(),
-                focal_distance: 10.0,
-                depth_of_field: 1.0,
-                chromatic_abberation: 0.1,
-                orientation: Quaternion::rotation(1.0, 0.0, 0.0, 1.531)
+                position: position,
+                field_of_view: pi * 0.35,
+                focal_distance: distance * 0.9,
+                // A slight blur, not too much, but enough to demonstrate the effect.
+                depth_of_field: 2.0,
+                // A subtle amount of chromatic abberation.
+                chromatic_abberation: 0.012,
+                orientation: orientation
             }
         }
 
