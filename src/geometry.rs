@@ -49,30 +49,39 @@ impl Plane {
     }
 }
 
+/// Intersects a plane, and returns the position, distance, and the dot
+/// product of the normal with the ray.
+fn intersect_plane(normal: &Vector3, offset: &Vector3, ray: &Ray)
+                   -> Option<(Vector3, f32, f32)> {
+    // Transform the ray into the space where the plane is a linear
+    // subspace (a plane through the origin).
+    let origin = ray.origin - *offset;
+
+    let d = dot(*normal, ray.direction);
+    if d == 0.0 { return None; }
+    let t = - dot(*normal, origin) / d;
+
+    // A ray has one direction, do not hit backwards.
+    if t <= 0.0 {
+        None
+    } else {
+        Some((ray.origin + ray.direction * t, t, d))
+    }
+}
+
 impl Surface for Plane {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
-        // Transform the ray into the space where the plane is a linear
-        // subspace (a plane through the origin).
-        let origin = ray.origin - self.offset;
-
-        let d = dot(self.normal, ray.direction);
-        if d == 0.0 { return None; }
-        let t = - dot(self.normal, origin) / d;
-
-        // A ray has one direction, do not hit backwards.
-        if t <= 0.0 {
-            None
-        } else {
-            let intersection = Intersection {
-                position: ray.origin + ray.direction * t,
+        intersect_plane(&self.normal, &self.offset, ray)
+        .map(|(pos, t, d)| {
+            Intersection {
+                position: pos,
                 // Planes are two-sided.
                 normal: if d < 0.0 { self.normal } else { -self.normal },
                 // Tangent is not used here.
                 tangent: Vector3::zero(),
                 distance: t
-            };
-            Some(intersection)
-        }
+            }
+        })
     }
 }
 
@@ -98,32 +107,63 @@ impl SpacePartitioning {
 
 impl Surface for SpacePartitioning {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
-        // Transform the ray into the space where the plane is a linear
-        // subspace (a plane through the origin).
-        let origin = ray.origin - self.offset;
-
-        let d = dot(self.normal, ray.direction);
-        let t = dot(self.normal, origin) / d;
-
-        // A ray has one direction, do not hit backwards.
-        if t <= 0.0 {
-            None
-        } else {
-            let intersection = Intersection {
-                position: ray.origin + ray.direction * t,
+        intersect_plane(&self.normal, &self.offset, ray)
+        .map(|(pos, t, d)| {
+            Intersection {
+                position: pos,
                 normal: self.normal,
                 // Tangent is not used here.
                 tangent: Vector3::zero(),
                 distance: t
-            };
-            Some(intersection)
-        }
+            }
+        })
     }
 }
 
 impl Volume for SpacePartitioning {
     fn lies_inside(&self, p: Vector3) -> bool {
         dot(p - self.offset, self.normal) < 0.0
+    }
+}
+
+pub struct Circle {
+    /// A unit vector perpendicular to the circle.
+    normal: Vector3,
+
+    /// The centre of the circle.
+    position: Vector3,
+
+    /// The square of the radius of the circle.
+    radius_squared: f32
+}
+
+impl Circle {
+    pub fn new(normal: Vector3, position: Vector3, radius: f32) -> Circle {
+        Circle {
+            normal: normal,
+            position: position,
+            radius_squared: radius * radius
+        }
+    }
+}
+
+impl Surface for Circle {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        intersect_plane(&self.normal, &self.position, ray)
+        .filtered(|&(pos, t, d)| {
+            // Allow only indersections that lie inside the circle.
+            (pos - self.position).magnitude_squared() <= self.radius_squared
+        })
+        .map(|(pos, t, d)| {
+            Intersection {
+                position: pos,
+                // Planes are two-sided.
+                normal: if d < 0.0 { self.normal } else { -self.normal },
+                // Tangent is not used here.
+                tangent: Vector3::zero(),
+                distance: t
+            }
+        })
     }
 }
 

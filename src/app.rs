@@ -22,7 +22,7 @@ use std::time::Duration;
 use std::vec::unzip;
 use camera::Camera;
 use gather_unit::GatherUnit;
-use geometry::{Plane, Sphere};
+use geometry::{Circle, Plane, Sphere};
 use material::{BlackBodyMaterial, DiffuseGreyMaterial, DiffuseColouredMaterial};
 use object::{Emissive, Object, Reflective};
 use plot_unit::PlotUnit;
@@ -219,7 +219,22 @@ impl App {
         objects.push(sun);
 
         let floor_normal = Vector3::new(0.0, 0.0, -1.0);
+
+        // Sky light 1.
         let sky_height: f32 = 30.0;
+        let sky1_radius: f32 = 5.0;
+        let sky1_position = Vector3::new(-sun_radius, 0.0, sky_height);
+        let sky1_circle = Circle::new(floor_normal, sky1_position, sky1_radius);
+        let sky1 = Object::new(box sky1_circle, Emissive(box sky1_emissive));
+        objects.push(sky1);
+
+        let sky2_radius: f32 = 15.0;
+        let sky2_position = Vector3 {
+            x: -sun_radius * 0.5, y: sun_radius * 2.0 + sky2_radius, z: sky_height
+        };
+        let sky2_circle = Circle::new(floor_normal, sky2_position, sky2_radius);
+        let sky2 = Object::new(box sky2_circle, Emissive(box sky2_emissive));
+        objects.push(sky2);
 
         // Ceiling plane (for more interesting light).
         let ceiling_position = Vector3::new(0.0, 0.0, sky_height * 2.0);
