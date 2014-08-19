@@ -109,7 +109,7 @@ impl TaskScheduler {
 
         // Then build the plot units.
         let plot_units = range(0, n_plot_units)
-        .map(|_| { box PlotUnit::new(width, height) })
+        .map(|i| { box PlotUnit::new(i, width, height) })
         .collect::<RingBuf<Box<PlotUnit>>>();
 
         // There must be one gather unit and one tonemap unit.
@@ -255,13 +255,13 @@ impl TaskScheduler {
     fn complete_plot_task(&mut self,
                           plot_unit: Box<PlotUnit>,
                           trace_units: Vec<Box<TraceUnit>>) {
-        println!("done plotting with unit x."); // TODO: unit numbers.
+        println!("done plotting with unit {}", plot_unit.id);
         print!("the following trace units are available again: ");
 
         // All trace units that were plotted, can be used again now.
         for trace_unit in trace_units.move_iter() {
+            print!(" {} ", trace_unit.id);
             self.available_trace_units.push(trace_unit);
-            print!(" x "); // TODO: unit numbers.
         }
 
         println!("");
@@ -279,8 +279,8 @@ impl TaskScheduler {
 
         // All plot units that were gathered, can be used again now.
         for plot_unit in plot_units.move_iter() {
+            print!(" {} ", plot_unit.id);
             self.available_plot_units.push(plot_unit);
-            print!(" x "); // TODO: unit numbers.
         }
 
         println!("");

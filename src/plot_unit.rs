@@ -30,18 +30,22 @@ pub struct PlotUnit {
     aspect_ratio: f32,
 
     /// The buffer of tristimulus values.
-    pub tristimulus_buffer: Vec<Vector3>
+    pub tristimulus_buffer: Vec<Vector3>,
+
+    /// An ID for identifying this unit in the UI.
+    pub id: uint
 }
 
 impl PlotUnit {
     /// Constructs a new plot unit that will plot to a canvas
     /// of the specified size.
-    pub fn new(width: uint, height: uint) -> PlotUnit {
+    pub fn new(id: uint, width: uint, height: uint) -> PlotUnit {
         PlotUnit {
             image_width: width,
             image_height: height,
             aspect_ratio: width as f32 / height as f32,
-            tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero())
+            tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero()),
+            id: id
         }
     }
 
