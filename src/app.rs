@@ -74,12 +74,14 @@ impl App {
             let mut worker_handles: Vec<Handle<Image>> = images
             .iter().map(|worker_rx| {
                 let mut handle = select.handle(worker_rx);
-                unsafe { handle.add(); }
                 handle
             }).collect();
+            for handle in worker_handles.mut_iter() {
+                unsafe { handle.add(); }
+            }
             let mut stop_handle = select.handle(&stop_rx);
             unsafe { stop_handle.add(); }
-            
+
             // Then go into the supervising loop: broadcast a stop signal to
             // all workers, or route a rendered image to the main task.
             loop {
