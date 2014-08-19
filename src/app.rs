@@ -22,6 +22,9 @@ use std::time::Duration;
 use std::vec::unzip;
 use camera::Camera;
 use gather_unit::GatherUnit;
+use geometry::{Plane, Sphere};
+use material::{BlackBodyMaterial, DiffuseColouredMaterial};
+use object::{Emissive, Object, Reflective};
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
 use scene::Scene;
@@ -198,7 +201,7 @@ impl App {
     }
 
     fn set_up_scene() -> Scene {
-        fn get_camera_at_time(_: f32) -> Camera {
+        fn make_camera(_: f32) -> Camera {
             Camera {
                 position: Vector3::new(0.0, 1.0, -10.0),
                 field_of_view: Float::frac_pi_2(),
@@ -209,9 +212,15 @@ impl App {
             }
         }
 
+        let red = DiffuseColouredMaterial::new(0.9, 700.0, 120.0);
+        let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::zero());
+        let sphere = Sphere::new(Vector3::zero(), 2.0);
+        let black_body = BlackBodyMaterial::new(6504.0, 1.0);
+        let reflective = Object::new(box plane, Reflective(box red));
+        let emissive = Object::new(box sphere, Emissive(box black_body));
         Scene {
-            objects: Vec::new(),
-            get_camera_at_time: get_camera_at_time 
+            objects: vec!(reflective, emissive),
+            get_camera_at_time: make_camera
         }
     }
 }

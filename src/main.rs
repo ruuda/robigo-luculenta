@@ -1,19 +1,27 @@
+// Robigo Luculenta -- Proof of concept spectral path tracer in Rust
+// Copyright (C) 2014 Ruud van Asseldonk
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 #![allow(dead_code)]
 
 extern crate time;
 extern crate lodepng;
 
-use camera::Camera;
-use gather_unit::GatherUnit;
-use geometry::{Volume, Plane, Sphere};
-use material::{EmissiveMaterial, BlackBodyMaterial, DiffuseColouredMaterial};
-use object::{Object, Emissive, Reflective};
-use quaternion::Quaternion;
-use scene::Scene;
-use tonemap_unit::TonemapUnit;
-use trace_unit::TraceUnit;
-use plot_unit::PlotUnit;
-use vector3::Vector3;
+use std::comm::channel;
+use std::io::stdin;
+use app::App;
 
 mod app;
 mod camera;
@@ -37,42 +45,39 @@ mod trace_unit;
 mod vector3;
 
 fn main() {
-    fn make_camera(_: f32) -> Camera {
-        Camera {
-            position: Vector3::new(0.0, 1.0, -10.0),
-            field_of_view: Float::frac_pi_2(),
-            focal_distance: 10.0,
-            depth_of_field: 1.0,
-            chromatic_abberation: 0.1,
-            orientation: Quaternion::rotation(1.0, 0.0, 0.0, 1.531)
-        }
-    }
-    let red = DiffuseColouredMaterial::new(0.9, 700.0, 120.0);
-    let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::zero());
-    let sphere = Sphere::new(Vector3::zero(), 2.0);
-    let black_body = BlackBodyMaterial::new(6504.0, 1.0);
-    let reflective = Object::new(box plane, Reflective(box red));
-    let emissive = Object::new(box sphere, Emissive(box black_body));
-    let scene = Scene {
-        objects: vec!(reflective, emissive),
-        get_camera_at_time: make_camera
-    };
-    println!("Is (1,0,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(1.0, 0.0, 0.0)));
-    println!("Is (2,1,0) inside sphere? {}.", sphere.lies_inside(Vector3::new(2.0, 1.0, 0.0)));
-    println!("Black body intensity at 400 and 600 nm is {} and {}.", black_body.get_intensity(400.0), black_body.get_intensity(600.0));
+    // Start up the path tracer. It begins rendering immediately.
+    let mut app = App::new();
 
-    let mut trace_unit = box TraceUnit::new(1280, 720);
-    let mut plot_unit = box PlotUnit::new(1280, 720);
-    for _ in range(0u, 100) {
-        trace_unit.render(&scene);
-        plot_unit.plot(trace_unit.mapped_photons);
-    }
-    let mut gather_unit = box GatherUnit::new(1280, 720);
-    gather_unit.accumulate(plot_unit.tristimulus_buffer.as_slice());
-    let mut tonemap_unit = box TonemapUnit::new(1280, 720);
-    tonemap_unit.tonemap(gather_unit.tristimulus_buffer.as_slice());
-    match lodepng::encode24_file(&Path::new("output.png"), tonemap_unit.rgb_buffer.as_slice(), 1280, 720) {
-        Ok(_) => { },
-        Err(reason) => println!("Failed to write output png: {}", reason)
+    // Spawn a new proc that will signal stop when enter is pressed.
+    let (stop_tx, stop_rx) = channel();
+    spawn(proc() {
+        println!("press enter to stop rendering");
+        stdin().read_line();
+        stop_tx.send(());
+    });
+
+    let mut images = app.images;
+
+    // Then wait for news from other tasks: when an image has been rendered,
+    // write it out, and when stop is signalled, stop the app.
+    loop {
+        select! {
+            img = images.recv() => {
+                // Write the image to output.png using lodepng.
+                // TODO: get the canvas size from a proper location.
+                match lodepng::encode24_file(&Path::new("output.png"),
+                                             img.as_slice(), 1280, 720) {
+                    Ok(_) => println!("wrote image to output.png"),
+                    Err(reason) => println!("failed to write output png: {}", reason)
+                }
+            },
+            () = stop_rx.recv() => {
+                // Tell the app to stop.
+                app.stop.send(());
+
+                // Stop the main loop.
+                break;
+            }
+        }
     }
 }
