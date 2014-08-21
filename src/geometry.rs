@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::f32::consts::PI;
 use intersection::Intersection;
 use ray::Ray;
 use vector3::{Vector3, cross, dot};
@@ -297,4 +298,65 @@ impl <T1: Volume, T2: Volume> Volume for Compound<T1, T2> {
     fn lies_inside(&self, p: Vector3) -> bool {
         self.surface1.lies_inside(p) && self.surface2.lies_inside(p)
     }
+}
+
+type InfinitePrism = Compound<Compound<SpacePartitioning, SpacePartitioning>,
+                              SpacePartitioning>;
+
+type ThickPlane = Compound<SpacePartitioning, SpacePartitioning>;
+
+type Prism = Compound<InfinitePrism, ThickPlane>;
+
+type HexagonalPrism = Compound<InfinitePrism, Prism>;
+
+/// Constructs an equilateral triangle with specified edge length,
+/// infinitely extruded along the axis vector,
+/// rotated at the specified angle.
+pub fn new_infinite_prism(axis: Vector3,
+           offset: Vector3,
+           edge_length: f32,
+           angle: f32)
+           -> InfinitePrism {
+    let radius = 3.0_f32.sqrt() / 6.0 * edge_length;
+    let a1 = angle;
+    let a2 = angle + PI * 2.0 / 3.0;
+    let a3 = angle + PI * 4.0 / 3.0;
+
+    // Calculate the three unit vertices on the xy-plane.
+    let p1 = Vector3::new(a1.cos(), a1.sin(), 0.0);
+    let p2 = Vector3::new(a2.cos(), a2.sin(), 0.0);
+    let p3 = Vector3::new(a3.cos(), a3.sin(), 0.0);
+
+    // Now rotate the vertices, so they lie in the plane which
+    // the axis vector is the normal.
+    let p1 = p1.rotate_towards(axis);
+    let p2 = p2.rotate_towards(axis);
+    let p3 = p3.rotate_towards(axis);
+
+    // Then the planes through the vertices can be constructed.
+    let sp1 = SpacePartitioning::new(p1, p1 * radius + offset);
+    let sp2 = SpacePartitioning::new(p2, p2 * radius + offset);
+    let sp3 = SpacePartitioning::new(p3, p3 * radius + offset);
+
+    // And finally combine the partitionings,
+    // so that the extruded triangle is ‘carved out’.
+    Compound::new(Compound::new(sp1, sp2), sp3)
+}
+
+/// Constructs a thick, infinite ‘wall’-like structure. One surface
+/// passes through the specified offset, the other one is translated
+/// along the normal for the specified thickness distance.
+pub fn new_thick_plane(normal: Vector3,
+                       offset: Vector3,
+                       thickness: f32)
+                       -> ThickPlane {
+    // The plane is extruded along the normal, so the plane through
+    // the offset vector should have the opposite normal.
+    let sp1 = SpacePartitioning::new(-normal, offset);
+
+    // And the extruded plane has the normal in the direction
+    // of the extrusion.
+    let sp2 = SpacePartitioning::new(normal, offset + normal * thickness);
+
+    Compound::new(sp1, sp2)
 }
