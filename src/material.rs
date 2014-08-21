@@ -193,3 +193,68 @@ impl Material for GlossyMirrorMaterial {
         ray
     }
 }
+
+/// Refractive glass.
+pub struct Sf10GlassMaterial;
+
+impl Sf10GlassMaterial {
+    /// Returns the index of refraction for SF10 glass.
+    fn get_index_of_refraction(wavelength: f32) -> f32 {
+        // See http://refractiveindex.info/?group=GLASSES&material=SF11
+
+        // Square and convert nanometer to micrometer
+        let w2 = (wavelength * wavelength * 1.0e-6) as f64;
+        (1.0
+            + 1.737596950 * w2 / (w2 - 0.0131887070)
+            + 0.313747346 * w2 / (w2 - 0.0623068142)
+            + 1.898781010 * w2 / (w2 - 155.23629000))
+        .sqrt() as f32
+    }
+}
+
+impl Material for Sf10GlassMaterial {
+    fn get_new_ray(&self, incoming_ray: &Ray, intersection: &Intersection) -> Ray {
+        let mut cos_i = -dot(incoming_ray.direction, intersection.normal);
+
+        // Retrieve the index of refraction to be used,
+        // which can be wavelength-dependent.
+        let mut ior = Sf10GlassMaterial::get_index_of_refraction(incoming_ray.wavelength);
+        let mut normal = intersection.normal;
+
+        // The IOR in this formula is n1 / n2, where n1 is air (1.0) when the
+        // ray enters, otherwise, when the ray leaves the material, the IOR is
+        // correct as is.
+        if cos_i > 0.0 {
+            ior = 1.0 / ior;
+        } else {
+            // The formula below assumes the normal to be at the same side as
+            // the incident ray. If this is not the case, reverse the normal.
+            normal = -normal;
+            cos_i = -cos_i;
+        }
+
+        let sin_t_sqr = ior * ior * (1.0 - cos_i * cos_i);
+
+        let dir = if sin_t_sqr > 1.0 {
+            // When refraction is impossible, total internal reflection must
+            // have occurred.
+            incoming_ray.direction.reflect(normal)
+        } else {
+            // Otherwise compute the reflected ray.
+            let cos_t = (1.0 - sin_t_sqr).sqrt();
+            incoming_ray.direction * ior + normal * (ior * cos_i - cos_t)
+        };
+
+        // There is only one way in which the ray can be refracted,
+        // Fresnel coefficients are not taken into account, so the probability
+        // of this happening is 1.
+        let probability: f32 = 1.0;
+
+        Ray {
+            origin: intersection.position,
+            direction: dir,
+            probability: probability,
+            wavelength: incoming_ray.wavelength
+        }
+    }
+}
