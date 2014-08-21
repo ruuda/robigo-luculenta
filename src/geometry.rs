@@ -249,3 +249,52 @@ impl Volume for Sphere {
         (p - self.position).magnitude_squared() < self.radius_squared
     }
 }
+
+/// An intersection of two volumes/surfaces, the boolean ‘and’.
+struct Compound<T1, T2> {
+    /// The first of the two surfaces.
+    surface1: T1,
+
+    /// The second of the two surfaces.
+    surface2: T2
+}
+
+impl<T1, T2> Compound<T1, T2> {
+    /// Creates a new object which is the intersection of the two
+    /// specified objects.
+    pub fn new(s1: T1, s2: T2) -> Compound<T1, T2> {
+        Compound {
+            surface1: s1,
+            surface2: s2
+        }
+    }
+}
+
+impl<T1: Surface + Volume, T2: Surface + Volume> Surface
+for Compound<T1, T2> {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        let i1 = self.surface1.intersect(ray);
+        let i2 = self.surface2.intersect(ray);
+
+        // Invalidate intersections that do not lie in both volumes.
+        let i1 = i1.filtered(|i| { self.surface2.lies_inside(i.position) });
+        let i2 = i2.filtered(|i| { self.surface1.lies_inside(i.position) });
+
+        // If both intersections are valid, pick the closest one.
+        if i1.is_some() && i2.is_some() {
+            if i1.unwrap().distance < i2.unwrap().distance {
+                return i1;
+            } else {
+                return i2;
+            }
+        }
+
+        i1.or(i2)
+    }
+}
+
+impl <T1: Volume, T2: Volume> Volume for Compound<T1, T2> {
+    fn lies_inside(&self, p: Vector3) -> bool {
+        self.surface1.lies_inside(p) && self.surface2.lies_inside(p)
+    }
+}
