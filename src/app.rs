@@ -15,12 +15,14 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::comm::{Handle, Select, Sender, Receiver, channel};
+use std::f32::consts::PI;
 use std::io::timer::sleep;
 use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use std::vec::unzip;
 use camera::Camera;
+use constants::GOLDEN_RATIO;
 use gather_unit::GatherUnit;
 use geometry::{Circle, Plane, Sphere};
 use material::{BlackBodyMaterial, DiffuseGreyMaterial, DiffuseColouredMaterial};
@@ -242,11 +244,31 @@ impl App {
         let ceiling = Object::new(box ceiling_plane, Reflective(box blue));
         objects.push(ceiling);
 
+        // Spiral sunflower seeds.
+        let gamma: f32 = PI * 2.0 * (1.0 - 1.0 / GOLDEN_RATIO as f32);
+        let seed_size: f32 = 0.8;
+        let seed_scale: f32 = 1.5;
+        let first_seed = ((sun_radius / seed_scale + 1.0).powi(2) + 0.5) as int;
+        let seeds = 100;
+        for i in range(first_seed, seeds) {
+            let phi = i as f32 * gamma;
+            let r = (i as f32).sqrt() * seed_scale;
+            let position = Vector3 {
+                x: phi.cos() * r,
+                y: phi.sin() * r,
+                z: (r - sun_radius) * -0.5
+            } + sun_position;
+            let sphere = box Sphere::new(position, seed_size);
+            let mat = box DiffuseColouredMaterial::new(0.9, (i - first_seed) as f32 / seeds as f32
+                                                       * 130.0 + 600.0, 60.0);
+            let object = Object::new(sphere, Reflective(mat));
+            objects.push(object);
+        }
+
         fn make_camera(t: f32) -> Camera {
             // Orbit around (0, 0, 0) based on the time.
-            let pi: f32 = Float::pi();
-            let phi = pi * (1.0 + 0.01 * t);
-            let alpha = pi * (0.3 - 0.01 * t);
+            let phi = PI * (1.0 + 0.01 * t);
+            let alpha = PI * (0.3 - 0.01 * t);
 
             // Also zoom in a bit. (Or actually, it is a dolly roll.)
             let distance = 50.0 - 0.5 * t;
@@ -260,12 +282,12 @@ impl App {
             // Compensate for the displacement of the camera by rotating
             // such that (0, 0, 0) remains fixed. The camera is aimed
             // downward with angle alpha.
-            let orientation = Quaternion::rotation(0.0, 0.0, -1.0, phi + Float::pi())
+            let orientation = Quaternion::rotation(0.0, 0.0, -1.0, phi + PI)
                 * Quaternion::rotation(1.0, 0.0, 0.0, -alpha);
 
             Camera {
                 position: position,
-                field_of_view: pi * 0.35,
+                field_of_view: PI * 0.35,
                 focal_distance: distance * 0.9,
                 // A slight blur, not too much, but enough to demonstrate the effect.
                 depth_of_field: 2.0,
