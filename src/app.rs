@@ -25,7 +25,7 @@ use camera::Camera;
 use constants::GOLDEN_RATIO;
 use gather_unit::GatherUnit;
 use geometry::{Circle, Plane, Sphere};
-use material::{BlackBodyMaterial, DiffuseGreyMaterial, DiffuseColouredMaterial};
+use material::{BlackBodyMaterial, DiffuseGreyMaterial, DiffuseColouredMaterial, GlossyMirrorMaterial};
 use object::{Emissive, Object, Reflective};
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
@@ -261,6 +261,21 @@ impl App {
             let sphere = box Sphere::new(position, seed_size);
             let mat = box DiffuseColouredMaterial::new(0.9, (i - first_seed) as f32 / seeds as f32
                                                        * 130.0 + 600.0, 60.0);
+            let object = Object::new(sphere, Reflective(mat));
+            objects.push(object);
+        }
+
+        // Seeds in between.
+        for i in range(first_seed, seeds) {
+            let phi = (i as f32 + 0.5) * gamma;
+            let r = (i as f32 + 0.5).sqrt() * seed_scale;
+            let position = Vector3 {
+                x: phi.cos() * r,
+                y: phi.sin() * r,
+                z: (r - sun_radius) * -0.25
+            } + sun_position;
+            let sphere = box Sphere::new(position, seed_size * 0.5);
+            let mat = box GlossyMirrorMaterial::new(0.1);
             let object = Object::new(sphere, Reflective(mat));
             objects.push(object);
         }
