@@ -204,20 +204,20 @@ impl App {
     fn set_up_scene() -> Scene {
         let mut objects = Vec::new();
 
-        let grey = DiffuseGreyMaterial::new(0.8);
-        let red = DiffuseColouredMaterial::new(0.9, 660.0, 60.0);
-        let green = DiffuseColouredMaterial::new(0.9, 550.0, 40.0);
-        let blue = DiffuseColouredMaterial::new(0.5, 470.0, 25.0);
+        let grey = box DiffuseGreyMaterial::new(0.8);
+        let red = box DiffuseColouredMaterial::new(0.9, 660.0, 60.0);
+        let green = box DiffuseColouredMaterial::new(0.9, 550.0, 40.0);
+        let blue = box DiffuseColouredMaterial::new(0.5, 470.0, 25.0);
 
-        let sun_emissive = BlackBodyMaterial::new(6504.0, 1.0);
-        let sky1_emissive = BlackBodyMaterial::new(7600.0, 0.6);
-        let sky2_emissive = BlackBodyMaterial::new(5000.0, 0.6);
+        let sun_emissive = box BlackBodyMaterial::new(6504.0, 1.0);
+        let sky1_emissive = box BlackBodyMaterial::new(7600.0, 0.6);
+        let sky2_emissive = box BlackBodyMaterial::new(5000.0, 0.6);
 
         // Sphere in the centre.
         let sun_radius: f32 = 5.0;
         let sun_position = Vector3::zero();
-        let sun_sphere = Sphere::new(sun_position, sun_radius);
-        let sun = Object::new(box sun_sphere, Emissive(box sun_emissive));
+        let sun_sphere = box Sphere::new(sun_position, sun_radius);
+        let sun = Object::new(sun_sphere, Emissive(sun_emissive));
         objects.push(sun);
 
         let floor_normal = Vector3::new(0.0, 0.0, -1.0);
@@ -226,22 +226,22 @@ impl App {
         let sky_height: f32 = 30.0;
         let sky1_radius: f32 = 5.0;
         let sky1_position = Vector3::new(-sun_radius, 0.0, sky_height);
-        let sky1_circle = Circle::new(floor_normal, sky1_position, sky1_radius);
-        let sky1 = Object::new(box sky1_circle, Emissive(box sky1_emissive));
+        let sky1_circle = box Circle::new(floor_normal, sky1_position, sky1_radius);
+        let sky1 = Object::new(sky1_circle, Emissive(sky1_emissive));
         objects.push(sky1);
 
         let sky2_radius: f32 = 15.0;
         let sky2_position = Vector3 {
             x: -sun_radius * 0.5, y: sun_radius * 2.0 + sky2_radius, z: sky_height
         };
-        let sky2_circle = Circle::new(floor_normal, sky2_position, sky2_radius);
-        let sky2 = Object::new(box sky2_circle, Emissive(box sky2_emissive));
+        let sky2_circle = box Circle::new(floor_normal, sky2_position, sky2_radius);
+        let sky2 = Object::new(sky2_circle, Emissive(sky2_emissive));
         objects.push(sky2);
 
         // Ceiling plane (for more interesting light).
         let ceiling_position = Vector3::new(0.0, 0.0, sky_height * 2.0);
-        let ceiling_plane = Plane::new(floor_normal, ceiling_position);
-        let ceiling = Object::new(box ceiling_plane, Reflective(box blue));
+        let ceiling_plane = box Plane::new(floor_normal, ceiling_position);
+        let ceiling = Object::new(ceiling_plane, Reflective(blue));
         objects.push(ceiling);
 
         // Spiral sunflower seeds.
@@ -297,12 +297,6 @@ impl App {
             }
         }
 
-        let red = DiffuseColouredMaterial::new(0.9, 700.0, 120.0);
-        let plane = Plane::new(Vector3::new(0.0, 1.0, 0.0), Vector3::zero());
-        let sphere = Sphere::new(Vector3::zero(), 2.0);
-        let black_body = BlackBodyMaterial::new(6504.0, 1.0);
-        let reflective = Object::new(box plane, Reflective(box red));
-        let emissive = Object::new(box sphere, Emissive(box black_body));
         Scene {
             objects: objects,
             get_camera_at_time: make_camera
