@@ -24,8 +24,12 @@ use std::vec::unzip;
 use camera::Camera;
 use constants::GOLDEN_RATIO;
 use gather_unit::GatherUnit;
-use geometry::{Circle, Plane, Sphere};
-use material::{BlackBodyMaterial, DiffuseGreyMaterial, DiffuseColouredMaterial, GlossyMirrorMaterial};
+use geometry::{Circle, Plane, Sphere, new_hexagonal_prism};
+use material::{BlackBodyMaterial,
+               DiffuseGreyMaterial,
+               DiffuseColouredMaterial,
+               GlossyMirrorMaterial,
+               Sf10GlassMaterial};
 use object::{Emissive, Object, Reflective};
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
@@ -278,6 +282,31 @@ impl App {
             let mat = box GlossyMirrorMaterial::new(0.1);
             let object = Object::new(sphere, Reflective(mat));
             objects.push(object);
+        }
+
+        // Prisms along the walls.
+        let prisms: int = 11;
+        let prism_angle: f32 = PI * 2.0 / prisms as f32;
+        let prism_radius: f32 = 17.0;
+        let prism_height: f32 = 8.0;
+        for i in range(0, prisms) {
+            let phi = i as f32 * prism_angle; {
+                // Get an initial position.
+                let position = Vector3 {
+                    x: phi.cos() * prism_radius,
+                    y: phi.sin() * prism_radius,
+                    z: 0.0
+                };
+                let normal = Vector3::new(0.0, 0.0, -1.0);
+
+                // TODO: intersect with floor and determine final position and normal.
+
+                let prism = box new_hexagonal_prism(normal, position, 3.0, 1.0,
+                                                    phi, prism_height);
+                let glass = box Sf10GlassMaterial;
+                let object = Object::new(prism, Reflective(glass));
+                objects.push(object);
+            }
         }
 
         fn make_camera(t: f32) -> Camera {
