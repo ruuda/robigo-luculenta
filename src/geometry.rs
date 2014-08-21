@@ -360,3 +360,50 @@ pub fn new_thick_plane(normal: Vector3,
 
     Compound::new(sp1, sp2)
 }
+
+/// Constructs a prism, oriented along the specified axis, its
+/// equilateral base triangle with specified edge length at the
+/// specified offset, rotated with the specified angle, and then
+/// extruded along the axis for the specified height.
+pub fn new_prism(axis: Vector3,
+                 offset: Vector3,
+                 edge_length: f32,
+                 angle: f32,
+                 height: f32)
+                 -> Prism {
+    // The infinite prism as before.
+    let prism = new_infinite_prism(axis, offset, edge_length, angle);
+    
+    // But now clipped by a thick plane along the axis.
+    let plane = new_thick_plane(axis, offset, height);
+
+    Compound::new(prism, plane)
+}
+
+/// Constructs a prism, oriented along the specified axis, its
+/// equilateral base triangle with specified edge length at the
+/// specified offset, rotated with the specified angle, and then
+/// extruded along the axis for the specified height. Then its corners
+/// are capped, such that the effective edge length becomes the edge
+/// length minus twice the bevel size.
+pub fn new_hexagonal_prism(axis: Vector3,
+                           offset: Vector3,
+                           edge_length: f32,
+                           bevel_size: f32,
+                           angle: f32,
+                           height: f32)
+                           -> HexagonalPrism {
+    // The ‘bevel edges’ (which is just an infinitely extruded
+    // triangle; an infinte prism). It is rotated 180 degrees,
+    // so it cuts off the corners. If the edge length is twice
+    // the edge length of the desired prism, it does not cut the
+    // corners at all.
+    let iprism = new_infinite_prism(axis, offset,
+                                    edge_length * 2.0 - bevel_size * 2.0,
+                                    angle + PI);
+
+    // And the normal prism, without bevel.
+    let prism = new_prism(axis, offset, edge_length, angle, height);
+
+    Compound::new(iprism, prism)
+}
