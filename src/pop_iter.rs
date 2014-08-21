@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use std::collections::{Deque, RingBuf};
+use std::collections::Deque;
 
 pub struct PopFrontItems<'a, C> {
     container: &'a mut C
@@ -44,6 +44,8 @@ impl<T, C: Collection + Deque<T>> PopFrontIter for C {
 
 #[test]
 fn pop_front_iter_ring_buf() {
+    use std::collections::RingBuf;
+
     let mut xs = RingBuf::new();
     xs.push(0u); xs.push(1); xs.push(2); xs.push(3); xs.push(4);
     let ys: Vec<uint> = xs.pop_front_iter().take(3).collect();
@@ -88,6 +90,8 @@ fn pop_iter_vec() {
 
 #[test]
 fn pop_iter_ring_buf() {
+    use std::collections::RingBuf;
+
     let mut xs = RingBuf::new();
     xs.push(0u); xs.push(1); xs.push(2); xs.push(3); xs.push(4);
     let ys: Vec<uint> = xs.pop_iter().take(3).collect();

@@ -108,7 +108,7 @@ impl SpacePartitioning {
 impl Surface for SpacePartitioning {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         intersect_plane(&self.normal, &self.offset, ray)
-        .map(|(pos, t, d)| {
+        .map(|(pos, t, _)| {
             Intersection {
                 position: pos,
                 normal: self.normal,
@@ -150,7 +150,7 @@ impl Circle {
 impl Surface for Circle {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         intersect_plane(&self.normal, &self.position, ray)
-        .filtered(|&(pos, t, d)| {
+        .filtered(|&(pos, _, _)| {
             // Allow only indersections that lie inside the circle.
             (pos - self.position).magnitude_squared() <= self.radius_squared
         })
