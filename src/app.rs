@@ -193,6 +193,9 @@ impl App {
             gather_unit.accumulate(unit.tristimulus_buffer.as_slice());
             unit.clear();
         }
+
+        // Save the gather state, so that rendering can be continued later.
+        gather_unit.save();
     }
 
     fn execute_tonemap_task(img_tx: &mut Sender<Image>,

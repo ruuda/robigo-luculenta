@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::io::{File, Open, Write};
+use std::mem::transmute;
+use std::slice::bytes::copy_memory;
 use vector3::Vector3;
 
 pub struct GatherUnit {
@@ -25,9 +28,14 @@ impl GatherUnit {
     /// Constructs a new GatherUnit that will gather a canvas
     /// of the specified size.
     pub fn new(width: uint, height: uint) -> GatherUnit {
-        GatherUnit {
+        let mut unit = GatherUnit {
             tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero())
-        }
+        };
+
+        // Try to continue a previous render.
+        unit.read();
+
+        unit
     }
 
     /// Add the results of the PlotUnit to the canvas.
@@ -40,4 +48,30 @@ impl GatherUnit {
             *acc = *acc + *px;
         }
     }
+
+    /// Saves the tristimulus buffer to a file, so that rendering
+    /// can be resumed later.
+    pub fn save(&self) {
+        let mut file = File::open_mode(&Path::new("buffer.raw"), Open, Write);
+        for trist in self.tristimulus_buffer.iter() {
+            let xyz: &[u8, ..12] = unsafe { transmute(trist) };
+            file.write(xyz.as_slice()).ok().expect("failed to write raw buffer");
+        }
+    }
+
+    /// Reads the tristimulus buffer from a file, to resume rendering.
+    fn read(&mut self) {
+        match File::open(&Path::new("buffer.raw")) {
+            Ok(ref mut file) => {
+                for trist in self.tristimulus_buffer.mut_iter() {
+                    let xyz: &mut [u8, ..12] = &mut [0, ..12];
+                    file.read(xyz.as_mut_slice()).ok().expect("failed to read raw buffer");
+                    let trist: &mut [u8, ..12] = unsafe { transmute(trist) };
+                    copy_memory(trist.as_mut_slice(), xyz.as_slice());
+                }
+            },
+            Err(_) => { }
+        }
+    }
+
 }
