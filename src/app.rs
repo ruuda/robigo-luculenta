@@ -24,7 +24,7 @@ use std::vec::unzip;
 use camera::Camera;
 use constants::GOLDEN_RATIO;
 use gather_unit::GatherUnit;
-use geometry::{Circle, Plane, Sphere, new_hexagonal_prism};
+use geometry::{Circle, Paraboloid, Plane, Sphere, Surface, new_hexagonal_prism};
 use material::{BlackBodyMaterial,
                DiffuseGreyMaterial,
                DiffuseColouredMaterial,
@@ -33,6 +33,7 @@ use material::{BlackBodyMaterial,
 use object::{Emissive, Object, Reflective};
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
+use ray::Ray;
 use scene::Scene;
 use task_scheduler::{Task, Sleep, Trace, Plot, Gather, Tonemap, TaskScheduler};
 use tonemap_unit::TonemapUnit;
@@ -208,7 +209,6 @@ impl App {
     fn set_up_scene() -> Scene {
         let mut objects = Vec::new();
 
-        let grey = box DiffuseGreyMaterial::new(0.8);
         let red = box DiffuseColouredMaterial::new(0.9, 660.0, 60.0);
         let green = box DiffuseColouredMaterial::new(0.9, 550.0, 40.0);
         let blue = box DiffuseColouredMaterial::new(0.5, 470.0, 25.0);
@@ -224,7 +224,14 @@ impl App {
         let sun = Object::new(sun_sphere, Emissive(sun_emissive));
         objects.push(sun);
 
+        // Floor paraboloid.
         let floor_normal = Vector3::new(0.0, 0.0, -1.0);
+        let floor_position = Vector3::new(0.0, 0.0, -sun_radius);
+        let floor_paraboloid = Paraboloid::new(floor_normal, floor_position,
+                                                   sun_radius * sun_radius);
+        let grey = box DiffuseGreyMaterial::new(0.8);
+        let floor = Object::new(box floor_paraboloid.clone(), Reflective(grey));
+        objects.push(floor);
 
         // Sky light 1.
         let sky_height: f32 = 30.0;
@@ -292,14 +299,28 @@ impl App {
         for i in range(0, prisms) {
             let phi = i as f32 * prism_angle; {
                 // Get an initial position.
-                let position = Vector3 {
+                let mut position = Vector3 {
                     x: phi.cos() * prism_radius,
                     y: phi.sin() * prism_radius,
                     z: 0.0
                 };
-                let normal = Vector3::new(0.0, 0.0, -1.0);
+                let mut normal = Vector3::new(0.0, 0.0, -1.0);
 
-                // TODO: intersect with floor and determine final position and normal.
+                // Intersect with the floor to get the normal.
+                let ray = Ray {
+                    origin: position,
+                    direction: normal,
+                    wavelength: 0.0,
+                    probability: 1.0
+                };
+                match floor_paraboloid.intersect(&ray) {
+                    Some(intersection) => {
+                        // The parabola focus is on the other side of the paraboloid.
+                        normal = -intersection.normal;
+                        position = intersection.position + normal * 2.0;
+                    },
+                    _ => { }
+                }
 
                 let prism = box new_hexagonal_prism(normal, position, 3.0, 1.0,
                                                     phi, prism_height);

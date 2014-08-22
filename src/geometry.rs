@@ -251,6 +251,7 @@ impl Volume for Sphere {
     }
 }
 
+#[deriving(Clone)]
 pub struct Paraboloid {
     /// The position of the focal point projected onto the plane.
     offset: Vector3,
