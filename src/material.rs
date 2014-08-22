@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::f32::consts::PI;
 use intersection::Intersection;
 use ray::Ray;
 use vector3::dot;
@@ -255,6 +256,51 @@ impl Material for Sf10GlassMaterial {
             direction: dir,
             probability: probability,
             wavelength: incoming_ray.wavelength
+        }
+    }
+}
+
+/// Not a physically accurate thin-film material, but still an aesthetically
+/// pleasing soap bubble material.
+pub struct SoapBubbleMaterial;
+
+impl Material for SoapBubbleMaterial {
+    fn get_new_ray(&self, incoming_ray: &Ray, intersection: &Intersection) -> Ray {
+        let cos_alpha = dot(incoming_ray.direction, intersection.normal);
+
+        // Reflect or pass through, based on the angle
+        // between the ray and the material.
+        let direction = if ::monte_carlo::get_unit() - 0.3 > cos_alpha.abs() {
+            // When the anglue between the normal and the ray is almost
+            // 90 degrees, reflect.
+            incoming_ray.direction.reflect(intersection.normal)
+        } else {
+            // Otherwise, simply pass it through, because the bubble is filled
+            // with air, so it does not refract anything.
+            incoming_ray.direction
+        };
+
+        // Take a phase shift from [0, 2pi] based on the wavelength.
+        let phase_shift = (incoming_ray.wavelength - 380.0) / 200.0 * PI;
+
+        // Then compute the probability for this wavelength based on the angles
+        // between the rays and the normal. Please note that this is by no means
+        // accurate; it simply looks cool :)
+        fn clamp(x: f32) -> f32 {
+            if x < -0.999 { -0.999 }
+            else if x > 0.999 { 0.999 }
+            else { x }
+        }
+        let cos_phi = clamp(dot(direction, intersection.normal));
+        let cos_theta = clamp(dot(direction, intersection.tangent));
+        let p = (phase_shift - cos_phi.acos() * 3.0 - cos_theta.acos() * 2.0
+                 + PI * 0.5).cos();
+
+        Ray {
+            origin: intersection.position,
+            direction: direction,
+            wavelength: incoming_ray.wavelength,
+            probability: p * 0.1 + 0.9
         }
     }
 }
