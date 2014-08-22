@@ -29,7 +29,8 @@ use material::{BlackBodyMaterial,
                DiffuseGreyMaterial,
                DiffuseColouredMaterial,
                GlossyMirrorMaterial,
-               Sf10GlassMaterial};
+               Sf10GlassMaterial,
+               SoapBubbleMaterial};
 use object::{Emissive, Object, Reflective};
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
@@ -261,7 +262,7 @@ impl App {
         let seed_scale: f32 = 1.5;
         let first_seed = ((sun_radius / seed_scale + 1.0).powi(2) + 0.5) as int;
         let seeds = 100;
-        for i in range(first_seed, seeds) {
+        for i in range(first_seed, first_seed + seeds) {
             let phi = i as f32 * gamma;
             let r = (i as f32).sqrt() * seed_scale;
             let position = Vector3 {
@@ -277,7 +278,7 @@ impl App {
         }
 
         // Seeds in between.
-        for i in range(first_seed, seeds) {
+        for i in range(first_seed, first_seed + seeds) {
             let phi = (i as f32 + 0.5) * gamma;
             let r = (i as f32 + 0.5).sqrt() * seed_scale;
             let position = Vector3 {
@@ -287,6 +288,22 @@ impl App {
             } + sun_position;
             let sphere = box Sphere::new(position, seed_size * 0.5);
             let mat = box GlossyMirrorMaterial::new(0.1);
+            let object = Object::new(sphere, Reflective(mat));
+            objects.push(object);
+        }
+
+        // Soap bubbles above.
+        for i in range(first_seed / 2, first_seed + seeds) {
+            let phi = -i as f32 * gamma;
+            let r = (i as f32).sqrt() * seed_scale * 1.5;
+            let position = Vector3 {
+                x: phi.cos() * r,
+                y: phi.sin() * r,
+                z: (r - sun_radius) * 1.5 + sun_radius * 2.0
+            } + sun_position;
+            let sphere = box Sphere::new(position, seed_size
+                                         * (0.5 + (i as f32).sqrt() * 0.2));
+            let mat = box SoapBubbleMaterial;
             let object = Object::new(sphere, Reflective(mat));
             objects.push(object);
         }
