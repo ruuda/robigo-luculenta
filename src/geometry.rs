@@ -251,8 +251,98 @@ impl Volume for Sphere {
     }
 }
 
+pub struct Paraboloid {
+    /// The position of the focal point projected onto the plane.
+    offset: Vector3,
+
+    /// The normal of the plane, a vector of length 1 perpendicular to
+    /// the plane (pointed towards the focal point).
+    normal: Vector3,
+
+    /// The position of the focal point, relative to the offset point.
+    focal_point: Vector3
+}
+
+impl Paraboloid {
+    /// Creates a new paraboloid, for the plane with the specified
+    /// normal, the top centered between the specified offset, and
+    /// specified focal distance (from the top, not the plane).
+    pub fn new(normal: Vector3,
+               offset: Vector3,
+               focal_distance: f32)
+               -> Paraboloid {
+        Paraboloid {
+            normal: normal,
+            offset: offset - normal * focal_distance,
+            focal_point: normal * (focal_distance * 2.0)
+        }
+    }
+}
+
+impl Surface for Paraboloid {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
+        // Transform the ray into the space where the plane is a linear
+        // subspace (a plane through the origin).
+        let origin = ray.origin - self.offset;
+        let focal_offset = origin - self.focal_point;
+
+        let n_dot_d = dot(self.normal, ray.direction);
+        let n_dot_o = dot(self.normal, origin);
+        let d_dot_f = dot(ray.direction, focal_offset);
+
+        // Compute a, b, and c for the quadratic paraboloid equation.
+        let a = n_dot_d * n_dot_d - 1.0;
+        let b = 2.0 * n_dot_d * n_dot_o - 2.0 * d_dot_f;
+        let c = n_dot_o * n_dot_o - focal_offset.magnitude_squared();
+
+        // If a is zero, there is no quadratic equation,
+        // and the solution is a simple line intersection.
+        let t = if a == 0.0 {
+            let t1 = -c / b;
+            // For negative t, the paraboloid lies behind the ray.
+            if t1 < 0.0 { return None; }
+            else { t1 }
+        } else {
+            // The discriminant determines whether the equation
+            // has a solution.
+            let d = b * b - 4.0 * a * c;
+
+            // If it is less than zero, there is no intersection.
+            if d < 0.0 { return None; }
+
+            // Otherwise, the equation can be solved for t.
+            let sqrt_d = d.sqrt();
+            let t1 = 0.5 * (-b + sqrt_d) / a;
+            let t2 = 0.5 * (-b - sqrt_d) / a;
+
+            // Pick the closest non-negative t.
+            match (t1, t2) {
+                (p, q) if p > 0.0 && (p < q || q < 0.0) => p,
+                (_, q) if q > 0.0 => q,
+                // For negative t, the paraboloid lies behind the ray entirely.
+                _ => { return None; }
+            }
+        };
+
+        // Compute the intersection details and normal.
+        let pos = ray.origin + ray.direction * t;
+        let local_pos = pos - self.offset;
+        let plane_pr = local_pos - self.normal * dot(local_pos, self.normal);
+        let normal = (self.focal_point - plane_pr).normalise();
+
+        let intersection = Intersection {
+            position: pos,
+            normal: normal,
+            tangent: Vector3::zero(), // Not used here.
+            distance: t
+        };
+
+        Some(intersection)
+    }
+}
+
 /// An intersection of two volumes/surfaces, the boolean ‘and’.
-struct Compound<T1, T2> {
+pub struct Compound<T1, T2> {
     /// The first of the two surfaces.
     surface1: T1,
 
