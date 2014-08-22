@@ -297,11 +297,12 @@ impl App {
         let prism_radius: f32 = 17.0;
         let prism_height: f32 = 8.0;
         for i in range(0, prisms) {
-            let phi = i as f32 * prism_angle; {
+            for &(ofs, radius) in vec!((0.0f32, 1.0f32), (0.5 * prism_angle, 1.2)).iter() {
+                let phi = i as f32 * prism_angle + ofs;
                 // Get an initial position.
                 let mut position = Vector3 {
-                    x: phi.cos() * prism_radius,
-                    y: phi.sin() * prism_radius,
+                    x: phi.cos() * prism_radius * radius,
+                    y: phi.sin() * prism_radius * radius,
                     z: 0.0
                 };
                 let mut normal = Vector3::new(0.0, 0.0, -1.0);
