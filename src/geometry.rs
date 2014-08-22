@@ -490,7 +490,7 @@ pub fn new_hexagonal_prism(axis: Vector3,
     // the edge length of the desired prism, it does not cut the
     // corners at all.
     let iprism = new_infinite_prism(axis, offset,
-                                    edge_length * 2.0 - bevel_size * 2.0,
+                                    edge_length * 2.0 - bevel_size * 3.0,
                                     angle + PI);
 
     // And the normal prism, without bevel.
