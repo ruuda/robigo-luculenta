@@ -56,6 +56,12 @@ fn sub_timespec(this: &Timespec, that: &Timespec) -> Timespec {
 
 /// Handles splitting the workload across threads.
 pub struct TaskScheduler {
+    /// The number of completed trace batches. Used to measure performance.
+    traces_completed: uint,
+
+    /// The time at which rendering started. Used to measure performance.
+    start_time: Timespec,
+
     /// The number of trace units to use. Not all of them have to be
     /// active simultaneously.
     number_of_trace_units: uint,
@@ -117,6 +123,8 @@ impl TaskScheduler {
         let tonemap_unit = Some(box TonemapUnit::new(width, height));
 
         TaskScheduler {
+            traces_completed: 0,
+            start_time: get_time(),
             number_of_trace_units: n_trace_units,
             available_trace_units: trace_units,
             done_trace_units: RingBuf::new(),
@@ -250,6 +258,9 @@ impl TaskScheduler {
         // The trace unit used for the task, now needs plotting before
         // it is available again.
         self.done_trace_units.push(trace_unit);
+
+        // Keep statatistics about performance.
+        self.traces_completed += 1;
     }
 
     fn complete_plot_task(&mut self,
@@ -308,5 +319,10 @@ impl TaskScheduler {
         // it will not change.
         self.image_changed = false;
         self.last_tonemap_time = get_time();
+
+        // Measure how many rays per seconds the renderer can handle.
+        let render_time = sub_timespec(&get_time(), &self.start_time);
+        let batches_per_sec = self.traces_completed as f64 / render_time.sec as f64;
+        println!("performance: {} batches/sec", batches_per_sec);
     }
 }
