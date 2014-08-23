@@ -72,16 +72,15 @@ impl TonemapUnit {
     pub fn tonemap(&mut self, tristimuli: &[Vector3]) {
         let max_intensity = self.find_exposure(tristimuli);
         let buffer = self.rgb_buffer.as_mut_slice().mut_chunks(3);
-        let pixels = tristimuli.iter();
         let ln_4 = 4.0f32.ln();
 
         // Loop through all pixels.
-        for (buf, px) in buffer.zip(pixels) {
+        for (buf, cie) in buffer.zip(tristimuli.iter()) {
             // Apply exposure correction.
             let cie = Vector3 {
-                x: (px.x / max_intensity + 1.0).ln() / ln_4,
-                y: (px.y / max_intensity + 1.0).ln() / ln_4,
-                z: (px.z / max_intensity + 1.0).ln() / ln_4
+                x: (cie.x / max_intensity + 1.0).ln() / ln_4,
+                y: (cie.y / max_intensity + 1.0).ln() / ln_4,
+                z: (cie.z / max_intensity + 1.0).ln() / ln_4
             };
 
             // Then convert to sRGB.
