@@ -16,7 +16,6 @@
 
 #![allow(dead_code)]
 
-#[deriving(Show)]
 pub struct Quaternion {
     pub x: f32,
     pub y: f32,

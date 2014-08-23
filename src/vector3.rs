@@ -16,7 +16,6 @@
 
 use quaternion::Quaternion;
 
-#[deriving(Show)]
 #[deriving(Clone)]
 pub struct Vector3 {
     pub x: f32,

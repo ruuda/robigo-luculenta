@@ -16,7 +16,6 @@
 
 use vector3::Vector3;
 
-#[deriving(Show)]
 pub struct Ray {
     /// The 'position' of the ray.
     pub origin: Vector3,

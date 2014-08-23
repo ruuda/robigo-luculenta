@@ -16,7 +16,6 @@
 
 use geometry::Surface;
 use material::{Material, EmissiveMaterial};
-use std::fmt::{Show, Formatter, FormatError};
 
 pub enum MaterialBox {
     Reflective(Box<Material + Sync + Send>),
@@ -39,16 +38,6 @@ impl Object {
         Object {
             surface: surface,
             material: material
-        }
-    }
-}
-
-// TODO: implement Show for debugging only, remove this.
-impl Show for Object {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
-        match self.material {
-            Reflective(_) => "ReflectiveObject".fmt(f),
-            Emissive(_) => "EmissiveObject".fmt(f)
         }
     }
 }
