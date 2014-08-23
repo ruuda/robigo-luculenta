@@ -52,20 +52,20 @@ impl TonemapUnit {
     /// The returned value is the maximum acceptable intensity, the
     /// intensity that should become (nearly) white.
     fn find_exposure(&self, tristimuli: &[Vector3]) -> f32 {
+        let n = (self.image_width * self.image_height) as f32;
+
         // Compute the average intensity.
         // Calculations are based on the CIE Y value,
         // which corresponds to lightness.
-        let average = tristimuli.iter().map(|cie| { cie.y }).sum() /
-        (self.image_width as f32 * self.image_height as f32);
+        let mean = tristimuli.iter().map(|cie| { cie.y }).sum() / n;
 
         // Then compute the standard deviation.
-        let variance = tristimuli.iter().map(|cie| { cie.y * cie.y }).sum() /
-        (self.image_width as f32 * self.image_height as f32) -
-        (average * average);
+        let sqr_mean = tristimuli.iter().map(|cie| { cie.y * cie.y }).sum() / n;
+        let variance = sqr_mean - (mean * mean);
         let standard_deviation = variance.sqrt();
 
         // The desired 'white' is one standard deviation above average.
-        average + standard_deviation
+        mean + standard_deviation
     }
 
     /// Converts the unweighted CIE XYZ values in the buffer
