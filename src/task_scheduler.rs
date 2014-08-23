@@ -73,10 +73,6 @@ pub struct TaskScheduler {
     /// before the trace unit can be used again.
     done_trace_units: RingBuf<Box<TraceUnit>>,
 
-    /// The number of plot units to use. Not all of them have to be
-    /// active simultaneously.
-    number_of_plot_units: uint,
-
     /// The plot units which are available for plotting mapped photons.
     available_plot_units: RingBuf<Box<PlotUnit>>,
 
@@ -128,7 +124,6 @@ impl TaskScheduler {
             number_of_trace_units: n_trace_units,
             available_trace_units: trace_units,
             done_trace_units: RingBuf::new(),
-            number_of_plot_units: n_plot_units,
             available_plot_units: plot_units,
             done_plot_units: RingBuf::new(),
             gather_unit: gather_unit,

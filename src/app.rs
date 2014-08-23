@@ -49,9 +49,6 @@ pub static image_width: uint = 1280;
 /// Height of the canvas.
 pub static image_height: uint = 720;
 
-/// Canvas aspect ratio.
-static aspect_ratio: f32 = image_width as f32 / image_height as f32;
-
 pub struct App {
     /// Channel that can be used to signal the application to stop.
     pub stop: Sender<()>,
