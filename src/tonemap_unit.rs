@@ -75,7 +75,7 @@ impl TonemapUnit {
         let ln_4 = 4.0f32.ln();
 
         // Loop through all pixels.
-        for (buf, cie) in buffer.zip(tristimuli.iter()) {
+        for (px, cie) in buffer.zip(tristimuli.iter()) {
             // Apply exposure correction.
             let cie = Vector3 {
                 x: (cie.x / max_intensity + 1.0).ln() / ln_4,
@@ -92,9 +92,9 @@ impl TonemapUnit {
             let b = clamp(rgb.z);
 
             // Then convert to integers.
-            buf[0] = (r * 255.0) as u8;
-            buf[1] = (g * 255.0) as u8;
-            buf[2] = (b * 255.0) as u8;
+            px[0] = (r * 255.0) as u8;
+            px[1] = (g * 255.0) as u8;
+            px[2] = (b * 255.0) as u8;
         }
     }
 }
