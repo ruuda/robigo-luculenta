@@ -52,26 +52,15 @@ impl TonemapUnit {
     /// The returned value is the maximum acceptable intensity, the
     /// intensity that should become (nearly) white.
     fn find_exposure(&self, tristimuli: &[Vector3]) -> f32 {
-        let mut intensities = tristimuli.iter()
-        // Iterate over triplets of CIE XYZ values.
-        // Calculations are based on the CIE Y value (which corresponds
-        // to lightness), but X and Z are also taken into account slightly
-        // to avoid weird situations.
-        .map(|cie| { cie.x + cie.y * 5.0 + cie.z });
+        // Compute the average intensity.
+        // Calculations are based on the CIE Y value,
+        // which corresponds to lightness.
+        let average = tristimuli.iter().map(|cie| { cie.y }).sum() /
+        (self.image_width as f32 * self.image_height as f32);
 
-        // Compute the average intensity. Divide by 7 to compensate
-        // for the coefficients above.
-        let average = intensities.sum() /
-        (self.image_width as f32 * self.image_height as f32 * 7.0);
-
-        // TODO: I have not found a good way to re-use an iterator.
-        intensities = tristimuli.iter()
-        .map(|cie| { cie.x + cie.y * 5.0 + cie.z });
-
-        // Then compute the standard deviation. Divide by 49 = 7 * 7
-        // to compensate for the coefficients above.
-        let variance = intensities.by_ref().map(|i| { i * i }).sum() /
-        (self.image_width as f32 * self.image_height as f32 * 49.0) -
+        // Then compute the standard deviation.
+        let variance = tristimuli.iter().map(|cie| { cie.y * cie.y }).sum() /
+        (self.image_width as f32 * self.image_height as f32) -
         (average * average);
         let standard_deviation = variance.sqrt();
 
