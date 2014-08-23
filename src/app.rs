@@ -151,7 +151,6 @@ impl App {
             }
         });
 
-        // TODO: spawn proc.
         (stop_tx, img_rx)
     }
 
