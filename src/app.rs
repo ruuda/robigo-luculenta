@@ -43,12 +43,6 @@ use vector3::Vector3;
 
 pub type Image = Vec<u8>;
 
-/// Width of the canvas.
-pub static image_width: uint = 1280;
-
-/// Height of the canvas.
-pub static image_height: uint = 720;
-
 pub struct App {
     /// Channel that can be used to signal the application to stop.
     pub stop: Sender<()>,
@@ -58,7 +52,9 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> App {
+    /// Constructs and starts a new path tracer that renders to a canvas of
+    /// the specified size.
+    pub fn new(image_width: uint, image_height: uint) -> App {
         let concurrency = num_cpus();
         let ts = TaskScheduler::new(concurrency, image_width, image_height);
         let task_scheduler = Arc::new(Mutex::new(ts));

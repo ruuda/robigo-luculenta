@@ -44,7 +44,9 @@ mod vector3;
 
 fn main() {
     // Start up the path tracer. It begins rendering immediately.
-    let app = App::new();
+    let width = 1280u;
+    let height = 720u;
+    let app = App::new(width, height);
 
     // Spawn a new proc that will signal stop when enter is pressed.
     let (stop_tx, stop_rx) = channel();
@@ -62,9 +64,8 @@ fn main() {
         select! {
             img = images.recv() => {
                 // Write the image to output.png using lodepng.
-                // TODO: get the canvas size from a proper location.
                 match lodepng::encode24_file(&Path::new("output.png"),
-                                             img.as_slice(), 1280, 720) {
+                                             img.as_slice(), width as u32, height as u32) {
                     Ok(_) => println!("wrote image to output.png"),
                     Err(reason) => println!("failed to write output png: {}", reason)
                 }
