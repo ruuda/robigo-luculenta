@@ -93,8 +93,6 @@ impl PlotUnit {
 
     /// Resets the tristimulus buffer to black.
     pub fn clear(&mut self) {
-        // TODO: is there a way to optimise this to a memzero?
-        // Will LLVM do it automatically?
         for x in self.tristimulus_buffer.mut_iter() {
             *x = Vector3::zero();
         }
