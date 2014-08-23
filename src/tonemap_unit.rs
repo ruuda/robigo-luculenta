@@ -57,15 +57,14 @@ impl TonemapUnit {
         // Compute the average intensity.
         // Calculations are based on the CIE Y value,
         // which corresponds to lightness.
-        let mean = tristimuli.iter().map(|cie| { cie.y }).sum() / n;
+        let mean = tristimuli.iter().map(|cie| cie.y).sum() / n;
 
         // Then compute the standard deviation.
-        let sqr_mean = tristimuli.iter().map(|cie| { cie.y * cie.y }).sum() / n;
-        let variance = sqr_mean - (mean * mean);
-        let standard_deviation = variance.sqrt();
+        let sqr_mean = tristimuli.iter().map(|cie| cie.y * cie.y).sum() / n;
+        let variance = sqr_mean - mean * mean;
 
         // The desired 'white' is one standard deviation above average.
-        mean + standard_deviation
+        mean + variance.sqrt()
     }
 
     /// Converts the unweighted CIE XYZ values in the buffer
