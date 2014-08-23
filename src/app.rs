@@ -67,12 +67,17 @@ impl App {
         let (stop_tx, stop_rx) = channel::<()>();
         let (img_tx, img_rx) = channel();
 
+        // Set up the scene that will be rendered.
+        let scene = Arc::new(App::set_up_scene());
+
         // Then spawn a supervisor task that will start the workers.
         spawn(proc() {
             // Spawn as many workers as cores.
             let (stop_workers, images) = unzip(
             range(0u, concurrency)
-            .map(|_| { App::start_worker(task_scheduler.clone()) }));
+            .map(|_| {
+                App::start_worker(task_scheduler.clone(), scene.clone())
+            }));
             
             // Combine values so we can recv one at a time.
             let select = Select::new();
@@ -116,17 +121,13 @@ impl App {
         }
     }
 
-    fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>)
+    fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>,
+                    scene: Arc<Scene>)
                     -> (Sender<()>, Receiver<Image>) {
         let (stop_tx, stop_rx) = channel::<()>();
         let (img_tx, img_rx) = channel::<Image>();
 
         spawn(proc() {
-            // TODO: there should be one scene for the entire program,
-            // not one per worker thread. However, I can't get sharing
-            // the scene working properly :(
-            let scene = App::set_up_scene();
-
             // Move img_tx into the proc.
             let mut owned_img_tx = img_tx;
 
@@ -140,7 +141,7 @@ impl App {
                 // Ask the task scheduler for a new task, complete the old one.
                 // Then execute it.
                 task = task_scheduler.lock().get_new_task(task);
-                App::execute_task(&mut task, &scene, &mut owned_img_tx);
+                App::execute_task(&mut task, &*scene, &mut owned_img_tx);
 
                 // Stop only if a stop signal has been sent.
                 match stop_rx.try_recv() {
