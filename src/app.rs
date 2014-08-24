@@ -326,7 +326,10 @@ impl App {
         let prism_radius: f32 = 17.0;
         let prism_height: f32 = 8.0;
         for i in range(0, prisms) {
-            for &(ofs, radius) in vec!((0.0f32, 1.0f32), (0.5 * prism_angle, 1.2)).iter() {
+            for &(ofs, radius, phi_ofs, h) in vec!(
+                    (0.0f32, 1.0f32, 0.0f32, 1.0f32),
+                    (0.5 * prism_angle, 1.2, PI * 0.5, 1.5)
+                ).iter() {
                 let phi = i as f32 * prism_angle + ofs;
                 // Get an initial position.
                 let mut position = Vector3 {
@@ -347,13 +350,13 @@ impl App {
                     Some(intersection) => {
                         // The parabola focus is on the other side of the paraboloid.
                         normal = -intersection.normal;
-                        position = intersection.position + normal * 2.0;
+                        position = intersection.position + normal * 2.0 * h;
                     },
                     _ => { }
                 }
 
                 let prism = box new_hexagonal_prism(normal, position, 3.0, 1.0,
-                                                    phi, prism_height);
+                                                    phi + phi_ofs, prism_height * h);
                 let glass = box Sf10GlassMaterial;
                 let object = Object::new(prism, Reflective(glass));
                 objects.push(object);
