@@ -48,10 +48,10 @@ fn main() {
     let height = 720u;
     let app = App::new(width, height);
 
-    // Spawn a new proc that will signal stop when enter is pressed.
+    // Spawn a new proc that will signal stop when enter is pressed. TODO
     let (stop_tx, stop_rx) = channel();
     spawn(proc() {
-        println!("press enter to stop rendering");
+        println!("press ctrl+c to stop rendering");
         stdin().read_line().unwrap();
         stop_tx.send(());
     });
@@ -72,7 +72,7 @@ fn main() {
             },
             () = stop_rx.recv() => {
                 // Tell the app to stop.
-                app.stop.send(());
+                // TODO
 
                 // Stop the main loop.
                 break;

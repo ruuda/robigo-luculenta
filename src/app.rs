@@ -20,7 +20,6 @@ use std::io::timer::sleep;
 use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use std::vec::unzip;
 use camera::Camera;
 use constants::GOLDEN_RATIO;
 use gather_unit::GatherUnit;
@@ -44,9 +43,6 @@ use vector3::Vector3;
 pub type Image = Vec<u8>;
 
 pub struct App {
-    /// Channel that can be used to signal the application to stop.
-    pub stop: Sender<()>,
-
     /// Channel that produces a rendered image periodically.
     pub images: Receiver<Image>
 }
@@ -59,8 +55,7 @@ impl App {
         let ts = TaskScheduler::new(concurrency, image_width, image_height);
         let task_scheduler = Arc::new(Mutex::new(ts));
 
-        // Channels for communicating back to the main task.
-        let (stop_tx, stop_rx) = channel::<()>();
+        // Channel for communicating back to the main task.
         let (img_tx, img_rx) = channel();
 
         // Set up the scene that will be rendered.
@@ -69,11 +64,9 @@ impl App {
         // Then spawn a supervisor task that will start the workers.
         spawn(proc() {
             // Spawn as many workers as cores.
-            let (stop_workers, images) = unzip(
-            range(0u, concurrency)
-            .map(|_| {
+            let images: Vec<Receiver<Image>> = range(0u, concurrency).map(|_| {
                 App::start_worker(task_scheduler.clone(), scene.clone())
-            }));
+            }).collect();
             
             // Combine values so we can recv one at a time.
             let select = Select::new();
@@ -82,15 +75,12 @@ impl App {
             for handle in worker_handles.mut_iter() {
                 unsafe { handle.add(); }
             }
-            let mut stop_handle = select.handle(&stop_rx);
-            unsafe { stop_handle.add(); }
 
-            // Then go into the supervising loop: broadcast a stop signal to
-            // all workers, or route a rendered image to the main task.
+            // Then go into the supervising loop: route a rendered image to
+            // the main task.
             loop {
                 let id = select.wait();
 
-                // Was the source a worker?
                 for handle in worker_handles.mut_iter() {
                     // When a new image arrives, route it to the main task.
                     if id == handle.id() {
@@ -98,29 +88,15 @@ impl App {
                         img_tx.send(img);
                     }
                 }
-
-                // Or the stop channel perhaps?
-                if id == stop_handle.id() {
-                    // Broadcast to all workers that they should stop.
-                    for stop in stop_workers.iter() {
-                        stop.send(());
-                    }
-                    // Then also stop the supervising loop.
-                    break;
-                }
             }
         });
 
-        App {
-            stop: stop_tx,
-            images: img_rx
-        }
+        App { images: img_rx }
     }
 
     fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>,
                     scene: Arc<Scene>)
-                    -> (Sender<()>, Receiver<Image>) {
-        let (stop_tx, stop_rx) = channel::<()>();
+                    -> Receiver<Image> {
         let (img_tx, img_rx) = channel::<Image>();
 
         spawn(proc() {
@@ -139,15 +115,11 @@ impl App {
                 task = task_scheduler.lock().get_new_task(task);
                 App::execute_task(&mut task, &*scene, &mut owned_img_tx);
 
-                // Stop only if a stop signal has been sent.
-                match stop_rx.try_recv() {
-                    Ok(()) => break,
-                    _ => { }
-                }
+                // TODO: check stop condition variable.
             }
         });
 
-        (stop_tx, img_rx)
+        img_rx
     }
 
     fn execute_task(task: &mut Task, scene: &Scene, img_tx: &mut Sender<Image>) {
