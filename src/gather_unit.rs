@@ -21,7 +21,10 @@ use vector3::Vector3;
 
 pub struct GatherUnit {
     /// The buffer of tristimulus values.
-    pub tristimulus_buffer: Vec<Vector3>
+    pub tristimulus_buffer: Vec<Vector3>,
+
+    /// A buffer that contains compensation for rounding errors in summing.
+    compensation_buffer: Vec<Vector3>
 }
 
 impl GatherUnit {
@@ -29,7 +32,8 @@ impl GatherUnit {
     /// of the specified size.
     pub fn new(width: uint, height: uint) -> GatherUnit {
         let mut unit = GatherUnit {
-            tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero())
+            tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero()),
+            compensation_buffer: Vec::from_elem(width * height, Vector3::zero())
         };
 
         // Try to continue a previous render.
@@ -41,11 +45,18 @@ impl GatherUnit {
     /// Add the results of the PlotUnit to the canvas.
     pub fn accumulate(&mut self, tristimuli: &[Vector3]) {
         let accs = self.tristimulus_buffer.mut_iter();
+        let comps = self.compensation_buffer.mut_iter();
         let pixels = tristimuli.iter();
 
         // Loop through all the pixels, and add the values.
-        for (acc, px) in accs.zip(pixels) {
-            *acc = *acc + *px;
+        for ((comp, acc), px) in comps.zip(accs).zip(pixels) {
+            // What we want to add, is the real value to add (px),
+            // minus compensation for previous errors.
+            let extra = *px - *comp;
+            let sum = *acc + extra;
+            // The new compensation is the error in the accumulation.
+            *comp = (sum - *acc) - extra;
+            *acc = sum;
         }
     }
 
