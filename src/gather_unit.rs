@@ -76,7 +76,9 @@ impl GatherUnit {
     fn read(&mut self) {
         match File::open(&Path::new("buffer.raw")) {
             Ok(ref mut file) => {
-                for trist in self.tristimulus_buffer.mut_iter() {
+                let mut data = self.tristimulus_buffer.mut_iter()
+                                   .chain(self.compensation_buffer.mut_iter());
+                for trist in data {
                     let xyz: &mut [u8, ..12] = &mut [0, ..12];
                     file.read(xyz.as_mut_slice()).ok().expect("failed to read raw buffer");
                     let trist: &mut [u8, ..12] = unsafe { transmute(trist) };
