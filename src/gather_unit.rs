@@ -64,7 +64,9 @@ impl GatherUnit {
     /// can be resumed later.
     pub fn save(&self) {
         let mut file = File::open_mode(&Path::new("buffer.raw"), Open, Write);
-        for trist in self.tristimulus_buffer.iter() {
+        let mut data = self.tristimulus_buffer.iter()
+                           .chain(self.compensation_buffer.iter());
+        for trist in data {
             let xyz: &[u8, ..12] = unsafe { transmute(trist) };
             file.write(xyz.as_slice()).ok().expect("failed to write raw buffer");
         }
