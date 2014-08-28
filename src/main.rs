@@ -17,8 +17,6 @@
 extern crate time;
 extern crate lodepng;
 
-use std::comm::channel;
-use std::io::stdin;
 use app::App;
 
 mod app;
@@ -47,36 +45,21 @@ fn main() {
     let width = 1280u;
     let height = 720u;
     let app = App::new(width, height);
-
-    // Spawn a new proc that will signal stop when enter is pressed. TODO
-    let (stop_tx, stop_rx) = channel();
-    spawn(proc() {
-        println!("press ctrl+c to stop rendering");
-        stdin().read_line().unwrap();
-        stop_tx.send(());
-    });
-
     let images = app.images;
 
-    // Then wait for news from other tasks: when an image has been rendered,
-    // write it out, and when stop is signalled, stop the app.
-    loop {
-        select! {
-            img = images.recv() => {
-                // Write the image to output.png using lodepng.
-                match lodepng::encode24_file(&Path::new("output.png"),
-                                             img.as_slice(), width as u32, height as u32) {
-                    Ok(_) => println!("wrote image to output.png"),
-                    Err(reason) => println!("failed to write output png: {}", reason)
-                }
-            },
-            () = stop_rx.recv() => {
-                // Tell the app to stop.
-                // TODO
+    println!("press ctrl+c to stop rendering");
 
-                // Stop the main loop.
-                break;
-            }
+    // Then wait for news from other tasks: when an image has been rendered,
+    // write it out. Loop forever; the application must be stopped by
+    // terminating it.
+    loop {
+        let img = images.recv();
+
+        // Write the image to output.png using lodepng.
+        match lodepng::encode24_file(&Path::new("output.png"),
+                                     img.as_slice(), width as u32, height as u32) {
+            Ok(_) => println!("wrote image to output.png"),
+            Err(reason) => println!("failed to write output png: {}", reason)
         }
     }
 }

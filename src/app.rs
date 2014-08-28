@@ -107,15 +107,12 @@ impl App {
             // a completed task. Therefore, this worker is done sleeping.
             let mut task = Sleep;
 
-            // Until something signals this worker to stop,
-            // continue executing tasks.
+            // Continue rendering forever, unless the application is terminated.
             loop {
                 // Ask the task scheduler for a new task, complete the old one.
                 // Then execute it.
                 task = task_scheduler.lock().get_new_task(task);
                 App::execute_task(&mut task, &*scene, &mut owned_img_tx);
-
-                // TODO: check stop condition variable.
             }
         });
 
