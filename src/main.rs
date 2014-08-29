@@ -53,7 +53,7 @@ fn main() {
     // write it out. Loop forever; the application must be stopped by
     // terminating it.
     loop {
-        let img = images.recv();
+        let img = *images.recv();
 
         // Write the image to output.png using lodepng.
         match lodepng::encode24_file(&Path::new("output.png"),
