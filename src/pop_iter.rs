@@ -16,7 +16,7 @@
 
 use std::collections::Deque;
 
-pub struct PopFrontItems<'a, C> {
+pub struct PopFrontItems<'a, C: 'a> {
     container: &'a mut C
 }
 
@@ -54,7 +54,7 @@ fn pop_front_iter_ring_buf() {
     assert_eq!(ys.as_slice(), &[0u, 1, 2]);
 }
 
-pub struct PopItems<'a, C> {
+pub struct PopItems<'a, C: 'a> {
     container: &'a mut C
 }
 
