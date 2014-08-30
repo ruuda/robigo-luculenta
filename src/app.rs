@@ -40,7 +40,7 @@ use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 use vector3::Vector3;
 
-pub type Image = Box<Vec<u8>>;
+pub type Image = Vec<u8>;
 
 pub struct App {
     /// Channel that produces a rendered image periodically.
@@ -166,7 +166,7 @@ impl App {
         tonemap_unit.tonemap(gather_unit.tristimulus_buffer.as_slice());
 
         // Copy the rendered image.
-        let img = box tonemap_unit.rgb_buffer.clone();
+        let img = tonemap_unit.rgb_buffer.clone();
 
         // And send it to the UI / main task.
         img_tx.send(img);
