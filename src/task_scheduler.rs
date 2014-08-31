@@ -218,7 +218,7 @@ impl TaskScheduler {
     fn create_gather_task(&mut self) -> Task {
         // We know the gather unit is available, because this method would
         // not have been called otherwise.
-        let gather_unit = self.gather_unit.take_unwrap();
+        let gather_unit = self.gather_unit.take().unwrap();
 
         // Have it gather all plot units which are done.
         let plot_units: Vec<Box<PlotUnit>> = self.done_plot_units
@@ -230,8 +230,8 @@ impl TaskScheduler {
     fn create_tonemap_task(&mut self) -> Task {
         // We know the units are available, because this method would
         // not have been called otherwise.
-        let gather_unit = self.gather_unit.take_unwrap();
-        let tonemap_unit = self.tonemap_unit.take_unwrap();
+        let gather_unit = self.gather_unit.take().unwrap();
+        let tonemap_unit = self.tonemap_unit.take().unwrap();
 
         Tonemap(tonemap_unit, gather_unit)
     }
