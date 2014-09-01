@@ -16,6 +16,7 @@
 
 use std::cmp::max;
 use std::collections::RingBuf;
+use std::time::Duration;
 use time::{Timespec, get_time};
 use gather_unit::GatherUnit;
 use plot_unit::PlotUnit;
@@ -41,17 +42,8 @@ pub enum Task {
 }
 
 /// Tonemap every 10 seconds.
-static tonemap_interval: Timespec = Timespec { sec: 10, nsec: 0 };
-
-// Helper to be able to take time differences.
-fn sub_timespec(this: &Timespec, that: &Timespec) -> Timespec {
-    let mut sec = this.sec - that.sec;
-    let mut nsec = this.nsec - that.nsec;
-    if nsec < 0 {
-        nsec += 1_000_000_000;
-        sec -= 1;
-    }
-    Timespec::new(sec, nsec)
+fn tonemap_interval() -> Duration {
+    Duration::seconds(10)
 }
 
 /// Handles splitting the workload across threads.
@@ -140,7 +132,7 @@ impl TaskScheduler {
         // If the last tonemapping time was more than x seconds ago,
         // an update should be done.
         let now = get_time();
-        if sub_timespec(&now, &self.last_tonemap_time) > tonemap_interval {
+        if now - self.last_tonemap_time > tonemap_interval() {
             // If the image has changed since it was last tonemapped,
             // tonemap it now.
             if self.image_changed {
@@ -316,8 +308,9 @@ impl TaskScheduler {
         self.last_tonemap_time = get_time();
 
         // Measure how many rays per seconds the renderer can handle.
-        let render_time = sub_timespec(&get_time(), &self.start_time);
-        let batches_per_sec = self.traces_completed as f64 / render_time.sec as f64;
+        let render_time = get_time() - self.start_time;
+        let batches_per_sec = self.traces_completed as f64 /
+                              render_time.num_milliseconds() as f64 * 1000.0;
         println!("performance: {} batches/sec", batches_per_sec);
     }
 }
