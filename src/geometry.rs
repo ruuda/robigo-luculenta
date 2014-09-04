@@ -148,10 +148,25 @@ impl Circle {
     }
 }
 
+// Filter(ed) is implemented manually, because it is deprecated in the standard
+// library, but it allows for some elegant code, so I wanted to keep it.
+trait Filter<T> {
+    fn filter(self, condition: |&T| -> bool) -> Self;
+}
+
+impl<T> Filter<T> for Option<T> {
+    fn filter(self, condition: |&T| -> bool) -> Option<T> {
+        match self {
+            Some(x) => if condition(&x) { Some(x) } else { None },
+            None => None
+        }
+    }
+}
+
 impl Surface for Circle {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         intersect_plane(&self.normal, &self.position, ray)
-        .filtered(|&(pos, _, _)| {
+        .filter(|&(pos, _, _)| {
             // Allow only indersections that lie inside the circle.
             (pos - self.position).magnitude_squared() <= self.radius_squared
         })
@@ -369,8 +384,8 @@ for Compound<T1, T2> {
         let i2 = self.surface2.intersect(ray);
 
         // Invalidate intersections that do not lie in both volumes.
-        let i1 = i1.filtered(|i| { self.surface2.lies_inside(i.position) });
-        let i2 = i2.filtered(|i| { self.surface1.lies_inside(i.position) });
+        let i1 = i1.filter(|i| { self.surface2.lies_inside(i.position) });
+        let i2 = i2.filter(|i| { self.surface1.lies_inside(i.position) });
 
         // If both intersections are valid, pick the closest one.
         if i1.is_some() && i2.is_some() {
