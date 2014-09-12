@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use std::comm::{Handle, Select, Sender, Receiver, channel};
+use std::comm::{Sender, Receiver, channel};
 use std::f32::consts::PI;
 use std::io::timer::sleep;
 use std::os::num_cpus;
@@ -61,44 +61,19 @@ impl App {
         // Set up the scene that will be rendered.
         let scene = Arc::new(App::set_up_scene());
 
-        // Then spawn a supervisor task that will start the workers.
-        spawn(proc() {
-            // Spawn as many workers as cores.
-            let images: Vec<Receiver<Image>> = range(0u, concurrency).map(|_| {
-                App::start_worker(task_scheduler.clone(), scene.clone())
-            }).collect();
+        // Spawn as many workers as cores.
+        for _ in range(0u, concurrency) {
+            App::start_worker(task_scheduler.clone(),
+                              scene.clone(),
+                              img_tx.clone());
+        }
             
-            // Combine values so we can recv one at a time.
-            let select = Select::new();
-            let mut worker_handles: Vec<Handle<Image>> = images
-            .iter().map(|worker_rx| { select.handle(worker_rx) }).collect();
-            for handle in worker_handles.mut_iter() {
-                unsafe { handle.add(); }
-            }
-
-            // Then go into the supervising loop: route a rendered image to
-            // the main task.
-            loop {
-                let id = select.wait();
-
-                for handle in worker_handles.mut_iter() {
-                    // When a new image arrives, route it to the main task.
-                    if id == handle.id() {
-                        let img = handle.recv();
-                        img_tx.send(img);
-                    }
-                }
-            }
-        });
-
         App { images: img_rx }
     }
 
     fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>,
-                    scene: Arc<Scene>)
-                    -> Receiver<Image> {
-        let (img_tx, img_rx) = channel::<Image>();
-
+                    scene: Arc<Scene>,
+                    img_tx: Sender<Image>) {
         spawn(proc() {
             // Move img_tx into the proc.
             let mut owned_img_tx = img_tx;
@@ -115,8 +90,6 @@ impl App {
                 App::execute_task(&mut task, &*scene, &mut owned_img_tx);
             }
         });
-
-        img_rx
     }
 
     fn execute_task(task: &mut Task, scene: &Scene, img_tx: &mut Sender<Image>) {
