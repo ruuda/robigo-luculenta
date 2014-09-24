@@ -257,7 +257,7 @@ impl TaskScheduler {
         print!("the following trace units are available again: ");
 
         // All trace units that were plotted, can be used again now.
-        for trace_unit in trace_units.move_iter() {
+        for trace_unit in trace_units.into_iter() {
             print!(" {} ", trace_unit.id);
             self.available_trace_units.push(trace_unit);
         }
@@ -276,7 +276,7 @@ impl TaskScheduler {
         print!("the following plot units are available again: ");
 
         // All plot units that were gathered, can be used again now.
-        for plot_unit in plot_units.move_iter() {
+        for plot_unit in plot_units.into_iter() {
             print!(" {} ", plot_unit.id);
             self.available_plot_units.push(plot_unit);
         }
