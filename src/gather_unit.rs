@@ -44,8 +44,8 @@ impl GatherUnit {
 
     /// Add the results of the PlotUnit to the canvas.
     pub fn accumulate(&mut self, tristimuli: &[Vector3]) {
-        let accs = self.tristimulus_buffer.mut_iter();
-        let comps = self.compensation_buffer.mut_iter();
+        let accs = self.tristimulus_buffer.iter_mut();
+        let comps = self.compensation_buffer.iter_mut();
         let pixels = tristimuli.iter();
 
         // Loop through all the pixels, and add the values.
@@ -76,8 +76,8 @@ impl GatherUnit {
     fn read(&mut self) {
         match File::open(&Path::new("buffer.raw")) {
             Ok(ref mut file) => {
-                let mut data = self.tristimulus_buffer.mut_iter()
-                                   .chain(self.compensation_buffer.mut_iter());
+                let mut data = self.tristimulus_buffer.iter_mut()
+                                   .chain(self.compensation_buffer.iter_mut());
                 for trist in data {
                     let xyz: &mut [u8, ..12] = &mut [0, ..12];
                     file.read(xyz.as_mut_slice()).ok().expect("failed to read raw buffer");

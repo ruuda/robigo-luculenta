@@ -93,7 +93,7 @@ impl PlotUnit {
 
     /// Resets the tristimulus buffer to black.
     pub fn clear(&mut self) {
-        for x in self.tristimulus_buffer.mut_iter() {
+        for x in self.tristimulus_buffer.iter_mut() {
             *x = Vector3::zero();
         }
     }
