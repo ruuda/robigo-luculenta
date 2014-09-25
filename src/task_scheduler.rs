@@ -16,6 +16,7 @@
 
 use std::cmp::max;
 use std::collections::RingBuf;
+use std::iter::AdditiveIterator;
 use std::time::Duration;
 use time::{Timespec, get_time};
 use gather_unit::GatherUnit;
@@ -51,8 +52,8 @@ pub struct TaskScheduler {
     /// The number of completed trace batches. Used to measure performance.
     traces_completed: uint,
 
-    /// The time at which rendering started. Used to measure performance.
-    start_time: Timespec,
+    /// Previous measurements of batches/second, used to determine variance.
+    performance: RingBuf<f32>,
 
     /// The number of trace units to use. Not all of them have to be
     /// active simultaneously.
@@ -112,7 +113,7 @@ impl TaskScheduler {
 
         TaskScheduler {
             traces_completed: 0,
-            start_time: get_time(),
+            performance: RingBuf::new(),
             number_of_trace_units: n_trace_units,
             available_trace_units: trace_units,
             done_trace_units: RingBuf::new(),
@@ -305,12 +306,24 @@ impl TaskScheduler {
         // The image is tonemapped now, so until a new gathering happens,
         // it will not change.
         self.image_changed = false;
-        self.last_tonemap_time = get_time();
 
         // Measure how many rays per seconds the renderer can handle.
-        let render_time = get_time() - self.start_time;
-        let batches_per_sec = self.traces_completed as f64 /
-                              render_time.num_milliseconds() as f64 * 1000.0;
-        println!("performance: {} batches/sec", batches_per_sec);
+        let now = get_time();
+        let render_time = now - self.last_tonemap_time;
+        let batches_per_sec = self.traces_completed as f32 * 1000.0 /
+                              render_time.num_milliseconds() as f32;
+        self.last_tonemap_time = now;
+        self.traces_completed = 0;
+
+        // Store the latest 512 measurements (should be about 1.5 hours).
+        self.performance.push(batches_per_sec);
+        if self.performance.len() > 512 { self.performance.pop(); }
+        let n = self.performance.len() as f32;
+
+        let mean = self.performance.iter().map(|&x| x).sum() / n;
+        let sqr_mean = self.performance.iter().map(|&x| x * x).sum() / n;
+        let variance = sqr_mean - mean * mean;
+
+        println!("performance: {} +- {} batches/sec", mean, variance.sqrt());
     }
 }
