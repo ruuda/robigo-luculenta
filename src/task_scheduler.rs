@@ -42,9 +42,9 @@ pub enum Task {
     Tonemap(Box<TonemapUnit>, Box<GatherUnit>)
 }
 
-/// Tonemap every 10 seconds.
+/// Tonemap every 30 seconds.
 fn tonemap_interval() -> Duration {
-    Duration::seconds(10)
+    Duration::seconds(30)
 }
 
 /// Handles splitting the workload across threads.
