@@ -315,7 +315,7 @@ impl TaskScheduler {
         self.last_tonemap_time = now;
         self.traces_completed = 0;
 
-        // Store the latest 512 measurements (should be about 1.5 hours).
+        // Store the latest 512 measurements (should be about 4.25 hours).
         self.performance.push(batches_per_sec);
         if self.performance.len() > 512 { self.performance.pop(); }
         let n = self.performance.len() as f32;
