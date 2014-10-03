@@ -288,13 +288,11 @@ impl App {
                     wavelength: 0.0,
                     probability: 1.0
                 };
-                match floor_paraboloid.intersect(&ray) {
-                    Some(intersection) => {
-                        // The parabola focus is on the other side of the paraboloid.
-                        normal = -intersection.normal;
-                        position = intersection.position + normal * 2.0 * h;
-                    },
-                    _ => { }
+
+                if let Some(intersection) = floor_paraboloid.intersect(&ray) {
+                    // The parabola focus is on the other side of the paraboloid.
+                    normal = -intersection.normal;
+                    position = intersection.position + normal * 2.0 * h;
                 }
 
                 let prism = box new_hexagonal_prism(normal, position, 3.0, 1.0,
