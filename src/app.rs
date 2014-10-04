@@ -99,9 +99,9 @@ impl App {
             Trace(ref mut trace_unit) =>
                 App::execute_trace_task(scene, &mut **trace_unit),
             Plot(ref mut plot_unit, ref mut units) =>
-                App::execute_plot_task(&mut **plot_unit, units.as_mut_slice()),
+                App::execute_plot_task(&mut **plot_unit, units[mut]),
             Gather(ref mut gather_unit, ref mut units) =>
-                App::execute_gather_task(&mut **gather_unit, units.as_mut_slice()),
+                App::execute_gather_task(&mut **gather_unit, units[mut]),
             Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
                 App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit)
         }
@@ -125,7 +125,7 @@ impl App {
     fn execute_gather_task(gather_unit: &mut GatherUnit,
                            units: &mut[Box<PlotUnit>]) {
         for unit in units.iter_mut() {
-            gather_unit.accumulate(unit.tristimulus_buffer.as_slice());
+            gather_unit.accumulate(unit.tristimulus_buffer[]);
             unit.clear();
         }
 
@@ -136,7 +136,7 @@ impl App {
     fn execute_tonemap_task(img_tx: &mut Sender<Image>,
                             tonemap_unit: &mut TonemapUnit,
                             gather_unit: &mut GatherUnit) {
-        tonemap_unit.tonemap(gather_unit.tristimulus_buffer.as_slice());
+        tonemap_unit.tonemap(gather_unit.tristimulus_buffer[]);
 
         // Copy the rendered image.
         let img = tonemap_unit.rgb_buffer.clone();

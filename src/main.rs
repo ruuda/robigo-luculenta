@@ -59,7 +59,7 @@ fn main() {
 
         // Write the image to output.png using lodepng.
         match lodepng::encode24_file(&Path::new("output.png"),
-                                     img.as_slice(), width as u32, height as u32) {
+                                     img[], width as u32, height as u32) {
             Ok(_) => println!("wrote image to output.png"),
             Err(reason) => println!("failed to write output png: {}", reason)
         }

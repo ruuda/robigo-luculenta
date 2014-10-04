@@ -68,7 +68,7 @@ impl GatherUnit {
                            .chain(self.compensation_buffer.iter());
         for trist in data {
             let xyz: &[u8, ..12] = unsafe { transmute(trist) };
-            file.write(xyz.as_slice()).ok().expect("failed to write raw buffer");
+            file.write(xyz).ok().expect("failed to write raw buffer");
         }
     }
 
@@ -79,9 +79,9 @@ impl GatherUnit {
                                .chain(self.compensation_buffer.iter_mut());
             for trist in data {
                 let xyz: &mut [u8, ..12] = &mut [0, ..12];
-                file.read(xyz.as_mut_slice()).ok().expect("failed to read raw buffer");
+                file.read(xyz).ok().expect("failed to read raw buffer");
                 let trist: &mut [u8, ..12] = unsafe { transmute(trist) };
-                copy_memory(trist.as_mut_slice(), xyz.as_slice());
+                copy_memory(trist, xyz);
             }
         }
     }
