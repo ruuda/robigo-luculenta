@@ -16,7 +16,6 @@
 
 use std::io::{File, Open, Write};
 use std::mem::transmute;
-use std::slice::bytes::copy_memory;
 use vector3::Vector3;
 
 pub struct GatherUnit {
@@ -78,10 +77,8 @@ impl GatherUnit {
             let mut data = self.tristimulus_buffer.iter_mut()
                                .chain(self.compensation_buffer.iter_mut());
             for trist in data {
-                let xyz: &mut [u8, ..12] = &mut [0, ..12];
+                let xyz: &mut [u8, ..12] = unsafe { transmute(trist) };
                 file.read(xyz).ok().expect("failed to read raw buffer");
-                let trist: &mut [u8, ..12] = unsafe { transmute(trist) };
-                copy_memory(trist, xyz);
             }
         }
     }
