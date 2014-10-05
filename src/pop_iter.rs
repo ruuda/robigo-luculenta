@@ -51,7 +51,7 @@ fn pop_front_iter_ring_buf() {
     let ys: Vec<uint> = xs.pop_front_iter().take(3).collect();
     assert_eq!(xs.get(0), &3u);
     assert_eq!(xs.get(1), &4u);
-    assert_eq!(ys[], &[0u, 1, 2]);
+    assert_eq!(ys[], [0u, 1, 2][]);
 }
 
 pub struct PopItems<'a, C: 'a> {
@@ -84,8 +84,8 @@ impl<T, C: Collection + MutableSeq<T>> PopIter for C {
 fn pop_iter_vec() {
     let mut xs = vec!(0u, 1, 2, 3, 4);
     let ys: Vec<uint> = xs.pop_iter().take(3).collect();
-    assert_eq!(xs[], &[0u, 1]);
-    assert_eq!(ys[], &[4u, 3, 2]);
+    assert_eq!(xs[], [0u, 1][]);
+    assert_eq!(ys[], [4u, 3, 2][]);
 }
 
 #[test]
@@ -97,5 +97,5 @@ fn pop_iter_ring_buf() {
     let ys: Vec<uint> = xs.pop_iter().take(3).collect();
     assert_eq!(xs.get(0), &0u);
     assert_eq!(xs.get(1), &1u);
-    assert_eq!(ys[], &[4u, 3, 2]);
+    assert_eq!(ys[], [4u, 3, 2][]);
 }
