@@ -19,7 +19,7 @@ use ray::Ray;
 use scene::Scene;
 
 /// The number of paths to trace in one batch.
-static number_of_photons: uint = 1024 * 512;
+static NUMBER_OF_PHOTONS: uint = 1024 * 512;
 
 /// Represents a photon that has been traced.
 pub struct MappedPhoton {
@@ -54,7 +54,7 @@ pub struct TraceUnit {
     aspect_ratio: f32,
 
     /// The photons that were rendered.
-    pub mapped_photons: [MappedPhoton, ..number_of_photons],
+    pub mapped_photons: [MappedPhoton, ..NUMBER_OF_PHOTONS],
 
     /// An ID for identifying this unit in the UI.
     pub id: uint
@@ -65,7 +65,7 @@ impl TraceUnit {
     pub fn new(id:uint, width: uint, height: uint) -> TraceUnit {
         TraceUnit {
             aspect_ratio: width as f32 / height as f32,
-            mapped_photons: [MappedPhoton::new(), ..number_of_photons],
+            mapped_photons: [MappedPhoton::new(), ..NUMBER_OF_PHOTONS],
             id: id
         }
     }

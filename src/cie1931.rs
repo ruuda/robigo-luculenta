@@ -27,22 +27,22 @@ pub fn get_tristimulus(wavelength: f32) -> Vector3 {
         Vector3::zero()
     } else if index == -1 {
         // No interpolation possible.
-        Vector3::new(x[0] * remainder, y[0] * remainder, z[0] * remainder)
+        Vector3::new(X[0] * remainder, Y[0] * remainder, Z[0] * remainder)
     } else if index == 80 {
         // No interpolation possible.
         Vector3 {
-            x: x[80] * (1.0 - remainder),
-            y: y[80] * (1.0 - remainder),
-            z: z[80] * (1.0 - remainder)
+            x: X[80] * (1.0 - remainder),
+            y: Y[80] * (1.0 - remainder),
+            z: Z[80] * (1.0 - remainder)
         }
     } else {
         let i = index as uint;
 
         // Interpolate between two measurements.
         Vector3 {
-            x: x[i] * (1.0 - remainder) + x[i + 1] * remainder,
-            y: y[i] * (1.0 - remainder) + y[i + 1] * remainder,
-            z: z[i] * (1.0 - remainder) + z[i + 1] * remainder
+            x: X[i] * (1.0 - remainder) + X[i + 1] * remainder,
+            y: Y[i] * (1.0 - remainder) + Y[i + 1] * remainder,
+            z: Z[i] * (1.0 - remainder) + Z[i + 1] * remainder
         }
     }
 }
@@ -50,7 +50,7 @@ pub fn get_tristimulus(wavelength: f32) -> Vector3 {
 // Data obtained from http://cvrl.ioo.ucl.ac.uk/index.htm.
 
 /// CIE X tristimulus values, at 5nm intervals, starting at 380 nm.
-static x: [f32, ..81] = [
+static X: [f32, ..81] = [
     0.001368,
     0.002236,
     0.004243,
@@ -135,7 +135,7 @@ static x: [f32, ..81] = [
 ];
 
 /// CIE Y tristimulus values, at 5nm intervals, starting at 380 nm.
-static y: [f32, ..81] = [
+static Y: [f32, ..81] = [
     0.000039,
     0.000064,
     0.000120,
@@ -220,7 +220,7 @@ static y: [f32, ..81] = [
 ];
 
 /// CIE Z tristimulus values, at 5nm intervals, starting at 380 nm.
-static z: [f32, ..81] = [
+static Z: [f32, ..81] = [
     0.006450,
     0.010550,
     0.020050,
