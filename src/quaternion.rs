@@ -125,7 +125,7 @@ impl MulQuaternion for Quaternion {
     }
 }
 
-impl<T: MulQuaternion> Mul<T, Quaternion> for Quaternion {
+impl<T> Mul<T, Quaternion> for Quaternion where T: MulQuaternion {
     fn mul(&self, other: &T) -> Quaternion {
         other.mul(self)
     }
