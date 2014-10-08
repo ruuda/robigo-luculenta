@@ -377,8 +377,8 @@ impl<T1, T2> Compound<T1, T2> {
     }
 }
 
-impl<T1: Surface + Volume, T2: Surface + Volume> Surface
-for Compound<T1, T2> {
+impl<T1, T2> Surface for Compound<T1, T2>
+    where T1: Surface + Volume, T2: Surface + Volume {
     fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         let i1 = self.surface1.intersect(ray);
         let i2 = self.surface2.intersect(ray);
@@ -400,7 +400,7 @@ for Compound<T1, T2> {
     }
 }
 
-impl <T1: Volume, T2: Volume> Volume for Compound<T1, T2> {
+impl<T1, T2> Volume for Compound<T1, T2> where T1: Volume, T2: Volume {
     fn lies_inside(&self, p: Vector3) -> bool {
         self.surface1.lies_inside(p) && self.surface2.lies_inside(p)
     }
