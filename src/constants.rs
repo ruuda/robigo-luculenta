@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-pub static GOLDEN_RATIO: f64 = 1.6180339887498948482045868343656381177203091798057628;
+pub const GOLDEN_RATIO: f64 = 1.6180339887498948482045868343656381177203091798057628;
 
-pub static PLANCKS_CONSTANT: f64 = 6.62606957e-34;
+pub const PLANCKS_CONSTANT: f64 = 6.62606957e-34;
 
-pub static BOLTZMANNS_CONSTANT: f64 = 1.3806488e-23;
+pub const BOLTZMANNS_CONSTANT: f64 = 1.3806488e-23;
 
-pub static SPEED_OF_LIGHT: f64 = 299792458.0;
+pub const SPEED_OF_LIGHT: f64 = 299792458.0;
 
-pub static WIENS_CONSTANT: f64 = 2.897772126e-3;
+pub const WIENS_CONSTANT: f64 = 2.897772126e-3;

@@ -19,7 +19,7 @@ use ray::Ray;
 use scene::Scene;
 
 /// The number of paths to trace in one batch.
-static NUMBER_OF_PHOTONS: uint = 1024 * 512;
+const NUMBER_OF_PHOTONS: uint = 1024 * 512;
 
 /// Represents a photon that has been traced.
 pub struct MappedPhoton {

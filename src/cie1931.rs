@@ -50,7 +50,7 @@ pub fn get_tristimulus(wavelength: f32) -> Vector3 {
 // Data obtained from http://cvrl.ioo.ucl.ac.uk/index.htm.
 
 /// CIE X tristimulus values, at 5nm intervals, starting at 380 nm.
-static X: [f32, ..81] = [
+const X: [f32, ..81] = [
     0.001368,
     0.002236,
     0.004243,
@@ -135,7 +135,7 @@ static X: [f32, ..81] = [
 ];
 
 /// CIE Y tristimulus values, at 5nm intervals, starting at 380 nm.
-static Y: [f32, ..81] = [
+const Y: [f32, ..81] = [
     0.000039,
     0.000064,
     0.000120,
@@ -220,7 +220,7 @@ static Y: [f32, ..81] = [
 ];
 
 /// CIE Z tristimulus values, at 5nm intervals, starting at 380 nm.
-static Z: [f32, ..81] = [
+const Z: [f32, ..81] = [
     0.006450,
     0.010550,
     0.020050,
