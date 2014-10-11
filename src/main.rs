@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #![feature(if_let)]
+#![feature(slicing_syntax)]
 
 extern crate time;
 extern crate lodepng;
