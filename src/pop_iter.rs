@@ -16,7 +16,7 @@
 
 use std::collections::Deque;
 
-pub struct PopFrontItems<'a, C: 'a> {
+pub struct PopFrontItems<'a, C> where C: 'a {
     container: &'a mut C
 }
 
@@ -24,7 +24,8 @@ pub trait PopFrontIter {
     fn pop_front_iter<'a>(&'a mut self) -> PopFrontItems<'a, Self>;
 }
 
-impl<'a, T, C: PopFrontIter + Collection + Deque<T>> Iterator<T> for PopFrontItems<'a, C> {
+impl<'a, T, C> Iterator<T> for PopFrontItems<'a, C>
+    where C: PopFrontIter + Collection + Deque<T> {
     fn next(&mut self) -> Option<T> {
         self.container.pop_front()
     }
@@ -34,7 +35,7 @@ impl<'a, T, C: PopFrontIter + Collection + Deque<T>> Iterator<T> for PopFrontIte
     }
 }
 
-impl<T, C: Collection + Deque<T>> PopFrontIter for C {
+impl<T, C> PopFrontIter for C where C: Collection + Deque<T> {
     fn pop_front_iter<'a>(&'a mut self) -> PopFrontItems<'a, C> {
         PopFrontItems {
             container: self
@@ -54,7 +55,7 @@ fn pop_front_iter_ring_buf() {
     assert_eq!(ys[], [0u, 1, 2][]);
 }
 
-pub struct PopItems<'a, C: 'a> {
+pub struct PopItems<'a, C> where C: 'a {
     container: &'a mut C
 }
 
@@ -62,7 +63,8 @@ pub trait PopIter {
     fn pop_iter<'a>(&'a mut self) -> PopItems<'a, Self>;
 }
 
-impl<'a, T, C: PopIter + Collection + MutableSeq<T>> Iterator<T> for PopItems<'a, C> {
+impl<'a, T, C> Iterator<T> for PopItems<'a, C>
+    where C: PopIter + Collection + MutableSeq<T> {
     fn next(&mut self) -> Option<T> {
         self.container.pop()
     }
@@ -72,7 +74,7 @@ impl<'a, T, C: PopIter + Collection + MutableSeq<T>> Iterator<T> for PopItems<'a
     }
 }
 
-impl<T, C: Collection + MutableSeq<T>> PopIter for C {
+impl<T, C> PopIter for C where C: Collection + MutableSeq<T> {
     fn pop_iter<'a>(&'a mut self) -> PopItems<'a, C> {
         PopItems {
             container: self
