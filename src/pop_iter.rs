@@ -50,8 +50,8 @@ fn pop_front_iter_ring_buf() {
     let mut xs = RingBuf::new();
     xs.push(0u); xs.push(1); xs.push(2); xs.push(3); xs.push(4);
     let ys: Vec<uint> = xs.pop_front_iter().take(3).collect();
-    assert_eq!(xs.get(0), &3u);
-    assert_eq!(xs.get(1), &4u);
+    assert_eq!(xs[0], 3u);
+    assert_eq!(xs[1], 4u);
     assert_eq!(ys[], [0u, 1, 2][]);
 }
 
@@ -97,7 +97,7 @@ fn pop_iter_ring_buf() {
     let mut xs = RingBuf::new();
     xs.push(0u); xs.push(1); xs.push(2); xs.push(3); xs.push(4);
     let ys: Vec<uint> = xs.pop_iter().take(3).collect();
-    assert_eq!(xs.get(0), &0u);
-    assert_eq!(xs.get(1), &1u);
+    assert_eq!(xs[0], 0u);
+    assert_eq!(xs[1], 1u);
     assert_eq!(ys[], [4u, 3, 2][]);
 }
