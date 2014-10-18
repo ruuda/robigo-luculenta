@@ -6,4 +6,4 @@ authors = [ "dev@veniogames.com" ]
 
 [dependencies.lodepng]
 version = "0.1.0"
-git = "https://github.com/ruud-v-a/lodepng-rust.git"
+git = "https://github.com/pornel/lodepng-rust.git"
