@@ -20,7 +20,7 @@ extern crate time;
 extern crate image;
 
 use app::App;
-use std::io::net::ip::SocketAddr;
+use std::io::net::ip::{Port, SocketAddr};
 
 mod app;
 mod camera;
@@ -44,7 +44,7 @@ mod trace_unit;
 mod vector3;
 
 enum AppMode {
-    Master,
+    Master(Port),
     Slave(SocketAddr),
     Single
 }
@@ -57,13 +57,19 @@ fn get_mode() -> AppMode {
     iter.next();
 
     match iter.next().map(|x| x[]) {
-        // If --master is specified, we are in master mode.
-        Some("--master") => Master,
+        // If --master is specified, try po parse the port.
+        Some("--master") => match iter.next() {
+            Some(port_str) => match from_str(port_str[]) {
+                Some(port) => Master(port),
+                None => panic!("invalid port")
+            },
+            None => panic!("no port specified")
+        },
 
         // If --slave is specified, try to parse the master address.
         Some("--slave") => match iter.next() {
-            Some(master) => match from_str(master[]) {
-                Some(master_addr) => Slave(master_addr),
+            Some(master_str) => match from_str(master_str[]) {
+                Some(master) => Slave(master),
                 None => panic!("invalid master address")
             },
             None => panic!("no master address specified")
@@ -78,7 +84,7 @@ fn main() {
     match mode {
         Single => println!("running in single mode"),
         Slave(master) => println!("running in slave mode, master is at {}", master),
-        Master => println!("running in master mode")
+        Master(port) => println!("running in master mode at port {}", port)
     }
 
     // Start up the path tracer. It begins rendering immediately.
