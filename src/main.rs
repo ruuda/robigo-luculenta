@@ -64,11 +64,11 @@ fn get_mode() -> AppMode {
         Some("--slave") => match iter.next() {
             Some(master) => match from_str(master[]) {
                 Some(master_addr) => Slave(master_addr),
-                None => fail!("invalid master address")
+                None => panic!("invalid master address")
             },
-            None => fail!("no master address specified")
+            None => panic!("no master address specified")
         },
-        Some(param) => fail!("unrecognised parameter {}", param),
+        Some(param) => panic!("unrecognised parameter {}", param),
         None => Single
     }
 }
