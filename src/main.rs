@@ -31,6 +31,7 @@ mod geometry;
 mod intersection;
 mod material;
 mod monte_carlo;
+mod network;
 mod object;
 mod plot_unit;
 mod pop_iter;
