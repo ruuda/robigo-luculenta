@@ -1,4 +1,3 @@
-
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
 // Copyright (C) 2014 Ruud van Asseldonk
 //
@@ -20,33 +19,19 @@ use std::io::net::ip::SocketAddr;
 use std::io::net::tcp::TcpStream;
 use vector3::Vector3;
 
-struct Sender {
-    /// The IP address and port of the master instance.
-    master_addr: SocketAddr
-}
+/// Attempts to connect to the master instance, and sends the buffer.
+pub fn send(master_addr: SocketAddr, tristimuli: &[Vector3]) -> IoResult<()> {
+    // There is this nice SocketAddr type, but then TcpStream::connect takes
+    // a string and integer, too bad :(
+    let host = format!("{}", master_addr.ip);
 
-impl Sender {
-    /// Creates a new sender that sends render results to the specified master.
-    pub fn new(master_addr: SocketAddr) -> Sender {
-        Sender {
-            master_addr: master_addr
-        }
+    let tcp_stream = try!(TcpStream::connect(host[], master_addr.port));
+    // Buffer writes, we would not want to issue a syscall for every pixel.
+    let mut writer = BufferedWriter::new(tcp_stream);
+    for tri in tristimuli.iter() {
+        try!(writer.write_le_f32(tri.x));
+        try!(writer.write_le_f32(tri.y));
+        try!(writer.write_le_f32(tri.z));
     }
-
-    /// Attempts to connect to the master instance, and sends the buffer.
-    pub fn send(&self, tristimuli: &[Vector3]) -> IoResult<()> {
-        // There is this nice SocketAddr type, but then TcpStream::connect takes
-        // a string and integer, too bad :(
-        let host = format!("{}", self.master_addr.ip);
-
-        let tcp_stream = try!(TcpStream::connect(host[], self.master_addr.port));
-        // Buffer writes, we would not want to issue a syscall for every pixel.
-        let mut writer = BufferedWriter::new(tcp_stream);
-        for tri in tristimuli.iter() {
-            try!(writer.write_le_f32(tri.x));
-            try!(writer.write_le_f32(tri.y));
-            try!(writer.write_le_f32(tri.z));
-        }
-        Ok(())
-    }
+    Ok(())
 }

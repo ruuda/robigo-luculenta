@@ -16,6 +16,7 @@
 
 use std::comm::{Sender, Receiver, channel};
 use std::f32::consts::PI;
+use std::io::net::ip::SocketAddr;
 use std::io::timer::sleep;
 use std::num::{Float, FloatMath};
 use std::os::num_cpus;
@@ -31,6 +32,8 @@ use material::{BlackBodyMaterial,
                GlossyMirrorMaterial,
                Sf10GlassMaterial,
                SoapBubbleMaterial};
+use mode::AppMode;
+use network::send;
 use object::Object;
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
@@ -51,9 +54,9 @@ pub struct App {
 impl App {
     /// Constructs and starts a new path tracer that renders to a canvas of
     /// the specified size.
-    pub fn new(image_width: uint, image_height: uint) -> App {
+    pub fn new(mode: AppMode, image_width: uint, image_height: uint) -> App {
         let concurrency = num_cpus();
-        let ts = TaskScheduler::new(concurrency, image_width, image_height);
+        let ts = TaskScheduler::new(mode, concurrency, image_width, image_height);
         let task_scheduler = Arc::new(Mutex::new(ts));
 
         // Channel for communicating back to the main task.
@@ -104,7 +107,9 @@ impl App {
             Task::Gather(ref mut gather_unit, ref mut units) =>
                 App::execute_gather_task(&mut **gather_unit, units[mut]),
             Task::Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
-                App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit)
+                App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit),
+            Task::Send(master_addr, ref mut gather_unit) =>
+                App::execute_send_task(master_addr, &mut **gather_unit)
         }
     }
 
@@ -144,6 +149,16 @@ impl App {
 
         // And send it to the UI / main task.
         img_tx.send(img);
+    }
+
+    fn execute_send_task(master_addr: SocketAddr, gather_unit: &mut GatherUnit) {
+        // Try to send the accumulated image to the master instance.
+        match send(master_addr, gather_unit.tristimulus_buffer[]) {
+            // If that succeeded, clear the unit to avoid accumulating the
+            // same pixels twice in the master instance.
+            Ok(_) => gather_unit.clear(),
+            Err(err) => println!("failed to send image to master: {}", err)
+        }
     }
 
     fn set_up_scene() -> Scene {

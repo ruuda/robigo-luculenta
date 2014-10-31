@@ -59,6 +59,14 @@ impl GatherUnit {
         }
     }
 
+    /// Resets the tristimulus buffer to black. This does not reset the
+    /// compensation buffer.
+    pub fn clear(&mut self) {
+        for x in self.tristimulus_buffer.iter_mut() {
+            *x = Vector3::zero();
+        }
+    }
+
     /// Saves the tristimulus buffer to a file, so that rendering
     /// can be resumed later.
     pub fn save(&self) {

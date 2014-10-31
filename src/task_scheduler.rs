@@ -16,11 +16,13 @@
 
 use std::cmp::max;
 use std::collections::RingBuf;
+use std::io::net::ip::SocketAddr;
 use std::iter::AdditiveIterator;
 use std::num::Float;
 use std::time::Duration;
 use time::{Timespec, get_time};
 use gather_unit::GatherUnit;
+use mode::AppMode;
 use plot_unit::PlotUnit;
 use pop_iter::PopFrontIter;
 use tonemap_unit::TonemapUnit;
@@ -40,7 +42,10 @@ pub enum Task {
     Gather(Box<GatherUnit>, Vec<Box<PlotUnit>>),
 
     /// Convert the CIE XYZ values to sRGB and display the image.
-    Tonemap(Box<TonemapUnit>, Box<GatherUnit>)
+    Tonemap(Box<TonemapUnit>, Box<GatherUnit>),
+
+    /// Send the gathered image to the master instance.
+    Send(SocketAddr, Box<GatherUnit>)
 }
 
 /// Tonemap every 30 seconds.
@@ -84,14 +89,18 @@ pub struct TaskScheduler {
     last_tonemap_time: Timespec,
 
     /// Whether a new gather task has been executed since the last
-    /// tonemapping task was executed.
-    image_changed: bool
+    /// tonemapping task or send task was executed.
+    image_changed: bool,
+
+    /// Whether to render in master/slave/single mode.
+    mode: AppMode
 }
 
 impl TaskScheduler {
     /// Creates a new task scheduler, that will render `scene` to a
     /// canvas of the specified size, using `concurrency` threads.
-    pub fn new(concurrency: uint, width: uint, height: uint) -> TaskScheduler {
+    pub fn new(mode: AppMode, concurrency: uint,
+               width: uint, height: uint) -> TaskScheduler {
         // More trace units than threads seems sensible,
         // but less plot units is acceptable,
         // because one plot unit can handle multiple trace units.
@@ -123,7 +132,8 @@ impl TaskScheduler {
             gather_unit: gather_unit,
             tonemap_unit: tonemap_unit,
             last_tonemap_time: get_time(),
-            image_changed: false
+            image_changed: false,
+            mode: mode
         }
     }
 
@@ -135,13 +145,22 @@ impl TaskScheduler {
         // an update should be done.
         let now = get_time();
         if now - self.last_tonemap_time > tonemap_interval() {
-            // If the image has changed since it was last tonemapped,
-            // tonemap it now.
+            // If the image has changed since it was last tonemapped or sent,
+            // tonemap or send it now.
             if self.image_changed {
-                // Tonemapping can only be done if no gathering
-                // and tonemapping are busy.
-                if self.gather_unit.is_some() && self.tonemap_unit.is_some() {
-                    return self.create_tonemap_task();
+                // In slave mode, do not tonemap, but send istead. Otherwise,
+                // do tonemap the result.
+                if let AppMode::Slave(master_addr) = self.mode {
+                    // Sending can only be done if no gathering is busy.
+                    if self.gather_unit.is_some() {
+                        return self.create_send_task(master_addr);
+                    }
+                } else {
+                    // Tonemapping can only be done if no gathering
+                    // and tonemapping are busy.
+                    if self.gather_unit.is_some() && self.tonemap_unit.is_some() {
+                        return self.create_tonemap_task();
+                    }
                 }
             } else {
                 // Otherwise, the plots must first be gathered, tonemapping
@@ -230,6 +249,14 @@ impl TaskScheduler {
         Task::Tonemap(tonemap_unit, gather_unit)
     }
 
+    fn create_send_task(&mut self, master_addr: SocketAddr) -> Task {
+        // We know the unit is available, because this method would
+        // not have been called otherwise.
+        let gather_unit = self.gather_unit.take().unwrap();
+
+        Task::Send(master_addr, gather_unit)
+    }
+
     /// Makes resources used by the task available again.
     fn complete_task(&mut self, task: Task) {
         match task {
@@ -237,7 +264,8 @@ impl TaskScheduler {
             Task::Trace(unit) => self.complete_trace_task(unit),
             Task::Plot(unit, units) => self.complete_plot_task(unit, units),
             Task::Gather(unit, units) => self.complete_gather_task(unit, units),
-            Task::Tonemap(t_unt, g_unt) => self.complete_tonemap_task(t_unt, g_unt)
+            Task::Tonemap(t_unt, g_unt) => self.complete_tonemap_task(t_unt, g_unt),
+            Task::Send(_, g_unt) => self.complete_send_task(g_unt)
         }
     }
 
@@ -326,5 +354,14 @@ impl TaskScheduler {
         let variance = sqr_mean - mean * mean;
 
         println!("performance: {} +- {} batches/sec", mean, variance.sqrt());
+    }
+
+    fn complete_send_task(&mut self, gather_unit: Box<GatherUnit>) {
+        self.gather_unit = Some(gather_unit);
+
+        // Hopefully, the image has been sent, so until a new gathering happens,
+        // it will not change. If sending failed, the unit is not cleared,
+        // and it will simply accumulate some more before trying again.
+        self.image_changed = false;
     }
 }

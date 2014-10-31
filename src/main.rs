@@ -20,7 +20,7 @@ extern crate time;
 extern crate image;
 
 use app::App;
-use std::io::net::ip::{Port, SocketAddr};
+use mode::{AppMode, get_mode};
 
 mod app;
 mod camera;
@@ -30,6 +30,7 @@ mod gather_unit;
 mod geometry;
 mod intersection;
 mod material;
+mod mode;
 mod monte_carlo;
 mod network;
 mod object;
@@ -44,54 +45,19 @@ mod tonemap_unit;
 mod trace_unit;
 mod vector3;
 
-enum AppMode {
-    Master(Port),
-    Slave(SocketAddr),
-    Single
-}
-
-fn get_mode() -> AppMode {
-    let args = std::os::args();
-    let mut iter = args.iter();
-
-    // First argument is the program name.
-    iter.next();
-
-    match iter.next().map(|x| x[]) {
-        // If --master is specified, try po parse the port.
-        Some("--master") => match iter.next() {
-            Some(port_str) => match from_str(port_str[]) {
-                Some(port) => Master(port),
-                None => panic!("invalid port")
-            },
-            None => panic!("no port specified")
-        },
-
-        // If --slave is specified, try to parse the master address.
-        Some("--slave") => match iter.next() {
-            Some(master_str) => match from_str(master_str[]) {
-                Some(master) => Slave(master),
-                None => panic!("invalid master address")
-            },
-            None => panic!("no master address specified")
-        },
-        Some(param) => panic!("unrecognised parameter {}", param),
-        None => Single
-    }
-}
-
 fn main() {
+    // Determine how the application should behave with respect to networking.
     let mode = get_mode();
     match mode {
-        Single => println!("running in single mode"),
-        Slave(master) => println!("running in slave mode, master is at {}", master),
-        Master(port) => println!("running in master mode at port {}", port)
+        AppMode::Single => println!("running a single local instance"),
+        AppMode::Slave(master) => println!("running in slave mode, master is at {}", master),
+        AppMode::Master(port) => println!("running in master mode, listening at port {}", port)
     }
 
     // Start up the path tracer. It begins rendering immediately.
     let width = 1280u;
     let height = 720u;
-    let app = App::new(width, height);
+    let app = App::new(mode, width, height);
     let images = app.images;
 
     println!("press ctrl+c to stop rendering");
