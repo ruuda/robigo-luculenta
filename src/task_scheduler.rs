@@ -357,6 +357,8 @@ impl TaskScheduler {
     }
 
     fn complete_send_task(&mut self, gather_unit: Box<GatherUnit>) {
+        println!("done sending");
+
         self.gather_unit = Some(gather_unit);
 
         // Hopefully, the image has been sent, so until a new gathering happens,

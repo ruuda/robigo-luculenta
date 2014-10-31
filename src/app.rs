@@ -156,7 +156,10 @@ impl App {
         match send(master_addr, gather_unit.tristimulus_buffer[]) {
             // If that succeeded, clear the unit to avoid accumulating the
             // same pixels twice in the master instance.
-            Ok(_) => gather_unit.clear(),
+            Ok(_) => {
+                gather_unit.clear();
+                println!("image sent to master");
+            },
             Err(err) => println!("failed to send image to master: {}", err)
         }
     }
