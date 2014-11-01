@@ -24,9 +24,10 @@ use time::{Timespec, get_time};
 use gather_unit::GatherUnit;
 use mode::AppMode;
 use plot_unit::PlotUnit;
-use pop_iter::PopFrontIter;
+use pop_iter::{PopIter, PopFrontIter};
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
+use vector3::Vector3;
 
 pub enum Task {
     /// Do nothing, wait a while.
@@ -45,7 +46,10 @@ pub enum Task {
     Tonemap(Box<TonemapUnit>, Box<GatherUnit>),
 
     /// Send the gathered image to the master instance.
-    Send(SocketAddr, Box<GatherUnit>)
+    Send(SocketAddr, Box<GatherUnit>),
+
+    /// Merge the results of slave instances into the master result.
+    Merge(Box<GatherUnit>, Vec<Vec<Vector3>>)
 }
 
 /// Tonemap every 30 seconds.
@@ -93,7 +97,10 @@ pub struct TaskScheduler {
     image_changed: bool,
 
     /// Whether to render in master/slave/single mode.
-    mode: AppMode
+    mode: AppMode,
+
+    /// Received images that need to be merged.
+    received_images: Vec<Vec<Vector3>>
 }
 
 impl TaskScheduler {
@@ -133,7 +140,8 @@ impl TaskScheduler {
             tonemap_unit: tonemap_unit,
             last_tonemap_time: get_time(),
             image_changed: false,
-            mode: mode
+            mode: mode,
+            received_images: Vec::new()
         }
     }
 
@@ -177,6 +185,12 @@ impl TaskScheduler {
         if self.done_trace_units.len() > self.number_of_trace_units / 2 &&
             !self.available_plot_units.is_empty() {
             return self.create_plot_task();
+        }
+
+        // If there are images received from slaves that need to be merged,
+        // merge them now, if the gather unit is available.
+        if !self.received_images.is_empty() && self.gather_unit.is_some() {
+            return self.create_merge_task();
         }
 
         // Then, if there are enough trace units available, go trace some rays!
@@ -240,6 +254,18 @@ impl TaskScheduler {
         Task::Gather(gather_unit, plot_units)
     }
 
+    fn create_merge_task(&mut self) -> Task {
+        // We know the unit is available, because this method would
+        // not have been called otherwise
+        let gather_unit = self.gather_unit.take().unwrap();
+
+        // The received images will be moved into the task, and the vector will
+        // be left empty, so that it can hold new images.
+        let images = self.received_images.pop_iter().collect();
+
+        Task::Merge(gather_unit, images)
+    }
+
     fn create_tonemap_task(&mut self) -> Task {
         // We know the units are available, because this method would
         // not have been called otherwise.
@@ -265,7 +291,8 @@ impl TaskScheduler {
             Task::Plot(unit, units) => self.complete_plot_task(unit, units),
             Task::Gather(unit, units) => self.complete_gather_task(unit, units),
             Task::Tonemap(t_unt, g_unt) => self.complete_tonemap_task(t_unt, g_unt),
-            Task::Send(_, g_unt) => self.complete_send_task(g_unt)
+            Task::Send(_, g_unt) => self.complete_send_task(g_unt),
+            Task::Merge(g_unt, imgs) => self.complete_merge_task(g_unt, imgs)
         }
     }
 
@@ -317,6 +344,17 @@ impl TaskScheduler {
         self.gather_unit = Some(gather_unit);
 
         // The image must have changed because of gathering.
+        self.image_changed = true;
+    }
+
+    fn complete_merge_task(&mut self, gather_unit: Box<GatherUnit>,
+                           images: Vec<Vec<Vector3>>) {
+        println!("done merging, {} image(s) were merged", images.len());
+
+        // The gather unit can now be used again.
+        self.gather_unit = Some(gather_unit);
+
+        // The image must have changed because of merging.
         self.image_changed = true;
     }
 

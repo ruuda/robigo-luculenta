@@ -109,7 +109,9 @@ impl App {
             Task::Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
                 App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit),
             Task::Send(master_addr, ref mut gather_unit) =>
-                App::execute_send_task(master_addr, &mut **gather_unit)
+                App::execute_send_task(master_addr, &mut **gather_unit),
+            Task::Merge(ref mut gather_unit, ref images) =>
+                App::execute_merge_task(&mut **gather_unit, images[])
         }
     }
 
@@ -133,6 +135,16 @@ impl App {
         for unit in units.iter_mut() {
             gather_unit.accumulate(unit.tristimulus_buffer[]);
             unit.clear();
+        }
+
+        // Save the gather state, so that rendering can be continued later.
+        gather_unit.save();
+    }
+
+    fn execute_merge_task(gather_unit: &mut GatherUnit,
+                          images: &[Vec<Vector3>]) {
+        for image in images.iter() {
+            gather_unit.accumulate(image[]);
         }
 
         // Save the gather state, so that rendering can be continued later.
