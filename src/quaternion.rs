@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#![allow(dead_code)]
-
 pub struct Quaternion {
     pub x: f32,
     pub y: f32,
@@ -36,28 +34,6 @@ impl Quaternion {
             y: (angle * 0.5).sin() * y,
             z: (angle * 0.5).sin() * z,
             w: (angle * 0.5).cos()
-        }
-    }
-
-    pub fn magnitude_squared(self) -> f32 {
-        self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
-    }
-
-    pub fn magnitude(self) -> f32 {
-        self.magnitude_squared().sqrt()
-    }
-
-    pub fn normalise(self) -> Quaternion {
-        let magnitude = self.magnitude();
-        if magnitude == 0.0 {
-            self
-        } else {
-            Quaternion {
-                x: self.x / magnitude,
-                y: self.y / magnitude,
-                z: self.z / magnitude,
-                w: self.w / magnitude
-            }
         }
     }
 
