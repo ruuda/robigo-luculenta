@@ -51,3 +51,39 @@ fn pop_front_iter_ring_buf() {
     assert_eq!(xs[1], 4u);
     assert_eq!(ys[], [0u, 1, 2][]);
 }
+
+pub struct PopItems<'a, C> where C: 'a {
+    container: &'a mut C
+}
+
+pub trait PopIter {
+    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, Self>;
+}
+
+impl<T> PopIter for Vec<T> {
+    fn pop_iter<'a>(&'a mut self) -> PopItems<'a, Vec<T>> {
+        PopItems {
+            container: self
+        }
+    }
+}
+
+impl<'a, T> Iterator<T> for PopItems<'a, Vec<T>> {
+    fn next(&mut self) -> Option<T> {
+        self.container.pop()
+    }
+
+    fn size_hint(&self) -> (uint, Option<uint>) {
+        (self.container.len(), Some(self.container.len()))
+    }
+}
+
+#[test]
+fn pop_iter_vec() {
+    let mut xs = Vec::new();
+    xs.push(0u); xs.push(1); xs.push(2); xs.push(3); xs.push(4);
+    let ys: Vec<uint> = xs.pop_iter().take(3).collect();
+    assert_eq!(xs[0], 0u);
+    assert_eq!(xs[1], 1u);
+    assert_eq!(ys[], [4u, 3, 2][]);
+}
