@@ -6,8 +6,8 @@
 /doc/
 
 # Program output
-/output.png
-/buffer.raw
+/*.png
+/*.raw
 
 # Editor files
 *.swp
