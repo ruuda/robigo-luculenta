@@ -75,34 +75,24 @@ impl Neg<Quaternion> for Quaternion {
     }
 }
 
-trait MulQuaternion {
-    fn mul(&self, lhs: &Quaternion) -> Quaternion;
-}
-
-impl MulQuaternion for f32 {
-    fn mul(&self, lhs: &Quaternion) -> Quaternion {
+impl Mul<f32, Quaternion> for Quaternion {
+    fn mul(&self, rhs: &f32) -> Quaternion {
         Quaternion {
-            x: lhs.x * *self,
-            y: lhs.y * *self,
-            z: lhs.z * *self,
-            w: lhs.w * *self
+            x: self.x * *rhs,
+            y: self.y * *rhs,
+            z: self.z * *rhs,
+            w: self.w * *rhs
         }
     }
 }
 
-impl MulQuaternion for Quaternion {
-    fn mul(&self, lhs: &Quaternion) -> Quaternion {
+impl Mul<Quaternion, Quaternion> for Quaternion {
+    fn mul(&self, rhs: &Quaternion) -> Quaternion {
         Quaternion {
-            x: lhs.w * self.x + lhs.x * self.w + lhs.y * self.z - lhs.z * self.y,
-            y: lhs.w * self.y - lhs.x * self.z + lhs.y * self.w + lhs.z * self.x,
-            z: lhs.w * self.z + lhs.x * self.y - lhs.y * self.x + lhs.z * self.w,
-            w: lhs.w * self.w - lhs.x * self.x - lhs.y * self.y - lhs.z * self.z
+            x: self.w * rhs.x + self.x * rhs.w + self.y * rhs.z - self.z * rhs.y,
+            y: self.w * rhs.y - self.x * rhs.z + self.y * rhs.w + self.z * rhs.x,
+            z: self.w * rhs.z + self.x * rhs.y - self.y * rhs.x + self.z * rhs.w,
+            w: self.w * rhs.w - self.x * rhs.x - self.y * rhs.y - self.z * rhs.z
         }
-    }
-}
-
-impl<T> Mul<T, Quaternion> for Quaternion where T: MulQuaternion {
-    fn mul(&self, other: &T) -> Quaternion {
-        other.mul(self)
     }
 }
