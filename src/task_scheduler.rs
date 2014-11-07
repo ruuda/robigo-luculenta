@@ -187,7 +187,7 @@ impl TaskScheduler {
         // Pick the first available trace unit, and use it for the task.
         // We know a unit is available, because this method would not
         // have been called otherwise.
-        let trace_unit = self.available_trace_units.pop().unwrap();
+        let trace_unit = self.available_trace_units.pop_front().unwrap();
         Trace(trace_unit)
     }
 
@@ -195,7 +195,7 @@ impl TaskScheduler {
         // Pick the first available plot unit, and use it for the task.
         // We know a unit is available, because this method would not
         // have been called otherwise.
-        let plot_unit = self.available_plot_units.pop().unwrap();
+        let plot_unit = self.available_plot_units.pop_front().unwrap();
 
         // Take around half of the trace units which are done for this task.
         let done = self.done_trace_units.len();
@@ -245,7 +245,7 @@ impl TaskScheduler {
 
         // The trace unit used for the task, now needs plotting before
         // it is available again.
-        self.done_trace_units.push(trace_unit);
+        self.done_trace_units.push_back(trace_unit);
 
         // Keep statatistics about performance.
         self.traces_completed += 1;
@@ -260,14 +260,14 @@ impl TaskScheduler {
         // All trace units that were plotted, can be used again now.
         for trace_unit in trace_units.into_iter() {
             print!(" {} ", trace_unit.id);
-            self.available_trace_units.push(trace_unit);
+            self.available_trace_units.push_back(trace_unit);
         }
 
         println!("");
 
         // And the plot unit that was used, needs to be gathered before
         // it can be used again.
-        self.done_plot_units.push(plot_unit);
+        self.done_plot_units.push_back(plot_unit);
     }
 
     fn complete_gather_task(&mut self,
@@ -279,7 +279,7 @@ impl TaskScheduler {
         // All plot units that were gathered, can be used again now.
         for plot_unit in plot_units.into_iter() {
             print!(" {} ", plot_unit.id);
-            self.available_plot_units.push(plot_unit);
+            self.available_plot_units.push_back(plot_unit);
         }
 
         println!("");
@@ -316,8 +316,8 @@ impl TaskScheduler {
         self.traces_completed = 0;
 
         // Store the latest 512 measurements (should be about 4.25 hours).
-        self.performance.push(batches_per_sec);
-        if self.performance.len() > 512 { self.performance.pop(); }
+        self.performance.push_back(batches_per_sec);
+        if self.performance.len() > 512 { self.performance.pop_front(); }
         let n = self.performance.len() as f32;
 
         let mean = self.performance.iter().map(|&x| x).sum() / n;
