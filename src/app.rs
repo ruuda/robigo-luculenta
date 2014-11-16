@@ -17,6 +17,7 @@
 use std::comm::{Sender, Receiver, channel};
 use std::f32::consts::PI;
 use std::io::timer::sleep;
+use std::num::{Float, FloatMath};
 use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;

@@ -17,6 +17,7 @@
 use std::cmp::max;
 use std::collections::RingBuf;
 use std::iter::AdditiveIterator;
+use std::num::Float;
 use std::time::Duration;
 use time::{Timespec, get_time};
 use gather_unit::GatherUnit;

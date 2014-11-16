@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::{min, max};
+use std::num::Float;
 use trace_unit::MappedPhoton;
 use vector3::Vector3;
 
