@@ -1,0 +1,26 @@
+[root]
+name = "robigo-luculenta"
+version = "0.1.1"
+dependencies = [
+ "image 0.1.0 (git+https://github.com/PistonDevelopers/image.git)",
+ "time 0.0.1 (git+https://github.com/rust-lang/time.git)",
+]
+
+[[package]]
+name = "gcc"
+version = "0.0.1"
+source = "git+https://github.com/alexcrichton/gcc-rs#f25b3ba9c40303781189cc137fb98fffe5b56de7"
+
+[[package]]
+name = "image"
+version = "0.1.0"
+source = "git+https://github.com/PistonDevelopers/image.git#3da4d9e150277c909d825eb3d34044c668b27377"
+
+[[package]]
+name = "time"
+version = "0.0.1"
+source = "git+https://github.com/rust-lang/time.git#f4bc73862b942b9c8d8fc92ffe72b73c6616a2ea"
+dependencies = [
+ "gcc 0.0.1 (git+https://github.com/alexcrichton/gcc-rs)",
+]
+

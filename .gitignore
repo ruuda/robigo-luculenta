@@ -1,5 +1,4 @@
 # Cargo files
-/Cargo.lock
 /target/
 
 # Rustdoc files
