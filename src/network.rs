@@ -21,11 +21,7 @@ use vector3::Vector3;
 
 /// Attempts to connect to the master instance, and sends the buffer.
 pub fn send(master_addr: SocketAddr, tristimuli: &[Vector3]) -> IoResult<()> {
-    // There is this nice SocketAddr type, but then TcpStream::connect takes
-    // a string and integer, too bad :(
-    let host = format!("{}", master_addr.ip);
-
-    let tcp_stream = try!(TcpStream::connect(host[], master_addr.port));
+    let tcp_stream = try!(TcpStream::connect(master_addr));
     // Buffer writes, we would not want to issue a syscall for every pixel.
     let mut writer = BufferedWriter::new(tcp_stream);
     for tri in tristimuli.iter() {
