@@ -181,7 +181,7 @@ impl TaskScheduler {
 
         // If everything is locked in dependencies and everything is a big
         // mess, simply wait a while for units to become available.
-        Sleep
+        Task::Sleep
     }
 
     fn create_trace_task(&mut self) -> Task {
@@ -189,7 +189,7 @@ impl TaskScheduler {
         // We know a unit is available, because this method would not
         // have been called otherwise.
         let trace_unit = self.available_trace_units.pop_front().unwrap();
-        Trace(trace_unit)
+        Task::Trace(trace_unit)
     }
 
     fn create_plot_task(&mut self) -> Task {
@@ -206,7 +206,7 @@ impl TaskScheduler {
         let trace_units: Vec<Box<TraceUnit>> = self.done_trace_units
         .pop_front_iter().take(n).collect();
 
-        Plot(plot_unit, trace_units)
+        Task::Plot(plot_unit, trace_units)
     }
 
     fn create_gather_task(&mut self) -> Task {
@@ -218,7 +218,7 @@ impl TaskScheduler {
         let plot_units: Vec<Box<PlotUnit>> = self.done_plot_units
         .pop_front_iter().collect();
 
-        Gather(gather_unit, plot_units)
+        Task::Gather(gather_unit, plot_units)
     }
 
     fn create_tonemap_task(&mut self) -> Task {
@@ -227,17 +227,17 @@ impl TaskScheduler {
         let gather_unit = self.gather_unit.take().unwrap();
         let tonemap_unit = self.tonemap_unit.take().unwrap();
 
-        Tonemap(tonemap_unit, gather_unit)
+        Task::Tonemap(tonemap_unit, gather_unit)
     }
 
     /// Makes resources used by the task available again.
     fn complete_task(&mut self, task: Task) {
         match task {
-            Sleep => { },
-            Trace(unit) => self.complete_trace_task(unit),
-            Plot(unit, units) => self.complete_plot_task(unit, units),
-            Gather(unit, units) => self.complete_gather_task(unit, units),
-            Tonemap(t_unt, g_unt) => self.complete_tonemap_task(t_unt, g_unt)
+            Task::Sleep => { },
+            Task::Trace(unit) => self.complete_trace_task(unit),
+            Task::Plot(unit, units) => self.complete_plot_task(unit, units),
+            Task::Gather(unit, units) => self.complete_gather_task(unit, units),
+            Task::Tonemap(t_unt, g_unt) => self.complete_tonemap_task(t_unt, g_unt)
         }
     }
 

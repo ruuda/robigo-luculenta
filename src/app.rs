@@ -31,12 +31,12 @@ use material::{BlackBodyMaterial,
                GlossyMirrorMaterial,
                Sf10GlassMaterial,
                SoapBubbleMaterial};
-use object::{Emissive, Object, Reflective};
+use object::Object;
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
 use ray::Ray;
 use scene::Scene;
-use task_scheduler::{Task, Sleep, Trace, Plot, Gather, Tonemap, TaskScheduler};
+use task_scheduler::{Task, TaskScheduler};
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 use vector3::Vector3;
@@ -81,7 +81,7 @@ impl App {
 
             // There is no task yet, but the task scheduler expects
             // a completed task. Therefore, this worker is done sleeping.
-            let mut task = Sleep;
+            let mut task = Task::Sleep;
 
             // Continue rendering forever, unless the application is terminated.
             loop {
@@ -95,15 +95,15 @@ impl App {
 
     fn execute_task(task: &mut Task, scene: &Scene, img_tx: &mut Sender<Image>) {
         match *task {
-            Sleep =>
+            Task::Sleep =>
                 App::execute_sleep_task(),
-            Trace(ref mut trace_unit) =>
+            Task::Trace(ref mut trace_unit) =>
                 App::execute_trace_task(scene, &mut **trace_unit),
-            Plot(ref mut plot_unit, ref mut units) =>
+            Task::Plot(ref mut plot_unit, ref mut units) =>
                 App::execute_plot_task(&mut **plot_unit, units[mut]),
-            Gather(ref mut gather_unit, ref mut units) =>
+            Task::Gather(ref mut gather_unit, ref mut units) =>
                 App::execute_gather_task(&mut **gather_unit, units[mut]),
-            Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
+            Task::Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
                 App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit)
         }
     }
@@ -147,6 +147,8 @@ impl App {
     }
 
     fn set_up_scene() -> Scene {
+        use object::MaterialBox::{Emissive, Reflective};
+
         let mut objects = Vec::new();
 
         // Sphere in the centre.
