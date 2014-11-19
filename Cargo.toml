@@ -9,5 +9,5 @@ version = "0.1.0"
 git = "https://github.com/PistonDevelopers/image.git"
 
 [dependencies.time]
-version = "0.0.1"
+version = "0.0.2"
 git = "https://github.com/rust-lang/time.git"
