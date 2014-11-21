@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::f32::consts::PI;
 use std::num::{Float, FloatMath};
 use std::rand;
 use std::rand::Closed01;
@@ -34,7 +35,7 @@ pub fn get_bi_unit() -> f32 {
 
 /// Returns a random number in the range [0, 2pi).
 pub fn  get_longitude() -> f32 {
-    rand::random::<f32>() * Float::two_pi()
+    rand::random::<f32>() * PI * 2.0
 }
 
 /// Returns a random number in the range [380, 780].
