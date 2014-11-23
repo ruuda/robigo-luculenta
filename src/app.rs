@@ -33,7 +33,7 @@ use material::{BlackBodyMaterial,
                Sf10GlassMaterial,
                SoapBubbleMaterial};
 use mode::AppMode;
-use network::send;
+use network::{listen, send};
 use object::Object;
 use plot_unit::PlotUnit;
 use quaternion::Quaternion;
@@ -56,7 +56,9 @@ impl App {
     /// the specified size.
     pub fn new(mode: AppMode, image_width: uint, image_height: uint) -> App {
         let concurrency = num_cpus();
-        let ts = TaskScheduler::new(mode, concurrency, image_width, image_height);
+        let incoming_images = App::maybe_listen(mode);
+        let ts = TaskScheduler::new(mode, concurrency,
+                                    incoming_images, image_width, image_height);
         let task_scheduler = Arc::new(Mutex::new(ts));
 
         // Channel for communicating back to the main task.
@@ -73,6 +75,15 @@ impl App {
         }
             
         App { images: img_rx }
+    }
+
+    fn maybe_listen(mode: AppMode) -> Receiver<Vec<Vector3>> {
+        // In master mode, start a listener, otherwise provide a dummy that
+        // will never receive anything.
+        match mode {
+            AppMode::Master(port) => listen(port),
+            _ => { let (_, rx) = channel(); rx }
+        }
     }
 
     fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>,

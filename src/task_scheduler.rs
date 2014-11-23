@@ -24,7 +24,7 @@ use time::{Timespec, get_time};
 use gather_unit::GatherUnit;
 use mode::AppMode;
 use plot_unit::PlotUnit;
-use pop_iter::{PopIter, PopFrontIter};
+use pop_iter::PopFrontIter;
 use tonemap_unit::TonemapUnit;
 use trace_unit::TraceUnit;
 use vector3::Vector3;
@@ -100,13 +100,15 @@ pub struct TaskScheduler {
     mode: AppMode,
 
     /// Received images that need to be merged.
-    received_images: Vec<Vec<Vector3>>
+    incoming_images: Receiver<Vec<Vector3>>
 }
 
 impl TaskScheduler {
-    /// Creates a new task scheduler, that will render `scene` to a
-    /// canvas of the specified size, using `concurrency` threads.
+    /// Creates a new task scheduler, that will render `scene` to a canvas of
+    /// the specified size, using `concurrency` threads. Incoming images on
+    /// `incoming_images` will be merged into the render state.
     pub fn new(mode: AppMode, concurrency: uint,
+               incoming_images: Receiver<Vec<Vector3>>,
                width: uint, height: uint) -> TaskScheduler {
         // More trace units than threads seems sensible,
         // but less plot units is acceptable,
@@ -141,7 +143,7 @@ impl TaskScheduler {
             last_tonemap_time: get_time(),
             image_changed: false,
             mode: mode,
-            received_images: Vec::new()
+            incoming_images: incoming_images
         }
     }
 
@@ -188,9 +190,15 @@ impl TaskScheduler {
         }
 
         // If there are images received from slaves that need to be merged,
-        // merge them now, if the gather unit is available.
-        if !self.received_images.is_empty() && self.gather_unit.is_some() {
-            return self.create_merge_task();
+        // merge them now, if the gather unit is available. This needs to be
+        // done in master mode only.
+        if let AppMode::Master(_) = self.mode {
+            if self.gather_unit.is_some() {
+                match self.incoming_images.try_recv() {
+                    Ok(image) => return self.create_merge_task(image),
+                    Err(_) => { } // If no image was available, fall through.
+                }
+            }
         }
 
         // Then, if there are enough trace units available, go trace some rays!
@@ -254,14 +262,21 @@ impl TaskScheduler {
         Task::Gather(gather_unit, plot_units)
     }
 
-    fn create_merge_task(&mut self) -> Task {
+    fn create_merge_task(&mut self, image: Vec<Vector3>) -> Task {
         // We know the unit is available, because this method would
         // not have been called otherwise
         let gather_unit = self.gather_unit.take().unwrap();
 
-        // The received images will be moved into the task, and the vector will
-        // be left empty, so that it can hold new images.
-        let images = self.received_images.pop_iter().collect();
+        let mut images = Vec::new();
+        images.push(image);
+
+        // If there are more images pending still, handle them now as well.
+        loop {
+            match self.incoming_images.try_recv() {
+                Ok(image) => images.push(image),
+                Err(_) => break
+            }
+        }
 
         Task::Merge(gather_unit, images)
     }
