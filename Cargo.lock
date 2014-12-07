@@ -2,25 +2,25 @@
 name = "robigo-luculenta"
 version = "0.1.1"
 dependencies = [
- "image 0.2.0-alpha.1 (git+https://github.com/PistonDevelopers/image.git)",
- "time 0.0.3 (git+https://github.com/rust-lang/time.git)",
+ "image 0.2.0-alpha.2 (git+https://github.com/PistonDevelopers/image.git)",
+ "time 0.1.1 (git+https://github.com/rust-lang/time.git)",
 ]
 
 [[package]]
 name = "gcc"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+version = "0.1.0"
+source = "git+https://github.com/alexcrichton/gcc-rs#3caf7309ef72644cd56a9d3a6f515ae553683176"
 
 [[package]]
 name = "image"
-version = "0.2.0-alpha.1"
-source = "git+https://github.com/PistonDevelopers/image.git#c6d88b6a4b8c87cfe7f9726cc7d50bd322c4bf13"
+version = "0.2.0-alpha.2"
+source = "git+https://github.com/PistonDevelopers/image.git#f7d33a9bac29556eca33060aafd615a907c509f2"
 
 [[package]]
 name = "time"
-version = "0.0.3"
-source = "git+https://github.com/rust-lang/time.git#44aec0e7996fc0f2e76eeb2215f8fd78e1965e46"
+version = "0.1.1"
+source = "git+https://github.com/rust-lang/time.git#c22414be22894905e4692896da4d2d246a361797"
 dependencies = [
- "gcc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gcc 0.1.0 (git+https://github.com/alexcrichton/gcc-rs)",
 ]
 
