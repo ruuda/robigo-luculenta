@@ -17,6 +17,7 @@
 use std::io::net::ip::{Port, SocketAddr};
 use std::os;
 
+#[deriving(Copy)]
 pub enum AppMode {
     Master(Port),
     Slave(SocketAddr),
