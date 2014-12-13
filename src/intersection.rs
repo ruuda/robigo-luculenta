@@ -16,6 +16,7 @@
 
 use vector3::Vector3;
 
+#[deriving(Copy)]
 pub struct Intersection {
     /// The position at which the intersection occurred.
     pub position: Vector3,

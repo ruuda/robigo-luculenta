@@ -17,7 +17,7 @@
 use std::num::Float;
 use quaternion::Quaternion;
 
-#[deriving(Clone)]
+#[deriving(Copy, Clone)]
 pub struct Vector3 {
     pub x: f32,
     pub y: f32,
