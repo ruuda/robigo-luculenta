@@ -8,19 +8,19 @@ dependencies = [
 
 [[package]]
 name = "gcc"
-version = "0.1.0"
-source = "git+https://github.com/alexcrichton/gcc-rs#3caf7309ef72644cd56a9d3a6f515ae553683176"
+version = "0.1.1"
+source = "git+https://github.com/alexcrichton/gcc-rs#d35c34c871dd75f97fadf04cb0ed85d997a9bc0c"
 
 [[package]]
 name = "image"
 version = "0.2.0-alpha.2"
-source = "git+https://github.com/PistonDevelopers/image.git#f7d33a9bac29556eca33060aafd615a907c509f2"
+source = "git+https://github.com/PistonDevelopers/image.git#2d9d4595936469acb2dd5683766fcc07ab099cc3"
 
 [[package]]
 name = "time"
 version = "0.1.1"
-source = "git+https://github.com/rust-lang/time.git#c22414be22894905e4692896da4d2d246a361797"
+source = "git+https://github.com/rust-lang/time.git#288b362e0d3cd9e36a4654c9520e021587f707d1"
 dependencies = [
- "gcc 0.1.0 (git+https://github.com/alexcrichton/gcc-rs)",
+ "gcc 0.1.1 (git+https://github.com/alexcrichton/gcc-rs)",
 ]
 
