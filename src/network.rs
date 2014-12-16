@@ -48,7 +48,7 @@ pub fn listen(port: Port) -> Receiver<Vec<Vector3>> {
     let (tx, rx) = sync_channel(4);
 
     // Accept incoming connections from another thread.
-    spawn(proc() {
+    spawn(move || {
         for incoming in acceptor.incoming() {
             match incoming {
                 Err(_) => println!("bad incoming connection"),
