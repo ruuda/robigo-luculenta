@@ -75,7 +75,7 @@ impl App {
     fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>,
                     scene: Arc<Scene>,
                     img_tx: Sender<Image>) {
-        spawn(proc() {
+        spawn(move || {
             // Move img_tx into the proc.
             let mut owned_img_tx = img_tx;
 
