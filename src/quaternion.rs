@@ -46,7 +46,7 @@ impl Quaternion {
 }
 
 impl Add<Quaternion, Quaternion> for Quaternion {
-    fn add(&self, other: &Quaternion) -> Quaternion {
+    fn add(self, other: Quaternion) -> Quaternion {
         Quaternion {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -57,7 +57,7 @@ impl Add<Quaternion, Quaternion> for Quaternion {
 }
 
 impl Sub<Quaternion, Quaternion> for Quaternion {
-    fn sub(&self, other: &Quaternion) -> Quaternion {
+    fn sub(self, other: Quaternion) -> Quaternion {
         Quaternion {
             x: self.x - other.x,
             y: self.y - other.y,
@@ -79,18 +79,18 @@ impl Neg<Quaternion> for Quaternion {
 }
 
 impl Mul<f32, Quaternion> for Quaternion {
-    fn mul(&self, rhs: &f32) -> Quaternion {
+    fn mul(self, rhs: f32) -> Quaternion {
         Quaternion {
-            x: self.x * *rhs,
-            y: self.y * *rhs,
-            z: self.z * *rhs,
-            w: self.w * *rhs
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+            w: self.w * rhs
         }
     }
 }
 
 impl Mul<Quaternion, Quaternion> for Quaternion {
-    fn mul(&self, rhs: &Quaternion) -> Quaternion {
+    fn mul(self, rhs: Quaternion) -> Quaternion {
         Quaternion {
             x: self.w * rhs.x + self.x * rhs.w + self.y * rhs.z - self.z * rhs.y,
             y: self.w * rhs.y - self.x * rhs.z + self.y * rhs.w + self.z * rhs.x,
