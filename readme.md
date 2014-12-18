@@ -14,3 +14,5 @@ it is multithreaded.
 
 [luculentus]: https://github.com/ruud-v-a/luculentus
 [gplv3]:      https://www.gnu.org/licenses/gpl.html
+
+[![Build Status](https://travis-ci.org/ruud-v-a/robigo-luculenta.svg?branch=master)](https://travis-ci.org/ruud-v-a/robigo-luculenta)
