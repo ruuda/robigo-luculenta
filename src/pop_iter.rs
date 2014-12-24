@@ -32,7 +32,9 @@ impl<T> PopFrontIter for RingBuf<T> {
     }
 }
 
-impl<'a, T> Iterator<T> for PopFrontItems<'a, RingBuf<T>> {
+impl<'a, T> Iterator<T> for PopFrontItems<'a, RingBuf<T>>
+    where T: 'a {
+
     fn next(&mut self) -> Option<T> {
         self.container.pop_front()
     }
