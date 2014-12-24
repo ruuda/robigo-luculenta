@@ -68,7 +68,7 @@ impl Sub<Quaternion, Quaternion> for Quaternion {
 }
 
 impl Neg<Quaternion> for Quaternion {
-    fn neg(&self) -> Quaternion {
+    fn neg(self) -> Quaternion {
         Quaternion {
             x: -self.x,
             y: -self.y,
