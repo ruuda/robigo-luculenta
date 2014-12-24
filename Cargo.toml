@@ -8,6 +8,5 @@ authors = [ "dev@veniogames.com" ]
 version = "0.2.0"
 git = "https://github.com/PistonDevelopers/image.git"
 
-[dependencies.time]
-version = "0.1.3"
-git = "https://github.com/rust-lang/time.git"
+[dependencies]
+time = "0.1.4"
