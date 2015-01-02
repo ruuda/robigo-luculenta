@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ impl TonemapUnit {
     /// to tonemapped sRGB values.
     pub fn tonemap(&mut self, tristimuli: &[Vector3]) {
         let max_intensity = self.find_exposure(tristimuli);
-        let buffer = self.rgb_buffer[mut].chunks_mut(3);
+        let buffer = self.rgb_buffer.as_mut_slice().chunks_mut(3);
         let ln_4 = 4.0f32.ln();
 
         // Loop through all pixels.

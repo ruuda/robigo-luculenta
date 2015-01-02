@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ impl App {
             loop {
                 // Ask the task scheduler for a new task, complete the old one.
                 // Then execute it.
-                task = task_scheduler.lock().get_new_task(task);
+                task = task_scheduler.lock().unwrap().get_new_task(task);
                 App::execute_task(&mut task, &*scene, &mut owned_img_tx);
             }
         });
@@ -100,9 +100,9 @@ impl App {
             Task::Trace(ref mut trace_unit) =>
                 App::execute_trace_task(scene, &mut **trace_unit),
             Task::Plot(ref mut plot_unit, ref mut units) =>
-                App::execute_plot_task(&mut **plot_unit, units[mut]),
+                App::execute_plot_task(&mut **plot_unit, units.as_mut_slice()),
             Task::Gather(ref mut gather_unit, ref mut units) =>
-                App::execute_gather_task(&mut **gather_unit, units[mut]),
+                App::execute_gather_task(&mut **gather_unit, units.as_mut_slice()),
             Task::Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
                 App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit)
         }
