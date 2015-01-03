@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::PartialOrd;
-use std::iter::AdditiveIterator;
+use std::iter::{repeat, AdditiveIterator};
 use std::num::Float;
 use vector3::Vector3;
 
@@ -45,7 +45,7 @@ impl TonemapUnit {
         TonemapUnit {
             image_width: width,
             image_height: height,
-            rgb_buffer: Vec::from_elem(width * height * 3, 0)
+            rgb_buffer: repeat(0).take(width * height * 3).collect()
         }
     }
 

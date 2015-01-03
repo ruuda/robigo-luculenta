@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::{min, max};
+use std::iter::repeat;
 use std::num::Float;
 use trace_unit::MappedPhoton;
 use vector3::Vector3;
@@ -45,7 +46,8 @@ impl PlotUnit {
             image_width: width,
             image_height: height,
             aspect_ratio: width as f32 / height as f32,
-            tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero()),
+            tristimulus_buffer: repeat(Vector3::zero()).take(width * height)
+                                                       .collect(),
             id: id
         }
     }

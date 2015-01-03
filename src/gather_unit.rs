@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::io::{File, Open, Write};
+use std::iter::repeat;
 use std::mem::transmute;
 use vector3::Vector3;
 
@@ -31,8 +32,10 @@ impl GatherUnit {
     /// of the specified size.
     pub fn new(width: uint, height: uint) -> GatherUnit {
         let mut unit = GatherUnit {
-            tristimulus_buffer: Vec::from_elem(width * height, Vector3::zero()),
-            compensation_buffer: Vec::from_elem(width * height, Vector3::zero())
+            tristimulus_buffer: repeat(Vector3::zero()).take(width * height)
+                                                       .collect(),
+            compensation_buffer: repeat(Vector3::zero()).take(width * height)
+                                                        .collect()
         };
 
         // Try to continue a previous render.
