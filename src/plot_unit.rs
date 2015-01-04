@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

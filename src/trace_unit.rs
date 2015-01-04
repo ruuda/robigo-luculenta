@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ pub struct TraceUnit {
     aspect_ratio: f32,
 
     /// The photons that were rendered.
-    pub mapped_photons: [MappedPhoton, ..NUMBER_OF_PHOTONS],
+    pub mapped_photons: [MappedPhoton; NUMBER_OF_PHOTONS],
 
     /// An ID for identifying this unit in the UI.
     pub id: uint
@@ -67,7 +67,7 @@ impl TraceUnit {
     pub fn new(id:uint, width: uint, height: uint) -> TraceUnit {
         TraceUnit {
             aspect_ratio: width as f32 / height as f32,
-            mapped_photons: [MappedPhoton::new(), ..NUMBER_OF_PHOTONS],
+            mapped_photons: [MappedPhoton::new(); NUMBER_OF_PHOTONS],
             id: id
         }
     }

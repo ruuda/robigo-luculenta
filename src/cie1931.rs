@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ pub fn get_tristimulus(wavelength: f32) -> Vector3 {
 // Data obtained from http://cvrl.ioo.ucl.ac.uk/index.htm.
 
 /// CIE X tristimulus values, at 5nm intervals, starting at 380 nm.
-const X: [f32, ..81] = [
+const X: [f32; 81] = [
     0.001368,
     0.002236,
     0.004243,
@@ -136,7 +136,7 @@ const X: [f32, ..81] = [
 ];
 
 /// CIE Y tristimulus values, at 5nm intervals, starting at 380 nm.
-const Y: [f32, ..81] = [
+const Y: [f32; 81] = [
     0.000039,
     0.000064,
     0.000120,
@@ -221,7 +221,7 @@ const Y: [f32, ..81] = [
 ];
 
 /// CIE Z tristimulus values, at 5nm intervals, starting at 380 nm.
-const Z: [f32, ..81] = [
+const Z: [f32; 81] = [
     0.006450,
     0.010550,
     0.020050,

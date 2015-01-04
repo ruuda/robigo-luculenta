@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ impl GatherUnit {
         let mut data = self.tristimulus_buffer.iter()
                            .chain(self.compensation_buffer.iter());
         for trist in data {
-            let xyz: &[u8, ..12] = unsafe { transmute(trist) };
+            let xyz: &[u8; 12] = unsafe { transmute(trist) };
             file.write(xyz).ok().expect("failed to write raw buffer");
         }
     }
@@ -80,7 +80,7 @@ impl GatherUnit {
             let mut data = self.tristimulus_buffer.iter_mut()
                                .chain(self.compensation_buffer.iter_mut());
             for trist in data {
-                let xyz: &mut [u8, ..12] = unsafe { transmute(trist) };
+                let xyz: &mut [u8; 12] = unsafe { transmute(trist) };
                 file.read(xyz).ok().expect("failed to read raw buffer");
             }
         }
