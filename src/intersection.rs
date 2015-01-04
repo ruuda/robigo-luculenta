@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 use vector3::Vector3;
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Intersection {
     /// The position at which the intersection occurred.
     pub position: Vector3,

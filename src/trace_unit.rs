@@ -23,7 +23,7 @@ use scene::Scene;
 const NUMBER_OF_PHOTONS: uint = 1024 * 512;
 
 /// Represents a photon that has been traced.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct MappedPhoton {
     /// The screen position x-coordinate.
     pub x: f32,

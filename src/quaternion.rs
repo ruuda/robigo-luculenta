@@ -17,7 +17,7 @@
 use std::ops::{Add, Sub, Neg, Mul};
 use std::num::FloatMath;
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Quaternion {
     pub x: f32,
     pub y: f32,
