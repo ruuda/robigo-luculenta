@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use std::comm::{Sender, Receiver, channel};
+use std::sync::mpsc::{Sender, Receiver, channel};
 use std::f32::consts::PI;
 use std::io::timer::sleep;
 use std::num::{Float, FloatMath};
