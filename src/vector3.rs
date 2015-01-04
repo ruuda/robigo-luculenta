@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::ops::{Add, Sub, Neg, Mul};
 use std::num::Float;
 use quaternion::Quaternion;
 
@@ -93,7 +94,9 @@ impl Vector3 {
     }
 }
 
-impl Add<Vector3, Vector3> for Vector3 {
+impl Add for Vector3 {
+    type Output = Vector3;
+
     fn add(self, other: Vector3) -> Vector3 {
         Vector3 {
             x: self.x + other.x,
@@ -103,7 +106,9 @@ impl Add<Vector3, Vector3> for Vector3 {
     }
 }
 
-impl Sub<Vector3, Vector3> for Vector3 {
+impl Sub for Vector3 {
+    type Output = Vector3;
+
     fn sub(self, other: Vector3) -> Vector3 {
         Vector3 {
             x: self.x - other.x,
@@ -113,7 +118,9 @@ impl Sub<Vector3, Vector3> for Vector3 {
     }
 }
 
-impl Neg<Vector3> for Vector3 {
+impl Neg for Vector3 {
+    type Output = Vector3;
+
     fn neg(self) -> Vector3 {
         Vector3 {
             x: -self.x,
@@ -123,7 +130,9 @@ impl Neg<Vector3> for Vector3 {
     }
 }
 
-impl Mul<f32, Vector3> for Vector3 {
+impl Mul<f32> for Vector3 {
+    type Output = Vector3;
+
     fn mul(self, f: f32) -> Vector3 {
         Vector3 {
             x: self.x * f,

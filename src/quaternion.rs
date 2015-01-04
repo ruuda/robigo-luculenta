@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::ops::{Add, Sub, Neg, Mul};
 use std::num::FloatMath;
 
 #[deriving(Copy)]
@@ -45,7 +46,9 @@ impl Quaternion {
     }
 }
 
-impl Add<Quaternion, Quaternion> for Quaternion {
+impl Add for Quaternion {
+    type Output = Quaternion;
+
     fn add(self, other: Quaternion) -> Quaternion {
         Quaternion {
             x: self.x + other.x,
@@ -56,7 +59,9 @@ impl Add<Quaternion, Quaternion> for Quaternion {
     }
 }
 
-impl Sub<Quaternion, Quaternion> for Quaternion {
+impl Sub for Quaternion {
+    type Output = Quaternion;
+
     fn sub(self, other: Quaternion) -> Quaternion {
         Quaternion {
             x: self.x - other.x,
@@ -67,7 +72,9 @@ impl Sub<Quaternion, Quaternion> for Quaternion {
     }
 }
 
-impl Neg<Quaternion> for Quaternion {
+impl Neg for Quaternion {
+    type Output = Quaternion;
+
     fn neg(self) -> Quaternion {
         Quaternion {
             x: -self.x,
@@ -78,7 +85,9 @@ impl Neg<Quaternion> for Quaternion {
     }
 }
 
-impl Mul<f32, Quaternion> for Quaternion {
+impl Mul<f32> for Quaternion {
+    type Output = Quaternion;
+
     fn mul(self, rhs: f32) -> Quaternion {
         Quaternion {
             x: self.x * rhs,
@@ -89,7 +98,9 @@ impl Mul<f32, Quaternion> for Quaternion {
     }
 }
 
-impl Mul<Quaternion, Quaternion> for Quaternion {
+impl Mul<Quaternion> for Quaternion {
+    type Output = Quaternion;
+
     fn mul(self, rhs: Quaternion) -> Quaternion {
         Quaternion {
             x: self.w * rhs.x + self.x * rhs.w + self.y * rhs.z - self.z * rhs.y,

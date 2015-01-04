@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #![feature(slicing_syntax)]
+#![feature(associated_types)]
 
 extern crate time;
 extern crate image;
