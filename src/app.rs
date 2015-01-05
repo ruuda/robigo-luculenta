@@ -144,7 +144,7 @@ impl App {
         let img = tonemap_unit.rgb_buffer.clone();
 
         // And send it to the UI / main task.
-        img_tx.send(img);
+        img_tx.send(img).unwrap();
     }
 
     fn set_up_scene() -> Scene {

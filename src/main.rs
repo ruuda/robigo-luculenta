@@ -57,7 +57,7 @@ fn main() {
     // write it out. Loop forever; the application must be stopped by
     // terminating it.
     loop {
-        let img = images.recv();
+        let img = images.recv().unwrap();
 
         // Write the image to output.png.
         match image::save_buffer(&Path::new("output.png"), img[],
