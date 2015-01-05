@@ -16,6 +16,7 @@
 
 #![feature(slicing_syntax)]
 #![feature(associated_types)]
+#![feature(default_type_params)]
 
 extern crate time;
 extern crate image;

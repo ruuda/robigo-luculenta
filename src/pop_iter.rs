@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,8 +32,9 @@ impl<T> PopFrontIter for RingBuf<T> {
     }
 }
 
-impl<'a, T> Iterator<T> for PopFrontItems<'a, RingBuf<T>>
+impl<'a, T> Iterator for PopFrontItems<'a, RingBuf<T>>
     where T: 'a {
+    type Item = T;
 
     fn next(&mut self) -> Option<T> {
         self.container.pop_front()
