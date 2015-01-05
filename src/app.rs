@@ -20,6 +20,7 @@ use std::io::timer::sleep;
 use std::num::{Float, FloatMath};
 use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
+use std::thread::Thread;
 use std::time::Duration;
 use camera::Camera;
 use constants::GOLDEN_RATIO;
@@ -75,7 +76,7 @@ impl App {
     fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>,
                     scene: Arc<Scene>,
                     img_tx: Sender<Image>) {
-        spawn(move || {
+        Thread::spawn(move || {
             // Move img_tx into the proc.
             let mut owned_img_tx = img_tx;
 
@@ -90,7 +91,7 @@ impl App {
                 task = task_scheduler.lock().unwrap().get_new_task(task);
                 App::execute_task(&mut task, &*scene, &mut owned_img_tx);
             }
-        });
+        }).detach();
     }
 
     fn execute_task(task: &mut Task, scene: &Scene, img_tx: &mut Sender<Image>) {
