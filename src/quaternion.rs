@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::ops::{Add, Sub, Neg, Mul};
-use std::num::FloatMath;
+use std::num::Float;
 
 #[derive(Copy)]
 pub struct Quaternion {

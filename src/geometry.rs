@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::f32::consts::PI;
-use std::num::{Float, FloatMath};
+use std::num::Float;
 use intersection::Intersection;
 use ray::Ray;
 use vector3::{Vector3, cross, dot};
