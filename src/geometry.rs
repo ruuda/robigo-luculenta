@@ -152,11 +152,11 @@ impl Circle {
 // Filter(ed) is implemented manually, because it is deprecated in the standard
 // library, but it allows for some elegant code, so I wanted to keep it.
 trait Filter<T> {
-    fn filter(self, condition: |&T| -> bool) -> Self;
+    fn filter<F>(self, condition: F) -> Self where F: Fn(&T) -> bool;
 }
 
 impl<T> Filter<T> for Option<T> {
-    fn filter(self, condition: |&T| -> bool) -> Option<T> {
+    fn filter<F>(self, condition: F) -> Option<T> where F: Fn(&T) -> bool {
         match self {
             Some(x) => if condition(&x) { Some(x) } else { None },
             None => None
