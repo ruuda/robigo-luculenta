@@ -9,4 +9,4 @@ version = "0.2.0"
 git = "https://github.com/PistonDevelopers/image.git"
 
 [dependencies]
-time = "0.1.4"
+time = "0.1.12"
