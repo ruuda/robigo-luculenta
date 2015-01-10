@@ -52,7 +52,7 @@ pub struct App {
 impl App {
     /// Constructs and starts a new path tracer that renders to a canvas of
     /// the specified size.
-    pub fn new(image_width: uint, image_height: uint) -> App {
+    pub fn new(image_width: usize, image_height: usize) -> App {
         let concurrency = num_cpus();
         let ts = TaskScheduler::new(concurrency, image_width, image_height);
         let task_scheduler = Arc::new(Mutex::new(ts));
@@ -64,12 +64,12 @@ impl App {
         let scene = Arc::new(App::set_up_scene());
 
         // Spawn as many workers as cores.
-        for _ in range(0u, concurrency) {
+        for _ in range(0us, concurrency) {
             App::start_worker(task_scheduler.clone(),
                               scene.clone(),
                               img_tx.clone());
         }
-            
+
         App { images: img_rx }
     }
 
@@ -218,7 +218,7 @@ impl App {
         let gamma: f32 = PI * 2.0 * (1.0 - 1.0 / GOLDEN_RATIO as f32);
         let seed_size: f32 = 0.8;
         let seed_scale: f32 = 1.5;
-        let first_seed = ((sun_radius / seed_scale + 1.0).powi(2) + 0.5) as int;
+        let first_seed = ((sun_radius / seed_scale + 1.0).powi(2) + 0.5) as isize;
         let seeds = 100;
         for i in range(first_seed, first_seed + seeds) {
             let phi = i as f32 * gamma;
@@ -268,7 +268,7 @@ impl App {
         }
 
         // Prisms along the walls.
-        let prisms: int = 11;
+        let prisms: isize = 11;
         let prism_angle: f32 = PI * 2.0 / prisms as f32;
         let prism_radius: f32 = 17.0;
         let prism_height: f32 = 8.0;

@@ -22,10 +22,10 @@ use vector3::Vector3;
 /// Converts the result of a `GatherUnit` into an sRGB image.
 pub struct TonemapUnit {
     /// The width of the canvas (in pixels).
-    image_width: uint,
+    image_width: usize,
 
     /// THe height of the canvas (in pixels).
-    image_height: uint,
+    image_height: usize,
 
     /// The buffer of sRGB values.
     pub rgb_buffer: Vec<u8>
@@ -41,7 +41,7 @@ fn clamp(x: f32) -> f32 {
 impl TonemapUnit {
     /// Constructs a new tonemap unit that will tonemap a canvas
     /// of the specified size.
-    pub fn new(width: uint, height: uint) -> TonemapUnit {
+    pub fn new(width: usize, height: usize) -> TonemapUnit {
         TonemapUnit {
             image_width: width,
             image_height: height,

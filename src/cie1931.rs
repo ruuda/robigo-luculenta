@@ -20,7 +20,7 @@ use vector3::Vector3;
 /// Returns the CIE 1931 tristimulus values for the given wavelength.
 pub fn get_tristimulus(wavelength: f32) -> Vector3 {
     let indexf = (wavelength - 380.0) / 5.0;
-    let index = indexf.floor() as int;
+    let index = indexf.floor() as isize;
     let remainder = indexf - index as f32;
 
     if index < -1 || index > 80 {
@@ -37,7 +37,7 @@ pub fn get_tristimulus(wavelength: f32) -> Vector3 {
             z: Z[80] * (1.0 - remainder)
         }
     } else {
-        let i = index as uint;
+        let i = index as usize;
 
         // Interpolate between two measurements.
         Vector3 {

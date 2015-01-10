@@ -23,10 +23,10 @@ use vector3::Vector3;
 /// Handles plotting the result of a `TraceUnit`.
 pub struct PlotUnit {
     /// The width of the canvas (in pixels).
-    image_width: uint,
+    image_width: usize,
 
     /// The height of the canvas (in pixels).
-    image_height: uint,
+    image_height: usize,
 
     /// Width of the canvas divided by its height.
     aspect_ratio: f32,
@@ -35,13 +35,13 @@ pub struct PlotUnit {
     pub tristimulus_buffer: Vec<Vector3>,
 
     /// An ID for identifying this unit in the UI.
-    pub id: uint
+    pub id: usize
 }
 
 impl PlotUnit {
     /// Constructs a new plot unit that will plot to a canvas
     /// of the specified size.
-    pub fn new(id: uint, width: uint, height: uint) -> PlotUnit {
+    pub fn new(id: usize, width: usize, height: usize) -> PlotUnit {
         PlotUnit {
             image_width: width,
             image_height: height,
@@ -62,10 +62,10 @@ impl PlotUnit {
         let py = (y * self.aspect_ratio * 0.5 + 0.5) * (h as f32 - 1.0);
 
         // Then map them to discrete pixels.
-        let px1 = max(0i, min(w as int - 1, px.floor() as int)) as uint;
-        let px2 = max(0i, min(w as int - 1, px.ceil() as int)) as uint;
-        let py1 = max(0i, min(h as int - 1, py.floor() as int)) as uint;
-        let py2 = max(0i, min(h as int - 1, py.ceil() as int)) as uint;
+        let px1 = max(0is, min(w as isize - 1, px.floor() as isize)) as usize;
+        let px2 = max(0is, min(w as isize - 1, px.ceil() as isize)) as usize;
+        let py1 = max(0is, min(h as isize - 1, py.floor() as isize)) as usize;
+        let py2 = max(0is, min(h as isize - 1, py.ceil() as isize)) as usize;
 
         // Compute pixel coefficients.
         let cx = px - px1 as f32;
