@@ -155,8 +155,8 @@ impl App {
         // Sphere in the centre.
         let sun_radius: f32 = 5.0;
         let sun_position = Vector3::zero();
-        let sun_sphere = box Sphere::new(sun_position, sun_radius);
-        let sun_emissive = box BlackBodyMaterial::new(6504.0, 1.0);
+        let sun_sphere = Box::new(Sphere::new(sun_position, sun_radius));
+        let sun_emissive = Box::new(BlackBodyMaterial::new(6504.0, 1.0));
         let sun = Object::new(sun_sphere, Emissive(sun_emissive));
         objects.push(sun);
 
@@ -164,28 +164,28 @@ impl App {
         let floor_normal = Vector3::new(0.0, 0.0, -1.0);
         let floor_position = Vector3::new(0.0, 0.0, -sun_radius);
         let floor_paraboloid = Paraboloid::new(floor_normal, floor_position,
-                                                   sun_radius.powi(2));
-        let grey = box DiffuseGreyMaterial::new(0.8);
-        let floor = Object::new(box floor_paraboloid.clone(), Reflective(grey));
+                                               sun_radius.powi(2));
+        let grey = Box::new(DiffuseGreyMaterial::new(0.8));
+        let floor = Object::new(Box::new(floor_paraboloid.clone()), Reflective(grey));
         objects.push(floor);
 
         // Floorwall paraboloid (left).
         let wall_left_normal = Vector3::new(0.0, 0.0, 1.0);
         let wall_left_position = Vector3::new(1.0, 0.0, -sun_radius.powi(2));
-        let wall_left_paraboloid = box Paraboloid::new(wall_left_normal,
-                                                       wall_left_position,
-                                                       sun_radius.powi(2));
-        let green = box DiffuseColouredMaterial::new(0.9, 550.0, 40.0);
+        let wall_left_paraboloid = Box::new(Paraboloid::new(wall_left_normal,
+                                                            wall_left_position,
+                                                            sun_radius.powi(2)));
+        let green = Box::new(DiffuseColouredMaterial::new(0.9, 550.0, 40.0));
         let wall_left = Object::new(wall_left_paraboloid, Reflective(green));
         objects.push(wall_left);
 
         // Floorwall paraboloid (right).
         let wall_right_normal = Vector3::new(0.0, 0.0, 1.0);
         let wall_right_position = Vector3::new(-1.0, 0.0, -sun_radius.powi(2));
-        let wall_right_paraboloid = box Paraboloid::new(wall_right_normal,
-                                                        wall_right_position,
-                                                        sun_radius.powi(2));
-        let red = box DiffuseColouredMaterial::new(0.9, 660.0, 60.0);
+        let wall_right_paraboloid = Box::new(Paraboloid::new(wall_right_normal,
+                                                             wall_right_position,
+                                                             sun_radius.powi(2)));
+        let red = Box::new(DiffuseColouredMaterial::new(0.9, 660.0, 60.0));
         let wall_right = Object::new(wall_right_paraboloid, Reflective(red));
         objects.push(wall_right);
 
@@ -193,8 +193,8 @@ impl App {
         let sky_height: f32 = 30.0;
         let sky1_radius: f32 = 5.0;
         let sky1_position = Vector3::new(-sun_radius, 0.0, sky_height);
-        let sky1_circle = box Circle::new(floor_normal, sky1_position, sky1_radius);
-        let sky1_emissive = box BlackBodyMaterial::new(7600.0, 0.6);
+        let sky1_circle = Box::new(Circle::new(floor_normal, sky1_position, sky1_radius));
+        let sky1_emissive = Box::new(BlackBodyMaterial::new(7600.0, 0.6));
         let sky1 = Object::new(sky1_circle, Emissive(sky1_emissive));
         objects.push(sky1);
 
@@ -202,15 +202,15 @@ impl App {
         let sky2_position = Vector3 {
             x: -sun_radius * 0.5, y: sun_radius * 2.0 + sky2_radius, z: sky_height
         };
-        let sky2_circle = box Circle::new(floor_normal, sky2_position, sky2_radius);
-        let sky2_emissive = box BlackBodyMaterial::new(5000.0, 0.6);
+        let sky2_circle = Box::new(Circle::new(floor_normal, sky2_position, sky2_radius));
+        let sky2_emissive = Box::new(BlackBodyMaterial::new(5000.0, 0.6));
         let sky2 = Object::new(sky2_circle, Emissive(sky2_emissive));
         objects.push(sky2);
 
         // Ceiling plane (for more interesting light).
         let ceiling_position = Vector3::new(0.0, 0.0, sky_height * 2.0);
-        let ceiling_plane = box Plane::new(floor_normal, ceiling_position);
-        let blue = box DiffuseColouredMaterial::new(0.5, 470.0, 25.0);
+        let ceiling_plane = Box::new(Plane::new(floor_normal, ceiling_position));
+        let blue = Box::new(DiffuseColouredMaterial::new(0.5, 470.0, 25.0));
         let ceiling = Object::new(ceiling_plane, Reflective(blue));
         objects.push(ceiling);
 
@@ -228,9 +228,10 @@ impl App {
                 y: phi.sin() * r,
                 z: (r - sun_radius) * -0.5
             } + sun_position;
-            let sphere = box Sphere::new(position, seed_size);
-            let mat = box DiffuseColouredMaterial::new(0.9, (i - first_seed) as f32 / seeds as f32
-                                                       * 130.0 + 600.0, 60.0);
+            let sphere = Box::new(Sphere::new(position, seed_size));
+            let mat = Box::new(DiffuseColouredMaterial::new(0.9,
+                              (i - first_seed) as f32 / seeds as f32
+                              * 130.0 + 600.0, 60.0));
             let object = Object::new(sphere, Reflective(mat));
             objects.push(object);
         }
@@ -244,8 +245,8 @@ impl App {
                 y: phi.sin() * r,
                 z: (r - sun_radius) * -0.25
             } + sun_position;
-            let sphere = box Sphere::new(position, seed_size * 0.5);
-            let mat = box GlossyMirrorMaterial::new(0.1);
+            let sphere = Box::new(Sphere::new(position, seed_size * 0.5));
+            let mat = Box::new(GlossyMirrorMaterial::new(0.1));
             let object = Object::new(sphere, Reflective(mat));
             objects.push(object);
         }
@@ -259,9 +260,9 @@ impl App {
                 y: phi.sin() * r,
                 z: (r - sun_radius) * 1.5 + sun_radius * 2.0
             } + sun_position;
-            let sphere = box Sphere::new(position, seed_size
-                                         * (0.5 + (i as f32).sqrt() * 0.2));
-            let mat = box SoapBubbleMaterial;
+            let sphere = Box::new(Sphere::new(position, seed_size
+                                             * (0.5 + (i as f32).sqrt() * 0.2)));
+            let mat = Box::new(SoapBubbleMaterial);
             let object = Object::new(sphere, Reflective(mat));
             objects.push(object);
         }
@@ -299,9 +300,9 @@ impl App {
                     position = intersection.position + normal * 2.0 * h;
                 }
 
-                let prism = box new_hexagonal_prism(normal, position, 3.0, 1.0,
-                                                    phi + phi_ofs, prism_height * h);
-                let glass = box Sf10GlassMaterial;
+                let prism = Box::new(new_hexagonal_prism(normal, position, 3.0, 1.0,
+                                                         phi + phi_ofs, prism_height * h));
+                let glass = Box::new(Sf10GlassMaterial);
                 let object = Object::new(prism, Reflective(glass));
                 objects.push(object);
             }

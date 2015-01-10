@@ -1,5 +1,5 @@
 // Robigo Luculenta -- Proof of concept spectral path tracer in Rust
-// Copyright (C) 2014 Ruud van Asseldonk
+// Copyright (C) 2014-2015 Ruud van Asseldonk
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,17 +100,17 @@ impl TaskScheduler {
 
         // Build the trace units.
         let trace_units = range(0, n_trace_units)
-        .map(|i| { box TraceUnit::new(i, width, height) })
+        .map(|i| { Box::new(TraceUnit::new(i, width, height)) })
         .collect::<RingBuf<Box<TraceUnit>>>();
 
         // Then build the plot units.
         let plot_units = range(0, n_plot_units)
-        .map(|i| { box PlotUnit::new(i, width, height) })
+        .map(|i| { Box::new(PlotUnit::new(i, width, height)) })
         .collect::<RingBuf<Box<PlotUnit>>>();
 
         // There must be one gather unit and one tonemap unit.
-        let gather_unit = Some(box GatherUnit::new(width, height));
-        let tonemap_unit = Some(box TonemapUnit::new(width, height));
+        let gather_unit = Some(Box::new(GatherUnit::new(width, height)));
+        let tonemap_unit = Some(Box::new(TonemapUnit::new(width, height)));
 
         TaskScheduler {
             traces_completed: 0,
