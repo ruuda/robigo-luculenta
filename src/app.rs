@@ -91,7 +91,7 @@ impl App {
                 task = task_scheduler.lock().unwrap().get_new_task(task);
                 App::execute_task(&mut task, &*scene, &mut owned_img_tx);
             }
-        }).detach();
+        });
     }
 
     fn execute_task(task: &mut Task, scene: &Scene, img_tx: &mut Sender<Image>) {
