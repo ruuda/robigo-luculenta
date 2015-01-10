@@ -56,5 +56,5 @@ fn pop_front_iter_ring_buf() {
     let ys: Vec<uint> = xs.pop_front_iter().take(3).collect();
     assert_eq!(xs[0], 3u);
     assert_eq!(xs[1], 4u);
-    assert_eq!(ys[], [0u, 1, 2][]);
+    assert_eq!(ys.as_slice(), [0u, 1, 2].as_slice());
 }
