@@ -30,12 +30,11 @@ pub struct GatherUnit {
 impl GatherUnit {
     /// Constructs a new GatherUnit that will gather a canvas
     /// of the specified size.
-    pub fn new(width: usize, height: usize) -> GatherUnit {
+    pub fn new(width: u32, height: u32) -> GatherUnit {
+        let sz = (width * height) as usize;
         let mut unit = GatherUnit {
-            tristimulus_buffer: repeat(Vector3::zero()).take(width * height)
-                                                       .collect(),
-            compensation_buffer: repeat(Vector3::zero()).take(width * height)
-                                                        .collect()
+            tristimulus_buffer: repeat(Vector3::zero()).take(sz).collect(),
+            compensation_buffer: repeat(Vector3::zero()).take(sz).collect()
         };
 
         // Try to continue a previous render.

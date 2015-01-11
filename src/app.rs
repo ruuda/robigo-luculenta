@@ -52,7 +52,7 @@ pub struct App {
 impl App {
     /// Constructs and starts a new path tracer that renders to a canvas of
     /// the specified size.
-    pub fn new(image_width: usize, image_height: usize) -> App {
+    pub fn new(image_width: u32, image_height: u32) -> App {
         let concurrency = num_cpus();
         let ts = TaskScheduler::new(concurrency, image_width, image_height);
         let task_scheduler = Arc::new(Mutex::new(ts));

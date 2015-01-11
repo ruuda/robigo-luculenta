@@ -51,7 +51,7 @@ fn tonemap_interval() -> Duration {
 /// Handles splitting the workload across threads.
 pub struct TaskScheduler {
     /// The number of completed trace batches. Used to measure performance.
-    traces_completed: usize,
+    traces_completed: u32,
 
     /// Previous measurements of batches/second, used to determine variance.
     performance: RingBuf<f32>,
@@ -91,7 +91,7 @@ pub struct TaskScheduler {
 impl TaskScheduler {
     /// Creates a new task scheduler, that will render `scene` to a
     /// canvas of the specified size, using `concurrency` threads.
-    pub fn new(concurrency: usize, width: usize, height: usize) -> TaskScheduler {
+    pub fn new(concurrency: usize, width: u32, height: u32) -> TaskScheduler {
         // More trace units than threads seems sensible,
         // but less plot units is acceptable,
         // because one plot unit can handle multiple trace units.

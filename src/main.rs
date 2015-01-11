@@ -44,8 +44,8 @@ mod vector3;
 
 fn main() {
     // Start up the path tracer. It begins rendering immediately.
-    let width = 1280us;
-    let height = 720us;
+    let width = 1280u32;
+    let height = 720u32;
     let app = App::new(width, height);
     let images = app.images;
 

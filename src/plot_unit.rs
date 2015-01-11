@@ -23,10 +23,10 @@ use vector3::Vector3;
 /// Handles plotting the result of a `TraceUnit`.
 pub struct PlotUnit {
     /// The width of the canvas (in pixels).
-    image_width: usize,
+    image_width: u32,
 
     /// The height of the canvas (in pixels).
-    image_height: usize,
+    image_height: u32,
 
     /// Width of the canvas divided by its height.
     aspect_ratio: f32,
@@ -41,13 +41,13 @@ pub struct PlotUnit {
 impl PlotUnit {
     /// Constructs a new plot unit that will plot to a canvas
     /// of the specified size.
-    pub fn new(id: usize, width: usize, height: usize) -> PlotUnit {
+    pub fn new(id: usize, width: u32, height: u32) -> PlotUnit {
+        let sz = (width * height) as usize;
         PlotUnit {
             image_width: width,
             image_height: height,
             aspect_ratio: width as f32 / height as f32,
-            tristimulus_buffer: repeat(Vector3::zero()).take(width * height)
-                                                       .collect(),
+            tristimulus_buffer: repeat(Vector3::zero()).take(sz).collect(),
             id: id
         }
     }
@@ -56,8 +56,8 @@ impl PlotUnit {
     /// (adding it to existing content).
     fn plot_pixel(&mut self, x: f32, y: f32, cie: Vector3) {
         // Map the position to pixels.
-        let w = self.image_width;
-        let h = self.image_height;
+        let w = self.image_width as usize;
+        let h = self.image_height as usize;
         let px = (x * 0.5 + 0.5) * (w as f32 - 1.0);
         let py = (y * self.aspect_ratio * 0.5 + 0.5) * (h as f32 - 1.0);
 

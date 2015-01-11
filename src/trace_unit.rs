@@ -64,7 +64,7 @@ pub struct TraceUnit {
 
 impl TraceUnit {
     /// Creates a new trace unit that renders the given scene.
-    pub fn new(id:usize, width: usize, height: usize) -> TraceUnit {
+    pub fn new(id: usize, width: u32, height: u32) -> TraceUnit {
         TraceUnit {
             aspect_ratio: width as f32 / height as f32,
             mapped_photons: [MappedPhoton::new(); NUMBER_OF_PHOTONS],
