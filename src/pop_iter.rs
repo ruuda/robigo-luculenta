@@ -48,13 +48,13 @@ impl<'a, T> Iterator for PopFrontItems<'a, RingBuf<T>>
 #[test]
 fn pop_front_iter_ring_buf() {
     let mut xs = RingBuf::new();
-    xs.push_back(0us);
+    xs.push_back(0u32);
     xs.push_back(1);
     xs.push_back(2);
     xs.push_back(3);
     xs.push_back(4);
-    let ys: Vec<usize> = xs.pop_front_iter().take(3).collect();
-    assert_eq!(xs[0], 3us);
-    assert_eq!(xs[1], 4us);
-    assert_eq!(ys.as_slice(), [0us, 1, 2].as_slice());
+    let ys: Vec<u32> = xs.pop_front_iter().take(3).collect();
+    assert_eq!(xs[0], 3u32);
+    assert_eq!(xs[1], 4u32);
+    assert_eq!(ys.as_slice(), [0u32, 1, 2].as_slice());
 }
