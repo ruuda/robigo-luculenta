@@ -56,16 +56,16 @@ impl PlotUnit {
     /// (adding it to existing content).
     fn plot_pixel(&mut self, x: f32, y: f32, cie: Vector3) {
         // Map the position to pixels.
-        let w = self.image_width as usize;
-        let h = self.image_height as usize;
+        let w = self.image_width as isize;
+        let h = self.image_height as isize;
         let px = (x * 0.5 + 0.5) * (w as f32 - 1.0);
         let py = (y * self.aspect_ratio * 0.5 + 0.5) * (h as f32 - 1.0);
 
         // Then map them to discrete pixels.
-        let px1 = max(0is, min(w as isize - 1, px.floor() as isize)) as usize;
-        let px2 = max(0is, min(w as isize - 1, px.ceil() as isize)) as usize;
-        let py1 = max(0is, min(h as isize - 1, py.floor() as isize)) as usize;
-        let py2 = max(0is, min(h as isize - 1, py.ceil() as isize)) as usize;
+        let px1 = max(0is, min(w - 1, px.floor() as isize)) as usize;
+        let px2 = max(0is, min(w - 1, px.ceil() as isize)) as usize;
+        let py1 = max(0is, min(h - 1, py.floor() as isize)) as usize;
+        let py2 = max(0is, min(h - 1, py.ceil() as isize)) as usize;
 
         // Compute pixel coefficients.
         let cx = px - px1 as f32;
@@ -77,6 +77,7 @@ impl PlotUnit {
 
         // Then plot the four pixels.
         let buffer = self.tristimulus_buffer.as_mut_slice();
+        let w = self.image_width as usize;
         buffer[py1 * w + px1] = buffer[py1 * w + px1] + cie * c11;
         buffer[py1 * w + px2] = buffer[py1 * w + px2] + cie * c21;
         buffer[py2 * w + px1] = buffer[py2 * w + px1] + cie * c12;
