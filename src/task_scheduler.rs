@@ -99,12 +99,12 @@ impl TaskScheduler {
         let n_plot_units = max(1us, concurrency / 2);
 
         // Build the trace units.
-        let trace_units = range(0, n_trace_units)
+        let trace_units = (0 .. n_trace_units)
         .map(|i| { Box::new(TraceUnit::new(i, width, height)) })
         .collect::<RingBuf<Box<TraceUnit>>>();
 
         // Then build the plot units.
-        let plot_units = range(0, n_plot_units)
+        let plot_units = (0 .. n_plot_units)
         .map(|i| { Box::new(PlotUnit::new(i, width, height)) })
         .collect::<RingBuf<Box<PlotUnit>>>();
 
