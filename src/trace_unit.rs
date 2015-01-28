@@ -14,16 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::iter::repeat;
 use std::num::Float;
 use object::MaterialBox::{Emissive, Reflective};
 use ray::Ray;
 use scene::Scene;
 
-/// The number of paths to trace in one batch.
-const NUMBER_OF_PHOTONS: usize = 1024 * 512;
-
 /// Represents a photon that has been traced.
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct MappedPhoton {
     /// The screen position x-coordinate.
     pub x: f32,
@@ -56,7 +54,7 @@ pub struct TraceUnit {
     aspect_ratio: f32,
 
     /// The photons that were rendered.
-    pub mapped_photons: [MappedPhoton; NUMBER_OF_PHOTONS],
+    pub mapped_photons: Vec<MappedPhoton>,
 
     /// An ID for identifying this unit in the UI.
     pub id: usize
@@ -65,9 +63,11 @@ pub struct TraceUnit {
 impl TraceUnit {
     /// Creates a new trace unit that renders the given scene.
     pub fn new(id: usize, width: u32, height: u32) -> TraceUnit {
+        // The number of photons to trace in one batch.
+        const NUMBER_OF_PHOTONS: usize = 1024 * 512;
         TraceUnit {
             aspect_ratio: width as f32 / height as f32,
-            mapped_photons: [MappedPhoton::new(); NUMBER_OF_PHOTONS],
+            mapped_photons: repeat(MappedPhoton::new()).take(NUMBER_OF_PHOTONS).collect(),
             id: id
         }
     }

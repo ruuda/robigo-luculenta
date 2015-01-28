@@ -120,7 +120,7 @@ impl App {
     fn execute_plot_task(plot_unit: &mut PlotUnit,
                          units: &mut[Box<TraceUnit>]) {
         for unit in units.iter_mut() {
-            plot_unit.plot(&unit.mapped_photons);
+            plot_unit.plot(&unit.mapped_photons[]);
         }
     }
 
