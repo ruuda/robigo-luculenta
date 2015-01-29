@@ -65,3 +65,10 @@ fn main() {
         }
     }
 }
+
+#[test]
+fn simulate_main() {
+    let width = 1280u32;
+    let height = 720u32;
+    App::new_test(width, height);
+}
