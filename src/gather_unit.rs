@@ -69,7 +69,7 @@ impl GatherUnit {
                            .chain(self.compensation_buffer.iter());
         for trist in data {
             let xyz: &[u8; 12] = unsafe { transmute(trist) };
-            file.write(xyz).ok().expect("failed to write raw buffer");
+            file.write_all(xyz).ok().expect("failed to write raw buffer");
         }
     }
 
