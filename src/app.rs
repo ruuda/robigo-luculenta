@@ -16,7 +16,7 @@
 
 use std::sync::mpsc::{Sender, Receiver, channel};
 use std::f32::consts::PI;
-use std::io::timer::sleep;
+use std::old_io::timer::sleep;
 use std::num::Float;
 use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
