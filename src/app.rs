@@ -16,7 +16,7 @@
 
 use std::sync::mpsc::{Sender, Receiver, channel};
 use std::f32::consts::PI;
-use std::io::timer::sleep;
+use std::old_io::timer::sleep;
 use std::num::Float;
 use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
@@ -73,6 +73,23 @@ impl App {
         App { images: img_rx }
     }
 
+    #[cfg(test)]
+    pub fn new_test(image_width: u32, image_height: u32) -> App {
+        // Set up a task scheduler and scene with no concurrency.
+        let mut ts = TaskScheduler::new(1, image_width, image_height);
+        let (mut img_tx, img_rx) = channel();
+        let scene = Arc::new(App::set_up_scene());
+
+        // Run 5 tasks serially, on this thread.
+        let mut task = Task::Sleep;
+        for _ in 0u8 .. 5 {
+            task = ts.get_new_task(task);
+            App::execute_task(&mut task, &*scene, &mut img_tx);
+        }
+
+        App { images: img_rx }
+    }
+
     fn start_worker(task_scheduler: Arc<Mutex<TaskScheduler>>,
                     scene: Arc<Scene>,
                     img_tx: Sender<Image>) {
@@ -120,7 +137,7 @@ impl App {
     fn execute_plot_task(plot_unit: &mut PlotUnit,
                          units: &mut[Box<TraceUnit>]) {
         for unit in units.iter_mut() {
-            plot_unit.plot(&unit.mapped_photons);
+            plot_unit.plot(&unit.mapped_photons[]);
         }
     }
 
