@@ -144,7 +144,7 @@ impl App {
     fn execute_gather_task(gather_unit: &mut GatherUnit,
                            units: &mut[Box<PlotUnit>]) {
         for unit in units.iter_mut() {
-            gather_unit.accumulate(unit.tristimulus_buffer.as_slice());
+            gather_unit.accumulate(&unit.tristimulus_buffer[]);
             unit.clear();
         }
 
@@ -155,7 +155,7 @@ impl App {
     fn execute_tonemap_task(img_tx: &mut Sender<Image>,
                             tonemap_unit: &mut TonemapUnit,
                             gather_unit: &mut GatherUnit) {
-        tonemap_unit.tonemap(gather_unit.tristimulus_buffer.as_slice());
+        tonemap_unit.tonemap(&gather_unit.tristimulus_buffer[]);
 
         // Copy the rendered image.
         let img = tonemap_unit.rgb_buffer.clone();

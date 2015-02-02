@@ -58,7 +58,7 @@ fn main() {
         let img = images.recv().unwrap();
 
         // Write the image to output.png.
-        match image::save_buffer(&Path::new("output.png"), img.as_slice(),
+        match image::save_buffer(&Path::new("output.png"), &img[],
                                  width as u32, height as u32, image::RGB(8)) {
             Ok(_) => println!("wrote image to output.png"),
             Err(reason) => println!("failed to write output png: {}", reason)
