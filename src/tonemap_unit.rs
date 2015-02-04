@@ -73,7 +73,7 @@ impl TonemapUnit {
     /// to tonemapped sRGB values.
     pub fn tonemap(&mut self, tristimuli: &[Vector3]) {
         let max_intensity = self.find_exposure(tristimuli);
-        let buffer = self.rgb_buffer.as_mut_slice().chunks_mut(3);
+        let buffer = (&mut self.rgb_buffer[]).chunks_mut(3);
         let ln_4 = 4.0f32.ln();
 
         // Loop through all pixels.

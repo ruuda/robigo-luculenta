@@ -118,9 +118,9 @@ impl App {
             Task::Trace(ref mut trace_unit) =>
                 App::execute_trace_task(scene, &mut **trace_unit),
             Task::Plot(ref mut plot_unit, ref mut units) =>
-                App::execute_plot_task(&mut **plot_unit, units.as_mut_slice()),
+                App::execute_plot_task(&mut **plot_unit, &mut units[]),
             Task::Gather(ref mut gather_unit, ref mut units) =>
-                App::execute_gather_task(&mut **gather_unit, units.as_mut_slice()),
+                App::execute_gather_task(&mut **gather_unit, &mut units[]),
             Task::Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
                 App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit)
         }
