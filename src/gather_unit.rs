@@ -65,8 +65,8 @@ impl GatherUnit {
     /// can be resumed later.
     pub fn save(&self) {
         let mut file = File::open_mode(&Path::new("buffer.raw"), Open, Write);
-        let mut data = self.tristimulus_buffer.iter()
-                           .chain(self.compensation_buffer.iter());
+        let data = self.tristimulus_buffer.iter()
+                       .chain(self.compensation_buffer.iter());
         for trist in data {
             let xyz: &[u8; 12] = unsafe { transmute(trist) };
             file.write_all(xyz).ok().expect("failed to write raw buffer");
@@ -76,8 +76,8 @@ impl GatherUnit {
     /// Reads the tristimulus buffer from a file, to resume rendering.
     fn read(&mut self) {
         if let Ok(ref mut file) = File::open(&Path::new("buffer.raw")) {
-            let mut data = self.tristimulus_buffer.iter_mut()
-                               .chain(self.compensation_buffer.iter_mut());
+            let data = self.tristimulus_buffer.iter_mut()
+                           .chain(self.compensation_buffer.iter_mut());
             for trist in data {
                 let xyz: &mut [u8; 12] = unsafe { transmute(trist) };
                 file.read(xyz).ok().expect("failed to read raw buffer");
