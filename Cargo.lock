@@ -14,14 +14,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "image"
 version = "0.2.0-alpha.9"
-source = "git+https://github.com/PistonDevelopers/image.git#b7aff0a1ad2b6b0bdc04c1a7731d502606cbafb3"
+source = "git+https://github.com/PistonDevelopers/image.git#22d6ff19129fb4a2c44d6388e4efa7eb20f26545"
 dependencies = [
  "num 0.1.12 (git+https://github.com/rust-lang/num)",
 ]
 
 [[package]]
 name = "libc"
-version = "0.1.0"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -43,6 +43,6 @@ version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gcc 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
