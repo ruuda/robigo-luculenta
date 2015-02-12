@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#![feature(core, io, os, path, rand, std_misc)]
+#![feature(core, io, os, path, std_misc)]
 
-extern crate time;
 extern crate image;
+extern crate rand;
+extern crate time;
 
 use app::App;
 

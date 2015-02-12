@@ -16,8 +16,8 @@
 
 use std::f32::consts::PI;
 use std::num::Float;
-use std::rand;
-use std::rand::Closed01;
+use rand;
+use rand::Closed01;
 use vector3::Vector3;
 
 // Note that it is safe to just use rand::random: it uses a task-local rng.

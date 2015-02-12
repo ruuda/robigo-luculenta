@@ -3,6 +3,7 @@ name = "robigo-luculenta"
 version = "0.1.1"
 dependencies = [
  "image 0.2.0-alpha.9 (git+https://github.com/PistonDevelopers/image.git)",
+ "rand 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -25,11 +26,25 @@ version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "log"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "num"
 version = "0.1.12"
 source = "git+https://github.com/rust-lang/num#0811c72bacce6d8adc7a25be8292ba55f4118d9e"
 dependencies = [
  "rustc-serialize 0.2.12 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "rand"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
