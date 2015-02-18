@@ -10,4 +10,4 @@ git = "https://github.com/PistonDevelopers/image.git"
 
 [dependencies]
 rand = "0.1.2"
-time = "0.1.16"
+time = "0.1.17"
