@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use std::collections::RingBuf;
+use std::collections::vec_deque::RingBuf;
 
 pub struct PopFrontItems<'a, C> where C: 'a {
     container: &'a mut C
