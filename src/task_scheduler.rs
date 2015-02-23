@@ -96,7 +96,7 @@ impl TaskScheduler {
         // but less plot units is acceptable,
         // because one plot unit can handle multiple trace units.
         let n_trace_units = concurrency * 3;
-        let n_plot_units = max(1us, concurrency / 2);
+        let n_plot_units = max(1, concurrency / 2);
 
         // Build the trace units.
         let trace_units = (0 .. n_trace_units)

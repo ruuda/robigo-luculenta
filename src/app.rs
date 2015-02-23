@@ -64,7 +64,7 @@ impl App {
         let scene = Arc::new(App::set_up_scene());
 
         // Spawn as many workers as cores.
-        for _ in (0us .. concurrency) {
+        for _ in (0 .. concurrency) {
             App::start_worker(task_scheduler.clone(),
                               scene.clone(),
                               img_tx.clone());

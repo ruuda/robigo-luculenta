@@ -62,10 +62,10 @@ impl PlotUnit {
         let py = (y * self.aspect_ratio * 0.5 + 0.5) * (h as f32 - 1.0);
 
         // Then map them to discrete pixels.
-        let px1 = max(0is, min(w - 1, px.floor() as isize)) as usize;
-        let px2 = max(0is, min(w - 1, px.ceil() as isize)) as usize;
-        let py1 = max(0is, min(h - 1, py.floor() as isize)) as usize;
-        let py2 = max(0is, min(h - 1, py.ceil() as isize)) as usize;
+        let px1 = max(0, min(w - 1, px.floor() as isize)) as usize;
+        let px2 = max(0, min(w - 1, px.ceil() as isize)) as usize;
+        let py1 = max(0, min(h - 1, py.floor() as isize)) as usize;
+        let py2 = max(0, min(h - 1, py.ceil() as isize)) as usize;
 
         // Compute pixel coefficients.
         let cx = px - px1 as f32;
