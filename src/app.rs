@@ -84,7 +84,7 @@ impl App {
         let mut task = Task::Sleep;
         for _ in 0u8 .. 5 {
             task = ts.get_new_task(task);
-            App::execute_task(&mut task, &*scene, &mut img_tx);
+            App::execute_task(&mut task, &scene, &mut img_tx);
         }
 
         App { images: img_rx }
@@ -106,7 +106,7 @@ impl App {
                 // Ask the task scheduler for a new task, complete the old one.
                 // Then execute it.
                 task = task_scheduler.lock().unwrap().get_new_task(task);
-                App::execute_task(&mut task, &*scene, &mut owned_img_tx);
+                App::execute_task(&mut task, &scene, &mut owned_img_tx);
             }
         });
     }
