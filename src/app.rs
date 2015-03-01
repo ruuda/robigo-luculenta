@@ -136,14 +136,14 @@ impl App {
 
     fn execute_plot_task(plot_unit: &mut PlotUnit,
                          units: &mut[Box<TraceUnit>]) {
-        for unit in units.iter_mut() {
+        for unit in units {
             plot_unit.plot(&unit.mapped_photons);
         }
     }
 
     fn execute_gather_task(gather_unit: &mut GatherUnit,
                            units: &mut[Box<PlotUnit>]) {
-        for unit in units.iter_mut() {
+        for unit in units {
             gather_unit.accumulate(&unit.tristimulus_buffer);
             unit.clear();
         }
