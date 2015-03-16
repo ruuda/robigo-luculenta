@@ -15,7 +15,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "image"
 version = "0.2.1"
-source = "git+https://github.com/PistonDevelopers/image.git#f11e2f193f42d51d14f026c19c8473743dfb5ef1"
+source = "git+https://github.com/PistonDevelopers/image.git#3589b613b6baa9ce84b7abbca2e7c301993834da"
 dependencies = [
  "num 0.1.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

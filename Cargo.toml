@@ -7,6 +7,8 @@ authors = [ "dev@veniogames.com" ]
 [dependencies.image]
 version = "0.2.1"
 git = "https://github.com/PistonDevelopers/image.git"
+default-features = false
+features = ["png"]
 
 [dependencies]
 rand = "0.1.4"
