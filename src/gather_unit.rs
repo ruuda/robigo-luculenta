@@ -14,9 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use std::old_io::{File, Open, Write};
+use std::fs::File;
+use std::io::{Read, Write, BufReader, BufWriter};
 use std::iter::repeat;
 use std::mem::transmute;
+use read;
 use vector3::Vector3;
 
 pub struct GatherUnit {
@@ -64,7 +66,9 @@ impl GatherUnit {
     /// Saves the tristimulus buffer to a file, so that rendering
     /// can be resumed later.
     pub fn save(&self) {
-        let mut file = File::open_mode(&Path::new("buffer.raw"), Open, Write);
+        let file = File::create("buffer.raw").ok()
+                       .expect("failed to open file");
+        let mut file = BufWriter::new(file);
         let data = self.tristimulus_buffer.iter()
                        .chain(self.compensation_buffer.iter());
         for trist in data {
@@ -75,12 +79,14 @@ impl GatherUnit {
 
     /// Reads the tristimulus buffer from a file, to resume rendering.
     fn read(&mut self) {
-        if let Ok(ref mut file) = File::open(&Path::new("buffer.raw")) {
+        if let Ok(ref file) = File::open("buffer.raw") {
+            let mut file = BufReader::new(file);
             let data = self.tristimulus_buffer.iter_mut()
                            .chain(self.compensation_buffer.iter_mut());
             for trist in data {
                 let xyz: &mut [u8; 12] = unsafe { transmute(trist) };
-                file.read(xyz).ok().expect("failed to read raw buffer");
+                read::read_into(&mut file, xyz).ok()
+                     .expect("failed to read from raw buffer");
             }
         }
     }

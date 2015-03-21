@@ -36,6 +36,7 @@ mod plot_unit;
 mod pop_iter;
 mod quaternion;
 mod ray;
+mod read;
 mod scene;
 mod srgb;
 mod task_scheduler;
