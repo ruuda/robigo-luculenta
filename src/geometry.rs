@@ -407,14 +407,14 @@ impl<T1, T2> Volume for Compound<T1, T2> where T1: Volume, T2: Volume {
     }
 }
 
-type InfinitePrism = Compound<Compound<SpacePartitioning, SpacePartitioning>,
+pub type InfinitePrism = Compound<Compound<SpacePartitioning, SpacePartitioning>,
                               SpacePartitioning>;
 
-type ThickPlane = Compound<SpacePartitioning, SpacePartitioning>;
+pub type ThickPlane = Compound<SpacePartitioning, SpacePartitioning>;
 
-type Prism = Compound<InfinitePrism, ThickPlane>;
+pub type Prism = Compound<InfinitePrism, ThickPlane>;
 
-type HexagonalPrism = Compound<InfinitePrism, Prism>;
+pub type HexagonalPrism = Compound<InfinitePrism, Prism>;
 
 /// Constructs an equilateral triangle with specified edge length,
 /// infinitely extruded along the axis vector,
