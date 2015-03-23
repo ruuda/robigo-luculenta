@@ -5,11 +5,11 @@ version = "0.1.1"
 authors = [ "dev@veniogames.com" ]
 
 [dependencies.image]
-version = "0.2.2"
+version = "0.2.4"
 git = "https://github.com/PistonDevelopers/image.git"
 default-features = false
 features = ["png"]
 
 [dependencies]
-rand = "0.2.0"
-time = "0.1.20"
+rand = "0.2.1"
+time = "0.1.21"

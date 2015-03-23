@@ -2,9 +2,9 @@
 name = "robigo-luculenta"
 version = "0.1.1"
 dependencies = [
- "image 0.2.3 (git+https://github.com/PistonDevelopers/image.git)",
- "rand 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "time 0.1.20 (registry+https://github.com/rust-lang/crates.io-index)",
+ "image 0.2.4 (git+https://github.com/PistonDevelopers/image.git)",
+ "rand 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "time 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -14,10 +14,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "image"
-version = "0.2.3"
-source = "git+https://github.com/PistonDevelopers/image.git#53a301c881d965378c7a0419b01644731eb3f69e"
+version = "0.2.4"
+source = "git+https://github.com/PistonDevelopers/image.git#8538368ebf8bdec5a5e1d9e772df217ac96a1cb8"
 dependencies = [
- "num 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -27,25 +27,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "log"
-version = "0.2.5"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "num"
-version = "0.1.16"
+version = "0.1.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "rand 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "rand"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "log 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -55,7 +58,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "time"
-version = "0.1.20"
+version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gcc 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
