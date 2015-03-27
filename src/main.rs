@@ -14,13 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#![feature(core, std_misc)]
+#![feature(core, old_io, os, std_misc)]
 
 extern crate image;
 extern crate rand;
 extern crate time;
 
-use std::old_path;
 use app::App;
 
 mod app;
@@ -61,7 +60,7 @@ fn main() {
         let img = images.recv().unwrap();
 
         // Write the image to output.png.
-        match image::save_buffer(&old_path::Path::new("output.png"), &img,
+        match image::save_buffer("output.png", &img,
                                  width as u32, height as u32, image::RGB(8)) {
             Ok(_) => println!("wrote image to output.png"),
             Err(reason) => println!("failed to write output png: {}", reason)
