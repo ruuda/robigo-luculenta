@@ -16,7 +16,6 @@
 
 use std::sync::mpsc::{Sender, Receiver, channel};
 use std::f32::consts::PI;
-use std::old_io::timer::sleep;
 use std::num::Float;
 use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
@@ -127,7 +126,7 @@ impl App {
     }
 
     fn execute_sleep_task() {
-        sleep(Duration::milliseconds(100));
+        thread::sleep(Duration::milliseconds(100));
     }
 
     fn execute_trace_task(scene: &Scene, trace_unit: &mut TraceUnit) {
