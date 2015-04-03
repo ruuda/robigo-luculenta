@@ -15,7 +15,6 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::f32::consts::PI;
-use std::num::Float;
 use rand;
 use rand::Closed01;
 use vector3::Vector3;

@@ -17,7 +17,6 @@
 use std::cmp::max;
 use std::collections::vec_deque::VecDeque;
 use std::iter::AdditiveIterator;
-use std::num::Float;
 use time::{Duration, Timespec, get_time};
 use gather_unit::GatherUnit;
 use plot_unit::PlotUnit;

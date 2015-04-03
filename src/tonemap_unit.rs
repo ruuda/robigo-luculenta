@@ -16,7 +16,6 @@
 
 use std::cmp::PartialOrd;
 use std::iter::{repeat, AdditiveIterator};
-use std::num::Float;
 use vector3::Vector3;
 
 /// Converts the result of a `GatherUnit` into an sRGB image.

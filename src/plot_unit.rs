@@ -16,7 +16,6 @@
 
 use std::cmp::{min, max};
 use std::iter::repeat;
-use std::num::Float;
 use trace_unit::MappedPhoton;
 use vector3::Vector3;
 

@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use std::num::Float;
 use quaternion::Quaternion;
 use ray::Ray;
 use vector3::Vector3;

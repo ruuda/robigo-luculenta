@@ -18,7 +18,6 @@ extern crate num_cpus;
 
 use std::sync::mpsc::{Sender, Receiver, channel};
 use std::f32::consts::PI;
-use std::num::Float;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;

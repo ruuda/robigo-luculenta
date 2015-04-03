@@ -15,7 +15,6 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::iter::repeat;
-use std::num::Float;
 use object::MaterialBox::{Emissive, Reflective};
 use ray::Ray;
 use scene::Scene;
