@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::max;
-use std::collections::vec_deque::RingBuf;
+use std::collections::vec_deque::VecDeque;
 use std::iter::AdditiveIterator;
 use std::num::Float;
 use time::{Duration, Timespec, get_time};
@@ -53,25 +53,25 @@ pub struct TaskScheduler {
     traces_completed: u32,
 
     /// Previous measurements of batches/second, used to determine variance.
-    performance: RingBuf<f32>,
+    performance: VecDeque<f32>,
 
     /// The number of trace units to use. Not all of them have to be
     /// active simultaneously.
     number_of_trace_units: usize,
 
     /// The trace units which are available for tracing rays.
-    available_trace_units: RingBuf<Box<TraceUnit>>,
+    available_trace_units: VecDeque<Box<TraceUnit>>,
 
     /// The trace units which have mapped photons that must be plotted,
     /// before the trace unit can be used again.
-    done_trace_units: RingBuf<Box<TraceUnit>>,
+    done_trace_units: VecDeque<Box<TraceUnit>>,
 
     /// The plot units which are available for plotting mapped photons.
-    available_plot_units: RingBuf<Box<PlotUnit>>,
+    available_plot_units: VecDeque<Box<PlotUnit>>,
 
     /// The plot units which have a screen that must be accumulated
     /// before the plot unit can be used again.
-    done_plot_units: RingBuf<Box<PlotUnit>>,
+    done_plot_units: VecDeque<Box<PlotUnit>>,
 
     /// The gather unit, when it is available.
     gather_unit: Option<Box<GatherUnit>>,
@@ -100,12 +100,12 @@ impl TaskScheduler {
         // Build the trace units.
         let trace_units = (0 .. n_trace_units)
         .map(|i| { Box::new(TraceUnit::new(i, width, height)) })
-        .collect::<RingBuf<Box<TraceUnit>>>();
+        .collect::<VecDeque<Box<TraceUnit>>>();
 
         // Then build the plot units.
         let plot_units = (0 .. n_plot_units)
         .map(|i| { Box::new(PlotUnit::new(i, width, height)) })
-        .collect::<RingBuf<Box<PlotUnit>>>();
+        .collect::<VecDeque<Box<PlotUnit>>>();
 
         // There must be one gather unit and one tonemap unit.
         let gather_unit = Some(Box::new(GatherUnit::new(width, height)));
@@ -113,12 +113,12 @@ impl TaskScheduler {
 
         TaskScheduler {
             traces_completed: 0,
-            performance: RingBuf::new(),
+            performance: VecDeque::new(),
             number_of_trace_units: n_trace_units,
             available_trace_units: trace_units,
-            done_trace_units: RingBuf::new(),
+            done_trace_units: VecDeque::new(),
             available_plot_units: plot_units,
-            done_plot_units: RingBuf::new(),
+            done_plot_units: VecDeque::new(),
             gather_unit: gather_unit,
             tonemap_unit: tonemap_unit,
             last_tonemap_time: get_time(),

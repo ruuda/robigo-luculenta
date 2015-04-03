@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use std::collections::vec_deque::RingBuf;
+use std::collections::vec_deque::VecDeque;
 
 pub struct PopFrontItems<'a, C> where C: 'a {
     container: &'a mut C
@@ -24,15 +24,15 @@ pub trait PopFrontIter {
     fn pop_front_iter<'a>(&'a mut self) -> PopFrontItems<'a, Self>;
 }
 
-impl<T> PopFrontIter for RingBuf<T> {
-    fn pop_front_iter<'a>(&'a mut self) -> PopFrontItems<'a, RingBuf<T>> {
+impl<T> PopFrontIter for VecDeque<T> {
+    fn pop_front_iter<'a>(&'a mut self) -> PopFrontItems<'a, VecDeque<T>> {
         PopFrontItems {
             container: self
         }
     }
 }
 
-impl<'a, T> Iterator for PopFrontItems<'a, RingBuf<T>>
+impl<'a, T> Iterator for PopFrontItems<'a, VecDeque<T>>
     where T: 'a {
     type Item = T;
 
@@ -47,7 +47,7 @@ impl<'a, T> Iterator for PopFrontItems<'a, RingBuf<T>>
 
 #[test]
 fn pop_front_iter_ring_buf() {
-    let mut xs = RingBuf::new();
+    let mut xs = VecDeque::new();
     xs.push_back(0u32);
     xs.push_back(1);
     xs.push_back(2);
