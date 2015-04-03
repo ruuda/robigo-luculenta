@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+extern crate num_cpus;
+
 use std::sync::mpsc::{Sender, Receiver, channel};
 use std::f32::consts::PI;
 use std::num::Float;
-use std::os::num_cpus;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
@@ -52,7 +53,7 @@ impl App {
     /// Constructs and starts a new path tracer that renders to a canvas of
     /// the specified size.
     pub fn new(image_width: u32, image_height: u32) -> App {
-        let concurrency = num_cpus();
+        let concurrency = num_cpus::get();
         let ts = TaskScheduler::new(concurrency, image_width, image_height);
         let task_scheduler = Arc::new(Mutex::new(ts));
 

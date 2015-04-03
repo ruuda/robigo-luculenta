@@ -11,5 +11,6 @@ default-features = false
 features = ["png"]
 
 [dependencies]
+num_cpus = "0.1.0"
 rand = "0.3.7"
 time = "0.1.24"
