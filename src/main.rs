@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#![feature(core, os, std_misc, thread_sleep)]
+#![feature(core)]
 
 extern crate image;
 extern crate rand;

@@ -20,7 +20,6 @@ use std::sync::mpsc::{Sender, Receiver, channel};
 use std::f32::consts::PI;
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::Duration;
 use camera::Camera;
 use constants::GOLDEN_RATIO;
 use gather_unit::GatherUnit;
@@ -126,7 +125,7 @@ impl App {
     }
 
     fn execute_sleep_task() {
-        thread::sleep(Duration::milliseconds(100));
+        thread::sleep_ms(100);
     }
 
     fn execute_trace_task(scene: &Scene, trace_unit: &mut TraceUnit) {
