@@ -16,7 +16,7 @@
 
 use std::ops::{Add, Sub, Neg, Mul};
 
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct Quaternion {
     pub x: f32,
     pub y: f32,
