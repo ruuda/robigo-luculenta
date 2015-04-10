@@ -16,7 +16,6 @@
 
 use std::cmp::max;
 use std::collections::vec_deque::VecDeque;
-use std::iter::AdditiveIterator;
 use time::{Duration, Timespec, get_time};
 use gather_unit::GatherUnit;
 use plot_unit::PlotUnit;
@@ -319,8 +318,8 @@ impl TaskScheduler {
         if self.performance.len() > 512 { self.performance.pop_front(); }
         let n = self.performance.len() as f32;
 
-        let mean = self.performance.iter().map(|&x| x).sum() / n;
-        let sqr_mean = self.performance.iter().map(|&x| x * x).sum() / n;
+        let mean = self.performance.iter().cloned().sum::<f32>() / n;
+        let sqr_mean = self.performance.iter().map(|&x| x * x).sum::<f32>() / n;
         let variance = sqr_mean - mean * mean;
 
         println!("performance: {} +- {} batches/sec", mean, variance.sqrt());

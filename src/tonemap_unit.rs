@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::PartialOrd;
-use std::iter::{repeat, AdditiveIterator};
+use std::iter::repeat;
 use vector3::Vector3;
 
 /// Converts the result of a `GatherUnit` into an sRGB image.
@@ -58,10 +58,10 @@ impl TonemapUnit {
         // Compute the average intensity.
         // Calculations are based on the CIE Y value,
         // which corresponds to lightness.
-        let mean = tristimuli.iter().map(|cie| cie.y).sum() / n;
+        let mean = tristimuli.iter().map(|cie| cie.y).sum::<f32>() / n;
 
         // Then compute the standard deviation.
-        let sqr_mean = tristimuli.iter().map(|cie| cie.y * cie.y).sum() / n;
+        let sqr_mean = tristimuli.iter().map(|cie| cie.y * cie.y).sum::<f32>() / n;
         let variance = sqr_mean - mean * mean;
 
         // The desired 'white' is one standard deviation above average.
