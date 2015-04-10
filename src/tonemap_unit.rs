@@ -23,7 +23,7 @@ pub struct TonemapUnit {
     /// The width of the canvas (in pixels).
     image_width: u32,
 
-    /// THe height of the canvas (in pixels).
+    /// The height of the canvas (in pixels).
     image_height: u32,
 
     /// The buffer of sRGB values.
