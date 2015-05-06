@@ -63,7 +63,12 @@ impl TraceUnit {
     /// Creates a new trace unit that renders the given scene.
     pub fn new(id: usize, width: u32, height: u32) -> TraceUnit {
         // The number of photons to trace in one batch.
+        #[cfg(not(test))]
         const NUMBER_OF_PHOTONS: usize = 1024 * 512;
+
+        #[cfg(test)]
+        const NUMBER_OF_PHOTONS: usize = 1024;
+
         TraceUnit {
             aspect_ratio: width as f32 / height as f32,
             mapped_photons: repeat(MappedPhoton::new()).take(NUMBER_OF_PHOTONS).collect(),
