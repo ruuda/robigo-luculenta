@@ -233,7 +233,7 @@ impl Surface for Sphere {
         };
 
         // One of the ts must be positive at least, for an intersection.
-        let mut t: f32;
+        let t: f32;
         if t1 > 0.0 && t1 < t2 { t = t1; }
         else if t2 > 0.0 && t2 < t1 { t = t2; }
         // For negative t, the sphere lies behind the ray entirely.
