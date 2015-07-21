@@ -2,7 +2,3 @@ language: rust
 
 rust:
   - nightly
-
-notifications:
-  email:
-    on_success: never
