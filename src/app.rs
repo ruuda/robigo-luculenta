@@ -114,13 +114,13 @@ impl App {
             Task::Sleep =>
                 App::execute_sleep_task(),
             Task::Trace(ref mut trace_unit) =>
-                App::execute_trace_task(scene, &mut **trace_unit),
+                App::execute_trace_task(scene, trace_unit),
             Task::Plot(ref mut plot_unit, ref mut units) =>
-                App::execute_plot_task(&mut **plot_unit, &mut units[..]),
+                App::execute_plot_task(plot_unit, &mut units[..]),
             Task::Gather(ref mut gather_unit, ref mut units) =>
-                App::execute_gather_task(&mut **gather_unit, &mut units[..]),
+                App::execute_gather_task(gather_unit, &mut units[..]),
             Task::Tonemap(ref mut tonemap_unit, ref mut gather_unit) =>
-                App::execute_tonemap_task(img_tx, &mut **tonemap_unit, &mut **gather_unit)
+                App::execute_tonemap_task(img_tx, tonemap_unit, gather_unit)
         }
     }
 
