@@ -149,7 +149,7 @@ impl TraceUnit {
 
     /// Fills the buffer of mapped photons once.
     pub fn render(&mut self, scene: &Scene) {
-        for mapped_photon in self.mapped_photons.iter_mut() {
+        for mapped_photon in &mut self.mapped_photons {
             // Pick a wavelength for this photon.
             let wavelength = ::monte_carlo::get_wavelength();
 
