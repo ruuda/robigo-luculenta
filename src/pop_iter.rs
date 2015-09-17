@@ -20,7 +20,7 @@ pub struct PopFrontItems<'a, C> where C: 'a {
     container: &'a mut C
 }
 
-pub trait PopFrontIter {
+pub trait PopFrontIter: Sized {
     fn pop_front_iter<'a>(&'a mut self) -> PopFrontItems<'a, Self>;
 }
 
