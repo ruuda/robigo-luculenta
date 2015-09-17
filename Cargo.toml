@@ -11,5 +11,5 @@ features = ["png"]
 
 [dependencies]
 num_cpus = "0.1.0"
-rand = "0.3.8"
-time = "0.1.25"
+rand = "0.3.11"
+time = "0.1.32"
