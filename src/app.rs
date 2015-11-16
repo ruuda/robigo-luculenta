@@ -62,7 +62,7 @@ impl App {
         let scene = Arc::new(App::set_up_scene());
 
         // Spawn as many workers as cores.
-        for _ in (0 .. concurrency) {
+        for _ in 0 .. concurrency {
             App::start_worker(task_scheduler.clone(),
                               scene.clone(),
                               img_tx.clone());
@@ -235,7 +235,7 @@ impl App {
         let seed_scale: f32 = 1.5;
         let first_seed = ((sun_radius / seed_scale + 1.0).powi(2) + 0.5) as isize;
         let seeds = 100;
-        for i in (first_seed .. first_seed + seeds) {
+        for i in first_seed .. first_seed + seeds {
             let phi = i as f32 * gamma;
             let r = (i as f32).sqrt() * seed_scale;
             let position = Vector3 {
@@ -252,7 +252,7 @@ impl App {
         }
 
         // Seeds in between.
-        for i in (first_seed .. first_seed + seeds) {
+        for i in first_seed .. first_seed + seeds {
             let phi = (i as f32 + 0.5) * gamma;
             let r = (i as f32 + 0.5).sqrt() * seed_scale;
             let position = Vector3 {
@@ -267,7 +267,7 @@ impl App {
         }
 
         // Soap bubbles above.
-        for i in (first_seed / 2 .. first_seed + seeds) {
+        for i in first_seed / 2 .. first_seed + seeds {
             let phi = -i as f32 * gamma;
             let r = (i as f32).sqrt() * seed_scale * 1.5;
             let position = Vector3 {
@@ -287,7 +287,7 @@ impl App {
         let prism_angle: f32 = PI * 2.0 / prisms as f32;
         let prism_radius: f32 = 17.0;
         let prism_height: f32 = 8.0;
-        for i in (0 .. prisms) {
+        for i in 0 .. prisms {
             for &(ofs, radius, phi_ofs, h) in vec!(
                     (0.0f32, 1.0f32, 0.0f32, 1.0f32),
                     (0.5 * prism_angle, 1.2, PI * 0.5, 1.5)
