@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::fs::File;
-use std::io::{Read, Write, BufReader, BufWriter};
+use std::io::{Write, BufReader, BufWriter};
 use std::iter::repeat;
 use std::mem::transmute;
 use read;
