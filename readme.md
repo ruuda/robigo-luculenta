@@ -16,7 +16,7 @@ to simulate effects like dispersion and chromatic aberration. It was written
 with code clarity as the primary goal; it is not optimised for speed, although
 it is multithreaded.
 
-[ci-img]:     https://travis-ci.org/ruud-v-a/robigo-luculenta.svg
-[ci]:         https://travis-ci.org/ruud-v-a/robigo-luculenta
-[luculentus]: https://github.com/ruud-v-a/luculentus
+[ci-img]:     https://travis-ci.org/ruuda/robigo-luculenta.svg
+[ci]:         https://travis-ci.org/ruuda/robigo-luculenta
+[luculentus]: https://github.com/ruuda/luculentus
 [gplv3]:      https://www.gnu.org/licenses/gpl.html
