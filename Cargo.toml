@@ -10,6 +10,6 @@ default-features = false
 features = ["png"]
 
 [dependencies]
-num_cpus = "0.1.0"
+num_cpus = "1.0.0"
 rand = "0.3.11"
 time = "0.1.32"
